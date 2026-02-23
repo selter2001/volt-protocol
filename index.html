@@ -644,25 +644,26 @@ function renderAttachment2() {
 
 function renderAttachment3() {
   const container = document.getElementById('attachment-3');
+  const inputCls = 'w-full border border-gray-300 rounded px-1 py-0.5 text-sm text-center';
+  const selectCls = 'w-full border border-gray-300 rounded px-1 py-0.5 text-sm';
   let html = '';
 
-  html += '<h2 class="text-lg font-semibold mb-3">Załącznik nr 3 - Badanie wyłączników różnicowoprądowych (RCD)</h2>';
-  html += '<button data-action="add-row-rcd" class="mb-3 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Dodaj wiersz</button>';
+  html += '<h2 class="text-lg font-semibold mb-3">Zalacznik nr 3 - Badanie wylacznikow roznicowopr&#261;dowych (RCD)</h2>';
 
   html += '<div class="overflow-x-auto">';
-  html += '<table class="w-full border-collapse border border-gray-300 text-sm">';
+  html += '<table class="w-full border-collapse text-sm">';
 
-  // Header
+  // Header (1 row)
   html += '<thead>';
-  html += '<tr class="bg-gray-100">';
+  html += '<tr class="bg-gray-50 text-center font-semibold">';
   html += '<th class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
-  html += '<th class="border border-gray-300 px-2 py-1">Typ urządzenia</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-14">TEST</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-16">I<sub>n</sub> [mA]</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-16">I<sub>w</sub> [mA]</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-16">t<sub>w</sub> [ms]</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-16">t<sub>z</sub> [ms]</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-20">Ocena</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 min-w-[180px]">Typ urzadzenia</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-16">TEST</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-20">I<sub>n</sub> [mA]</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-20">I<sub>w</sub> [mA]</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-20">t<sub>w</sub> [ms]</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-20">t<sub>z</sub> [ms]</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-24">Ocena</th>';
   html += '<th class="border border-gray-300 px-2 py-1 w-10"></th>';
   html += '</tr>';
   html += '</thead>';
@@ -672,29 +673,76 @@ function renderAttachment3() {
   for (let i = 0; i < AppState.attachment3.rows.length; i++) {
     const row = AppState.attachment3.rows[i];
     const lp = i + 1;
+    row.calculated = calcRCDRow(row);
+    const calc = row.calculated;
+    const dataAttrs = 'data-row-id="' + row.id + '" data-attachment="3"';
+
     html += '<tr data-row-id="' + row.id + '">';
-    html += '<td class="border border-gray-300 px-2 py-1 text-center">' + lp + '</td>';
-    html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" colspan="6">wiersz pomiarowy (pełna edycja w Planie 03)</td>';
-    html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold">' + (row.calculated.verdict || '') + '</td>';
-    html += '<td class="border border-gray-300 px-1 py-1 text-center">';
-    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-attachment="3" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
+
+    // Lp.
+    html += '<td class="border border-gray-300 px-2 py-1 text-center font-medium">' + lp + '</td>';
+
+    // Typ urzadzenia
+    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<input type="text" data-field="rcd-deviceType" ' + dataAttrs + ' value="' + escapeHtml(row.deviceType || '') + '" class="' + inputCls + '" placeholder="np. Eaton PF7-25/2/003-A">';
     html += '</td>';
+
+    // TEST (TAK/NIE)
+    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<select data-field="rcd-testResult" ' + dataAttrs + ' class="' + selectCls + '">';
+    html += '<option value="TAK"' + (row.testResult === 'TAK' ? ' selected' : '') + '>TAK</option>';
+    html += '<option value="NIE"' + (row.testResult === 'NIE' ? ' selected' : '') + '>NIE</option>';
+    html += '</select>';
+    html += '</td>';
+
+    // In [mA]
+    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<input type="number" data-field="rcd-In" ' + dataAttrs + ' value="' + (row.In != null ? row.In : '') + '" step="1" class="' + inputCls + ' font-mono" placeholder="mA">';
+    html += '</td>';
+
+    // Iw [mA]
+    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<input type="number" data-field="rcd-Iw" ' + dataAttrs + ' value="' + (row.Iw != null ? row.Iw : '') + '" step="0.1" class="' + inputCls + ' font-mono" placeholder="mA">';
+    html += '</td>';
+
+    // tw [ms]
+    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<input type="number" data-field="rcd-tw" ' + dataAttrs + ' value="' + (row.tw != null ? row.tw : '') + '" step="1" class="' + inputCls + ' font-mono" placeholder="ms">';
+    html += '</td>';
+
+    // tz [ms] (default 300)
+    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<input type="number" data-field="rcd-tz" ' + dataAttrs + ' value="' + (row.tz != null ? row.tz : '') + '" step="1" class="' + inputCls + ' font-mono" placeholder="ms">';
+    html += '</td>';
+
+    // Verdict
+    const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700' : calc.verdict === 'NEGATYWNA' ? 'text-red-700' : '';
+    html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold rcd-verdict-cell ' + verdictClass + '" data-row-id="' + row.id + '">' + (calc.verdict || '') + '</td>';
+
+    // Usun
+    html += '<td class="border border-gray-300 px-1 py-1 text-center">';
+    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-attachment="3" class="text-red-500 hover:text-red-700 text-xs">Usun</button>';
+    html += '</td>';
+
     html += '</tr>';
   }
 
   if (AppState.attachment3.rows.length === 0) {
-    html += '<tr><td colspan="9" class="border border-gray-300 px-2 py-4 text-center text-gray-400 italic">Brak wierszy - kliknij "Dodaj wiersz"</td></tr>';
+    html += '<tr><td colspan="9" class="border border-gray-300 px-2 py-4 text-center text-gray-400 italic">Brak wierszy - kliknij "Dodaj wiersz RCD"</td></tr>';
   }
 
   html += '</tbody></table>';
   html += '</div>';
 
+  // "Dodaj wiersz RCD" button below table
+  html += '<button data-action="add-row-rcd" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Dodaj wiersz RCD</button>';
+
   // Legend RCD-05
   html += '<div class="mt-4 text-xs text-gray-600 grid grid-cols-2 gap-x-6 gap-y-1">';
-  html += '<div><strong>I<sub>n</sub></strong> - znamionowy prąd różnicowy zadziałania [mA]</div>';
-  html += '<div><strong>I<sub>w</sub></strong> - zmierzony prąd zadziałania [mA]</div>';
-  html += '<div><strong>t<sub>w</sub></strong> - zmierzony czas wyłączenia [ms]</div>';
-  html += '<div><strong>t<sub>z</sub></strong> - wymagany czas wyłączenia [ms]</div>';
+  html += '<div><strong>I<sub>n</sub></strong> - Znamionowy prad roznicowy wylacznika [mA]</div>';
+  html += '<div><strong>I<sub>w</sub></strong> - Zmierzony prad wylaczajacy [mA]</div>';
+  html += '<div><strong>t<sub>w</sub></strong> - Zmierzony czas wylaczenia [ms]</div>';
+  html += '<div><strong>t<sub>z</sub></strong> - Dopuszczalny czas wylaczenia [ms]</div>';
   html += '</div>';
 
   container.innerHTML = html;
@@ -702,24 +750,24 @@ function renderAttachment3() {
 
 function renderAttachment4() {
   const container = document.getElementById('attachment-4');
+  const inputCls = 'w-full border border-gray-300 rounded px-1 py-0.5 text-sm text-center';
   let html = '';
 
-  html += '<h2 class="text-lg font-semibold mb-3">Załącznik nr 4 - Rezystancja uziemienia</h2>';
-  html += '<button data-action="add-row-uziem" class="mb-3 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Dodaj wiersz</button>';
+  html += '<h2 class="text-lg font-semibold mb-3">Zalacznik nr 4 - Rezystancja uziemienia</h2>';
 
   html += '<div class="overflow-x-auto">';
-  html += '<table class="w-full border-collapse border border-gray-300 text-sm">';
+  html += '<table class="w-full border-collapse text-sm">';
 
-  // Header
+  // Header (1 row)
   html += '<thead>';
-  html += '<tr class="bg-gray-100">';
+  html += '<tr class="bg-gray-50 text-center font-semibold">';
   html += '<th class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
-  html += '<th class="border border-gray-300 px-2 py-1">Nazwa urządzenia</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-16">R<sub>E</sub> [&Omega;]</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-14">W<sub>k</sub></th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-16">R<sub>po</sub> [&Omega;]</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-16">R<sub>w</sub> [&Omega;]</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-20">Ocena</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 min-w-[180px]">Nazwa urzadzenia</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-20">R<sub>E</sub> [&Omega;]</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-16">W<sub>k</sub></th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-20">R<sub>po</sub> [&Omega;]</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-20">R<sub>w</sub> [&Omega;]</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-24">Ocena</th>';
   html += '<th class="border border-gray-300 px-2 py-1 w-10"></th>';
   html += '</tr>';
   html += '</thead>';
@@ -729,14 +777,47 @@ function renderAttachment4() {
   for (let i = 0; i < AppState.attachment4.rows.length; i++) {
     const row = AppState.attachment4.rows[i];
     const lp = i + 1;
-    const calc = calcUZIEMRow(row);
+    row.calculated = calcUZIEMRow(row);
+    const calc = row.calculated;
+    const dataAttrs = 'data-row-id="' + row.id + '" data-attachment="4"';
+
     html += '<tr data-row-id="' + row.id + '">';
-    html += '<td class="border border-gray-300 px-2 py-1 text-center">' + lp + '</td>';
-    html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" colspan="5">wiersz pomiarowy (pełna edycja w Planie 03)</td>';
-    html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold ' + (calc.verdict === 'POZYTYWNA' ? 'text-green-700' : calc.verdict === 'NEGATYWNA' ? 'text-red-700' : '') + '">' + (calc.verdict || '') + '</td>';
-    html += '<td class="border border-gray-300 px-1 py-1 text-center">';
-    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-attachment="4" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
+
+    // Lp.
+    html += '<td class="border border-gray-300 px-2 py-1 text-center font-medium">' + lp + '</td>';
+
+    // Nazwa urzadzenia
+    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<input type="text" data-field="uziem-deviceName" ' + dataAttrs + ' value="' + escapeHtml(row.deviceName || '') + '" class="' + inputCls + '" placeholder="np. Instalacja odgromowa">';
     html += '</td>';
+
+    // Rp (RE) [Ohm]
+    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<input type="number" data-field="uziem-Rp" ' + dataAttrs + ' value="' + (row.Rp != null ? row.Rp : '') + '" step="0.01" class="' + inputCls + ' font-mono" placeholder="&Omega;">';
+    html += '</td>';
+
+    // Wk
+    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<input type="number" data-field="uziem-Wk" ' + dataAttrs + ' value="' + (row.Wk != null ? row.Wk : '') + '" step="0.01" class="' + inputCls + ' font-mono" placeholder="Wk">';
+    html += '</td>';
+
+    // Rpo (computed, display only)
+    html += '<td class="border border-gray-300 px-2 py-1 text-right font-mono uziem-rpo-cell" data-row-id="' + row.id + '">' + (calc.Rpo != null ? calc.Rpo.toFixed(2) : '') + '</td>';
+
+    // Rw [Ohm] (editable, default 10)
+    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<input type="number" data-field="uziem-Rw" ' + dataAttrs + ' value="' + (row.Rw != null ? row.Rw : '') + '" step="0.1" class="' + inputCls + ' font-mono" placeholder="&Omega;">';
+    html += '</td>';
+
+    // Verdict
+    const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700' : calc.verdict === 'NEGATYWNA' ? 'text-red-700' : '';
+    html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold uziem-verdict-cell ' + verdictClass + '" data-row-id="' + row.id + '">' + (calc.verdict || '') + '</td>';
+
+    // Usun
+    html += '<td class="border border-gray-300 px-1 py-1 text-center">';
+    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-attachment="4" class="text-red-500 hover:text-red-700 text-xs">Usun</button>';
+    html += '</td>';
+
     html += '</tr>';
   }
 
@@ -747,12 +828,15 @@ function renderAttachment4() {
   html += '</tbody></table>';
   html += '</div>';
 
+  // "Dodaj wiersz" button below table (UZIEM-05)
+  html += '<button data-action="add-row-uziem" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Dodaj wiersz</button>';
+
   // Legend UZIEM-06
   html += '<div class="mt-4 text-xs text-gray-600 grid grid-cols-2 gap-x-6 gap-y-1">';
-  html += '<div><strong>R<sub>E</sub></strong> - zmierzona rezystancja uziemienia [&Omega;]</div>';
-  html += '<div><strong>W<sub>k</sub></strong> - współczynnik korekcyjny</div>';
-  html += '<div><strong>R<sub>po</sub></strong> - przeliczona rezystancja uziemienia R<sub>E</sub> &times; W<sub>k</sub> [&Omega;]</div>';
-  html += '<div><strong>R<sub>w</sub></strong> - wymagana (dopuszczalna) rezystancja uziemienia [&Omega;]</div>';
+  html += '<div><strong>R<sub>E</sub></strong> - Zmierzona wartosc rezystancji uziemienia [&Omega;]</div>';
+  html += '<div><strong>W<sub>k</sub></strong> - Wspolczynnik korekcyjny</div>';
+  html += '<div><strong>R<sub>po</sub></strong> - Obliczona wartosc rezystancji uziemienia [&Omega;]</div>';
+  html += '<div><strong>R<sub>w</sub></strong> - Wymagana wartosc rezystancji uziemienia [&Omega;]</div>';
   html += '</div>';
 
   container.innerHTML = html;
@@ -934,11 +1018,23 @@ function bindAppEvents() {
       return;
     }
 
+    // RCD field editing
+    if (field && field.startsWith('rcd-')) {
+      handleRCDFieldChange(e.target);
+      return;
+    }
+
+    // UZIEM field editing
+    if (field && field.startsWith('uziem-')) {
+      handleUZIEMFieldChange(e.target);
+      return;
+    }
+
     // SWZ field editing (input fields: circuit, protType, protCurrent, Usk, Ia, Zs)
     handleSWZFieldChange(e.target);
   });
 
-  // Change delegation (for selects: baseType, baseCurrent, tw, izol-phaseType)
+  // Change delegation (for selects: baseType, baseCurrent, tw, izol-phaseType, rcd-testResult)
   app.addEventListener('change', (e) => {
     const field = e.target.dataset.field;
     if (!field) return;
@@ -946,6 +1042,12 @@ function bindAppEvents() {
     // IZOL phaseType select
     if (field === 'izol-phaseType') {
       handleIZOLFieldChange(e.target);
+      return;
+    }
+
+    // RCD testResult select
+    if (field === 'rcd-testResult') {
+      handleRCDFieldChange(e.target);
       return;
     }
 
@@ -1122,6 +1224,109 @@ function handleIZOLFieldChange(el) {
 
 function updateIZOLVerdict(rowId, result) {
   const verdictCell = document.querySelector('.izol-verdict-cell[data-row-id="' + rowId + '"]');
+  if (verdictCell) {
+    verdictCell.textContent = result.verdict || '';
+    verdictCell.classList.remove('text-green-700', 'text-red-700');
+    if (result.verdict === 'POZYTYWNA') verdictCell.classList.add('text-green-700');
+    if (result.verdict === 'NEGATYWNA') verdictCell.classList.add('text-red-700');
+  }
+}
+
+// === RCD FIELD CHANGE HANDLER ===
+
+const RCD_NUMERIC_FIELDS = { 'rcd-In': 'In', 'rcd-Iw': 'Iw', 'rcd-tw': 'tw', 'rcd-tz': 'tz' };
+
+function findRCDRow(rowId) {
+  return AppState.attachment3.rows.find(r => r.id === rowId) || null;
+}
+
+function handleRCDFieldChange(el) {
+  const field = el.dataset.field;
+  if (!field) return;
+
+  const rowId = el.dataset.rowId;
+  if (!rowId) return;
+
+  const row = findRCDRow(rowId);
+  if (!row) return;
+
+  // Handle numeric fields
+  const numericKey = RCD_NUMERIC_FIELDS[field];
+  if (numericKey) {
+    const val = el.value.trim();
+    row[numericKey] = val === '' ? null : parseFloat(val);
+    row.calculated = calcRCDRow(row);
+    updateRCDVerdict(rowId, row.calculated);
+    return;
+  }
+
+  // Handle deviceType
+  if (field === 'rcd-deviceType') {
+    row.deviceType = el.value;
+    return;
+  }
+
+  // Handle testResult (select)
+  if (field === 'rcd-testResult') {
+    row.testResult = el.value;
+    return;
+  }
+}
+
+function updateRCDVerdict(rowId, result) {
+  const verdictCell = document.querySelector('.rcd-verdict-cell[data-row-id="' + rowId + '"]');
+  if (verdictCell) {
+    verdictCell.textContent = result.verdict || '';
+    verdictCell.classList.remove('text-green-700', 'text-red-700');
+    if (result.verdict === 'POZYTYWNA') verdictCell.classList.add('text-green-700');
+    if (result.verdict === 'NEGATYWNA') verdictCell.classList.add('text-red-700');
+  }
+}
+
+// === UZIEM FIELD CHANGE HANDLER ===
+
+const UZIEM_NUMERIC_FIELDS = { 'uziem-Rp': 'Rp', 'uziem-Wk': 'Wk', 'uziem-Rw': 'Rw' };
+
+function findUZIEMRow(rowId) {
+  return AppState.attachment4.rows.find(r => r.id === rowId) || null;
+}
+
+function handleUZIEMFieldChange(el) {
+  const field = el.dataset.field;
+  if (!field) return;
+
+  const rowId = el.dataset.rowId;
+  if (!rowId) return;
+
+  const row = findUZIEMRow(rowId);
+  if (!row) return;
+
+  // Handle numeric fields
+  const numericKey = UZIEM_NUMERIC_FIELDS[field];
+  if (numericKey) {
+    const val = el.value.trim();
+    row[numericKey] = val === '' ? null : parseFloat(val);
+    row.calculated = calcUZIEMRow(row);
+    updateUZIEMComputedCells(rowId, row.calculated);
+    return;
+  }
+
+  // Handle deviceName
+  if (field === 'uziem-deviceName') {
+    row.deviceName = el.value;
+    return;
+  }
+}
+
+function updateUZIEMComputedCells(rowId, result) {
+  // Update Rpo cell
+  const rpoCell = document.querySelector('.uziem-rpo-cell[data-row-id="' + rowId + '"]');
+  if (rpoCell) {
+    rpoCell.textContent = result.Rpo != null ? result.Rpo.toFixed(2) : '';
+  }
+
+  // Update verdict cell
+  const verdictCell = document.querySelector('.uziem-verdict-cell[data-row-id="' + rowId + '"]');
   if (verdictCell) {
     verdictCell.textContent = result.verdict || '';
     verdictCell.classList.remove('text-green-700', 'text-red-700');
