@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 1 of 3 (Formularze i Obliczenia)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-24 — Completed 01-01-PLAN.md (szkielet HTML + AppState + dynamiczne sekcje)
+Last activity: 2026-02-24 — Completed 01-02-PLAN.md (tabela SWZ z obliczeniami i ocena)
 
-Progress: [███░░░░░░░] 1/9 plans (11%)
+Progress: [██████░░░░] 2/9 plans (22%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 4min
-- Total execution time: 4min
+- Total plans completed: 2
+- Average duration: 3.5min
+- Total execution time: 7min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-formularze-i-obliczenia | 1/3 | 4min | 4min |
+| 01-formularze-i-obliczenia | 2/3 | 7min | 3.5min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4min)
-- Trend: baseline
+- Last 5 plans: 01-01 (4min), 01-02 (3min)
+- Trend: stable
 
 *Updated after each plan completion*
 
@@ -50,6 +50,9 @@ Recent decisions affecting current work:
 - [01-01]: AppState.sections jako jedna wspoldzielona tablica dla Zal.1 i Zal.2 (DYN-06)
 - [01-01]: Lp. nigdy nie przechowywane w AppState - obliczane w renderze
 - [01-01]: rowsBySubsection inicjalizowane dla OBU zalacznikow przy tworzeniu subsection (Pitfall 5)
+- [01-02]: Targeted DOM update zamiast pelnego re-renderu na kazdym keystroke
+- [01-02]: Full re-render z focus save/restore tylko przy zmianie baseType
+- [01-02]: Reczna korekta Ia NIE jest resetowana przy zmianie baseType/baseCurrent (Open Question 2)
 
 ### Pending Todos
 
@@ -63,5 +66,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 01-01-PLAN.md — index.html (812 lines) z AppState, EventBus, dynamicznymi sekcjami
-Resume file: .planning/phases/01-formularze-i-obliczenia/01-02-PLAN.md
+Stopped at: Completed 01-02-PLAN.md — index.html (1033 lines) z pelna tabela SWZ, obliczeniami i ocena
+Resume file: .planning/phases/01-formularze-i-obliczenia/01-03-PLAN.md
