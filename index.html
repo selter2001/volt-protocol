@@ -489,72 +489,131 @@ function renderAttachment1() {
   container.innerHTML = html;
 }
 
+function renderIZOLRowCells(row, lp, subId, isFixed) {
+  const rowIdAttr = isFixed ? 'izol-fixed' : row.id;
+  const subIdAttr = subId || '';
+  const calc = row.calculated || { verdict: null };
+  const izolFields = ['L1N','L2N','L3N','L1L2','L1L3','L2L3','L1PE','L2PE','L3PE','NPE'];
+  const activeFields = getActiveIZOLFields(row.phaseType);
+
+  const dataAttrs = 'data-row-id="' + rowIdAttr + '"' + (subIdAttr ? ' data-sub-id="' + subIdAttr + '"' : '') + ' data-attachment="2"';
+  const inputCls = 'w-full border border-gray-300 rounded px-1 py-0.5 text-sm text-center';
+
+  let html = '';
+
+  // Lp.
+  html += '<td class="border border-gray-300 px-2 py-1 text-center font-medium">' + lp + '</td>';
+
+  // Nazwa obwodu
+  if (isFixed) {
+    html += '<td class="border border-gray-300 px-2 py-1 font-medium">WLZ</td>';
+  } else {
+    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<input type="text" data-field="izol-name" ' + dataAttrs + ' value="' + escapeHtml(row.name || '') + '" class="' + inputCls + '" placeholder="nazwa obwodu">';
+    html += '</td>';
+  }
+
+  // Typ przewodu
+  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<input type="text" data-field="izol-wireType" ' + dataAttrs + ' value="' + escapeHtml(row.wireType || '') + '" class="' + inputCls + '" placeholder="typ przewodu">';
+  html += '</td>';
+
+  // Fazy select
+  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  if (isFixed) {
+    html += '<span class="text-sm text-gray-500">3-faz</span>';
+  } else {
+    html += '<select data-field="izol-phaseType" ' + dataAttrs + ' class="w-full border border-gray-300 rounded px-1 py-0.5 text-sm">';
+    html += '<option value="1"' + (row.phaseType === '1' ? ' selected' : '') + '>1-fazowy</option>';
+    html += '<option value="3"' + (row.phaseType === '3' ? ' selected' : '') + '>3-fazowy</option>';
+    html += '</select>';
+  }
+  html += '</td>';
+
+  // 10 Rp fields
+  for (const field of izolFields) {
+    const isActive = activeFields.includes(field);
+    const val = row.rp[field] != null ? row.rp[field] : '';
+    const disabledAttr = isActive ? '' : ' disabled';
+    const disabledCls = isActive ? '' : ' bg-gray-100 text-gray-400 cursor-not-allowed';
+    html += '<td class="border border-gray-300 px-0.5 py-0.5">';
+    html += '<input type="number" data-field="izol-rp-' + field + '" ' + dataAttrs + ' value="' + val + '" step="0.01" class="w-14 border border-gray-300 rounded px-0.5 py-0.5 text-sm text-center font-mono' + disabledCls + '"' + disabledAttr + '>';
+    html += '</td>';
+  }
+
+  // Rw (not editable, display "1")
+  html += '<td class="border border-gray-300 px-2 py-1 text-center font-mono">' + row.Rw + '</td>';
+
+  // Verdict
+  const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700' : calc.verdict === 'NEGATYWNA' ? 'text-red-700' : '';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold izol-verdict-cell ' + verdictClass + '" data-row-id="' + rowIdAttr + '">' + (calc.verdict || '') + '</td>';
+
+  // Action
+  if (isFixed) {
+    html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" title="Wiersz staly - nie mozna usunac">-</td>';
+  } else {
+    html += '<td class="border border-gray-300 px-1 py-1 text-center">';
+    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-sub-id="' + subId + '" data-attachment="2" class="text-red-500 hover:text-red-700 text-xs">Usun</button>';
+    html += '</td>';
+  }
+
+  return html;
+}
+
 function renderAttachment2() {
   const container = document.getElementById('attachment-2');
   let html = '';
 
-  html += '<h2 class="text-lg font-semibold mb-3">Załącznik nr 2 - Rezystancja izolacji</h2>';
-  html += '<p class="mb-3 text-sm text-blue-600 italic">Sekcje zarządzane z Zał. 1</p>';
+  html += '<h2 class="text-lg font-semibold mb-3">Zalacznik nr 2 - Rezystancja izolacji</h2>';
+  html += '<p class="mb-3 text-sm text-blue-600 italic">Sekcje zarzadzane z Zal. 1</p>';
 
   html += '<div class="overflow-x-auto">';
-  html += '<table class="w-full border-collapse border border-gray-300 text-sm min-w-max">';
+  html += '<table class="min-w-max border-collapse text-sm">';
 
-  // Header
-  html += '<thead>';
-  html += '<tr class="bg-gray-100">';
-  html += '<th class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
-  html += '<th class="border border-gray-300 px-2 py-1">Nazwa obwodu</th>';
-  html += '<th class="border border-gray-300 px-2 py-1">Typ przewodu</th>';
-  html += '<th class="border border-gray-300 px-2 py-1" colspan="10">Rezystancja izolacji R<sub>p</sub> [M&Omega;]</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-14">R<sub>w</sub></th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-20">Ocena</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-10"></th>';
+  // Header Row 1
+  html += '<thead class="bg-gray-50 text-xs text-center">';
+  html += '<tr>';
+  html += '<th rowspan="2" class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
+  html += '<th rowspan="2" class="border border-gray-300 px-2 py-1 min-w-[120px]">Nazwa obwodu</th>';
+  html += '<th rowspan="2" class="border border-gray-300 px-2 py-1 min-w-[100px]">Typ przewodu</th>';
+  html += '<th rowspan="2" class="border border-gray-300 px-2 py-1 w-20">Fazy</th>';
+  html += '<th colspan="10" class="border border-gray-300 px-2 py-1">R<sub>p</sub> [M&Omega;]</th>';
+  html += '<th rowspan="2" class="border border-gray-300 px-2 py-1 w-14">R<sub>w</sub><br>[M&Omega;]</th>';
+  html += '<th rowspan="2" class="border border-gray-300 px-2 py-1 w-24">Ocena</th>';
+  html += '<th rowspan="2" class="border border-gray-300 px-2 py-1 w-10"></th>';
   html += '</tr>';
-  html += '<tr class="bg-gray-100 text-xs text-gray-500">';
-  html += '<td class="border border-gray-300 px-1 text-center"></td>';
-  html += '<td class="border border-gray-300 px-1"></td>';
-  html += '<td class="border border-gray-300 px-1"></td>';
+
+  // Header Row 2 - Rp sub-columns
+  html += '<tr>';
   const izolCols = ['L1-N','L2-N','L3-N','L1-L2','L1-L3','L2-L3','L1-PE','L2-PE','L3-PE','N-PE'];
   for (const col of izolCols) {
-    html += '<td class="border border-gray-300 px-1 text-center">' + col + '</td>';
+    html += '<th class="border border-gray-300 px-1 py-0.5 text-xs font-normal text-gray-600">' + col + '</th>';
   }
-  html += '<td class="border border-gray-300 px-1 text-center">[M&Omega;]</td>';
-  html += '<td class="border border-gray-300 px-1 text-center"></td>';
-  html += '<td class="border border-gray-300 px-1"></td>';
   html += '</tr>';
   html += '</thead>';
 
   html += '<tbody>';
 
-  // Fixed row: WLZ (Lp.1)
+  // Fixed row: WLZ (Lp.1) - always 3-phase
   const ifr = AppState.attachment2.fixedRow;
-  html += '<tr class="bg-yellow-50">';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center font-medium">1</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 font-medium">WLZ</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400">-</td>';
-  const izolFields = ['L1N','L2N','L3N','L1L2','L1L3','L2L3','L1PE','L2PE','L3PE','NPE'];
-  for (const field of izolFields) {
-    html += '<td class="border border-gray-300 px-2 py-1 text-center">' + (ifr.rp[field] != null ? ifr.rp[field] : '') + '</td>';
-  }
-  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + ifr.Rw + '</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold">' + (ifr.calculated.verdict || '') + '</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" title="Wiersz stały - nie można usunąć">-</td>';
+  ifr.calculated = calcIZOLRow(ifr);
+  html += '<tr class="bg-yellow-50" data-row-id="izol-fixed">';
+  html += renderIZOLRowCells(ifr, 1, null, true);
   html += '</tr>';
 
-  // Shared sections from AppState.sections
+  // Shared sections from AppState.sections (DYN-06)
   for (const section of AppState.sections) {
     // Section header row (read-only title)
-    html += '<tr class="bg-gray-200">';
-    html += '<td colspan="14" class="border border-gray-300 px-2 py-1 font-bold">' + escapeHtml(section.title) + '</td>';
-    html += '<td colspan="2" class="border border-gray-300 px-2 py-1"></td>';
+    html += '<tr class="bg-gray-200 font-bold">';
+    html += '<td colspan="17" class="border border-gray-300 px-2 py-1">' + escapeHtml(section.title) + '</td>';
     html += '</tr>';
 
     for (const sub of section.subsections) {
       // Subsection header row (read-only title, add-row for Zal.2)
-      html += '<tr class="bg-gray-100">';
-      html += '<td colspan="14" class="border border-gray-300 px-2 py-1 italic">';
+      html += '<tr class="bg-gray-100 italic">';
+      html += '<td colspan="15" class="border border-gray-300 px-2 py-1">';
       html += escapeHtml(sub.title);
-      html += '<button data-action="add-row-izol" data-sub-id="' + sub.id + '" class="ml-3 px-2 py-0.5 bg-green-500 text-white rounded text-xs hover:bg-green-600">Dodaj wiersz</button>';
+      html += '<button data-action="add-row-izol" data-sub-id="' + sub.id + '" class="ml-3 px-2 py-0.5 bg-green-500 text-white rounded text-xs hover:bg-green-600 not-italic font-normal">Dodaj wiersz</button>';
       html += '</td>';
       html += '<td colspan="2" class="border border-gray-300 px-2 py-1"></td>';
       html += '</tr>';
@@ -563,12 +622,9 @@ function renderAttachment2() {
       const rows = AppState.attachment2.rowsBySubsection[sub.id] || [];
       for (const row of rows) {
         const lp = getIZOLLpNumber(sub.id, row.id);
+        row.calculated = calcIZOLRow(row);
         html += '<tr data-row-id="' + row.id + '" data-sub-id="' + sub.id + '">';
-        html += '<td class="border border-gray-300 px-2 py-1 text-center">' + lp + '</td>';
-        html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" colspan="13">wiersz pomiarowy (pełna edycja w Planie 03)</td>';
-        html += '<td class="border border-gray-300 px-1 py-1 text-center">';
-        html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-sub-id="' + sub.id + '" data-attachment="2" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
-        html += '</td>';
+        html += renderIZOLRowCells(row, lp, sub.id, false);
         html += '</tr>';
       }
     }
@@ -579,8 +635,8 @@ function renderAttachment2() {
 
   // Legend IZOL-07
   html += '<div class="mt-4 text-xs text-gray-600 grid grid-cols-2 gap-x-6 gap-y-1">';
-  html += '<div><strong>R<sub>p</sub></strong> - zmierzona rezystancja izolacji [M&Omega;]</div>';
-  html += '<div><strong>R<sub>w</sub></strong> - wymagana (dopuszczalna) rezystancja izolacji [M&Omega;]</div>';
+  html += '<div><strong>R<sub>p</sub></strong> - Zmierzona wartosc rezystancji izolacji [M&Omega;]</div>';
+  html += '<div><strong>R<sub>w</sub></strong> - Wymagana wartosc rezystancji izolacji [M&Omega;]</div>';
   html += '</div>';
 
   container.innerHTML = html;
@@ -872,14 +928,26 @@ function bindAppEvents() {
       return;
     }
 
+    // IZOL field editing
+    if (field && field.startsWith('izol-')) {
+      handleIZOLFieldChange(e.target);
+      return;
+    }
+
     // SWZ field editing (input fields: circuit, protType, protCurrent, Usk, Ia, Zs)
     handleSWZFieldChange(e.target);
   });
 
-  // Change delegation (for selects: baseType, baseCurrent, tw)
+  // Change delegation (for selects: baseType, baseCurrent, tw, izol-phaseType)
   app.addEventListener('change', (e) => {
     const field = e.target.dataset.field;
     if (!field) return;
+
+    // IZOL phaseType select
+    if (field === 'izol-phaseType') {
+      handleIZOLFieldChange(e.target);
+      return;
+    }
 
     // SWZ select fields
     handleSWZFieldChange(e.target);
@@ -977,6 +1045,83 @@ function updateSWZComputedCells(rowId, result) {
   if (zsmaxCell) {
     zsmaxCell.textContent = result.Zsmax != null ? result.Zsmax.toFixed(2) : '';
   }
+  if (verdictCell) {
+    verdictCell.textContent = result.verdict || '';
+    verdictCell.classList.remove('text-green-700', 'text-red-700');
+    if (result.verdict === 'POZYTYWNA') verdictCell.classList.add('text-green-700');
+    if (result.verdict === 'NEGATYWNA') verdictCell.classList.add('text-red-700');
+  }
+}
+
+// === IZOL FIELD CHANGE HANDLER ===
+
+const IZOL_RP_FIELDS_MAP = {
+  'izol-rp-L1N': 'L1N', 'izol-rp-L2N': 'L2N', 'izol-rp-L3N': 'L3N',
+  'izol-rp-L1L2': 'L1L2', 'izol-rp-L1L3': 'L1L3', 'izol-rp-L2L3': 'L2L3',
+  'izol-rp-L1PE': 'L1PE', 'izol-rp-L2PE': 'L2PE', 'izol-rp-L3PE': 'L3PE',
+  'izol-rp-NPE': 'NPE'
+};
+
+function findIZOLRow(rowId, subId) {
+  if (rowId === 'izol-fixed') return AppState.attachment2.fixedRow;
+  if (!subId) return null;
+  const rows = AppState.attachment2.rowsBySubsection[subId];
+  if (!rows) return null;
+  return rows.find(r => r.id === rowId) || null;
+}
+
+function handleIZOLFieldChange(el) {
+  const field = el.dataset.field;
+  if (!field) return;
+
+  const rowId = el.dataset.rowId;
+  const subId = el.dataset.subId;
+  if (!rowId) return;
+
+  const row = findIZOLRow(rowId, subId);
+  if (!row) return;
+
+  // Handle phaseType change
+  if (field === 'izol-phaseType') {
+    row.phaseType = el.value;
+    // Clear values of inactive fields in AppState
+    const activeFields = getActiveIZOLFields(row.phaseType);
+    const allFields = IZOL_FIELDS_3PHASE;
+    for (const f of allFields) {
+      if (!activeFields.includes(f)) {
+        row.rp[f] = null;
+      }
+    }
+    row.calculated = calcIZOLRow(row);
+    // Re-render to apply phase type visuals (disable/enable fields)
+    const savedFocus = document.activeElement;
+    renderAttachment2();
+    return;
+  }
+
+  // Handle Rp field changes
+  const rpField = IZOL_RP_FIELDS_MAP[field];
+  if (rpField) {
+    const val = el.value.trim();
+    row.rp[rpField] = val === '' ? null : parseFloat(val);
+    row.calculated = calcIZOLRow(row);
+    updateIZOLVerdict(rowId, row.calculated);
+    return;
+  }
+
+  // Handle name and wireType
+  if (field === 'izol-name') {
+    row.name = el.value;
+    return;
+  }
+  if (field === 'izol-wireType') {
+    row.wireType = el.value;
+    return;
+  }
+}
+
+function updateIZOLVerdict(rowId, result) {
+  const verdictCell = document.querySelector('.izol-verdict-cell[data-row-id="' + rowId + '"]');
   if (verdictCell) {
     verdictCell.textContent = result.verdict || '';
     verdictCell.classList.remove('text-green-700', 'text-red-700');
