@@ -116,61 +116,61 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FORM-01 | — | Pending |
-| FORM-02 | — | Pending |
-| FORM-03 | — | Pending |
-| FORM-04 | — | Pending |
-| FORM-05 | — | Pending |
-| FORM-06 | — | Pending |
-| FORM-07 | — | Pending |
-| DYN-01 | — | Pending |
-| DYN-02 | — | Pending |
-| DYN-03 | — | Pending |
-| DYN-04 | — | Pending |
-| DYN-05 | — | Pending |
-| DYN-06 | — | Pending |
-| SWZ-01 | — | Pending |
-| SWZ-02 | — | Pending |
-| SWZ-03 | — | Pending |
-| SWZ-04 | — | Pending |
-| SWZ-05 | — | Pending |
-| SWZ-06 | — | Pending |
-| SWZ-07 | — | Pending |
-| IZOL-01 | — | Pending |
-| IZOL-02 | — | Pending |
-| IZOL-03 | — | Pending |
-| IZOL-04 | — | Pending |
-| IZOL-05 | — | Pending |
-| IZOL-06 | — | Pending |
-| IZOL-07 | — | Pending |
-| RCD-01 | — | Pending |
-| RCD-02 | — | Pending |
-| RCD-03 | — | Pending |
-| RCD-04 | — | Pending |
-| RCD-05 | — | Pending |
-| UZIEM-01 | — | Pending |
-| UZIEM-02 | — | Pending |
-| UZIEM-03 | — | Pending |
-| UZIEM-04 | — | Pending |
-| UZIEM-05 | — | Pending |
-| UZIEM-06 | — | Pending |
-| PROT-01 | — | Pending |
-| PROT-02 | — | Pending |
-| PROT-03 | — | Pending |
-| EXP-01 | — | Pending |
-| EXP-02 | — | Pending |
-| EXP-03 | — | Pending |
-| EXP-04 | — | Pending |
-| EXP-05 | — | Pending |
-| EXP-06 | — | Pending |
-| EXP-07 | — | Pending |
-| EXP-08 | — | Pending |
+| FORM-01 | Phase 2 | Pending |
+| FORM-02 | Phase 2 | Pending |
+| FORM-03 | Phase 2 | Pending |
+| FORM-04 | Phase 2 | Pending |
+| FORM-05 | Phase 2 | Pending |
+| FORM-06 | Phase 2 | Pending |
+| FORM-07 | Phase 2 | Pending |
+| DYN-01 | Phase 1 | Pending |
+| DYN-02 | Phase 1 | Pending |
+| DYN-03 | Phase 1 | Pending |
+| DYN-04 | Phase 1 | Pending |
+| DYN-05 | Phase 1 | Pending |
+| DYN-06 | Phase 1 | Pending |
+| SWZ-01 | Phase 1 | Pending |
+| SWZ-02 | Phase 1 | Pending |
+| SWZ-03 | Phase 1 | Pending |
+| SWZ-04 | Phase 1 | Pending |
+| SWZ-05 | Phase 1 | Pending |
+| SWZ-06 | Phase 1 | Pending |
+| SWZ-07 | Phase 1 | Pending |
+| IZOL-01 | Phase 1 | Pending |
+| IZOL-02 | Phase 1 | Pending |
+| IZOL-03 | Phase 1 | Pending |
+| IZOL-04 | Phase 1 | Pending |
+| IZOL-05 | Phase 1 | Pending |
+| IZOL-06 | Phase 1 | Pending |
+| IZOL-07 | Phase 1 | Pending |
+| RCD-01 | Phase 1 | Pending |
+| RCD-02 | Phase 1 | Pending |
+| RCD-03 | Phase 1 | Pending |
+| RCD-04 | Phase 1 | Pending |
+| RCD-05 | Phase 1 | Pending |
+| UZIEM-01 | Phase 1 | Pending |
+| UZIEM-02 | Phase 1 | Pending |
+| UZIEM-03 | Phase 1 | Pending |
+| UZIEM-04 | Phase 1 | Pending |
+| UZIEM-05 | Phase 1 | Pending |
+| UZIEM-06 | Phase 1 | Pending |
+| PROT-01 | Phase 1 | Pending |
+| PROT-02 | Phase 1 | Pending |
+| PROT-03 | Phase 1 | Pending |
+| EXP-01 | Phase 3 | Pending |
+| EXP-02 | Phase 3 | Pending |
+| EXP-03 | Phase 3 | Pending |
+| EXP-04 | Phase 3 | Pending |
+| EXP-05 | Phase 3 | Pending |
+| EXP-06 | Phase 3 | Pending |
+| EXP-07 | Phase 3 | Pending |
+| EXP-08 | Phase 3 | Pending |
 
 **Coverage:**
-- v1 requirements: 48 total
-- Mapped to phases: 0
-- Unmapped: 48 ⚠️
+- v1 requirements: 49 total
+- Mapped to phases: 49
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-23*
-*Last updated: 2026-02-23 after initial definition*
+*Last updated: 2026-02-23 after roadmap creation — all 49 requirements mapped to 3 phases*
