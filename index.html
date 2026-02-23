@@ -841,7 +841,7 @@ function bindAppEvents() {
     }
   });
 
-  // Input delegation (for section/subsection title editing)
+  // Input delegation (for section/subsection title editing AND SWZ field editing)
   app.addEventListener('input', (e) => {
     const field = e.target.dataset.field;
     if (!field) return;
@@ -854,6 +854,7 @@ function bindAppEvents() {
         // Re-render Zal.2 only (Zal.1 is being edited - no re-render needed for it)
         renderAttachment2();
       }
+      return;
     }
 
     if (field === 'subsection-title') {
@@ -868,8 +869,120 @@ function bindAppEvents() {
           renderAttachment2();
         }
       }
+      return;
     }
+
+    // SWZ field editing (input fields: circuit, protType, protCurrent, Usk, Ia, Zs)
+    handleSWZFieldChange(e.target);
   });
+
+  // Change delegation (for selects: baseType, baseCurrent, tw)
+  app.addEventListener('change', (e) => {
+    const field = e.target.dataset.field;
+    if (!field) return;
+
+    // SWZ select fields
+    handleSWZFieldChange(e.target);
+  });
+}
+
+// === SWZ FIELD CHANGE HANDLER ===
+
+const SWZ_FIELDS = new Set(['circuit', 'protType', 'protCurrent', 'baseType', 'baseCurrent', 'Usk', 'Ia', 'Zs', 'tw']);
+const SWZ_NUMERIC_FIELDS = new Set(['protCurrent', 'Usk', 'Ia', 'Zs']);
+
+function findSWZRow(rowId, subId) {
+  if (rowId === 'fixed') return AppState.swzFixedRow;
+  if (!subId) return null;
+  const rows = AppState.attachment1.rowsBySubsection[subId];
+  if (!rows) return null;
+  return rows.find(r => r.id === rowId) || null;
+}
+
+function handleSWZFieldChange(el) {
+  const field = el.dataset.field;
+  if (!field || !SWZ_FIELDS.has(field)) return;
+
+  const rowId = el.dataset.rowId;
+  const subId = el.dataset.subId;
+  if (!rowId) return;
+
+  const row = findSWZRow(rowId, subId);
+  if (!row) return;
+
+  // Normalize and update value in AppState
+  if (SWZ_NUMERIC_FIELDS.has(field)) {
+    const val = el.value.trim();
+    row[field] = val === '' ? null : parseFloat(val);
+  } else if (field === 'baseCurrent') {
+    row[field] = Number(el.value);
+  } else if (field === 'tw') {
+    row[field] = el.value;
+  } else {
+    // String fields: circuit, protType, baseType
+    row[field] = el.value;
+  }
+
+  // Special: baseType change -> validate baseCurrent, recalculate, re-render
+  if (field === 'baseType') {
+    const spec = PROTECTION_DB[row.baseType];
+    if (spec && !spec.ratings.includes(Number(row.baseCurrent))) {
+      row.baseCurrent = 16; // default if current rating not in new type
+    }
+    // Recalculate before re-render so row.calculated is fresh
+    row.calculated = calcSWZRow(row);
+    // Re-render to refresh baseCurrent options and Ia placeholder
+    // Save/restore focus
+    const activeField = document.activeElement?.dataset?.field;
+    const activeRowId = document.activeElement?.dataset?.rowId;
+    const activeSubId = document.activeElement?.dataset?.subId;
+    renderAttachment1();
+    if (activeField && activeRowId) {
+      const selector = '[data-field="' + activeField + '"][data-row-id="' + activeRowId + '"]' +
+        (activeSubId ? '[data-sub-id="' + activeSubId + '"]' : '');
+      const restored = document.querySelector(selector);
+      if (restored) restored.focus();
+    }
+    return;
+  }
+
+  // Special: baseCurrent change -> update Ia placeholder (no need for full re-render)
+  if (field === 'baseCurrent') {
+    // Update Ia placeholder
+    const iaInput = document.querySelector('[data-field="Ia"][data-row-id="' + rowId + '"]' +
+      (subId ? '[data-sub-id="' + subId + '"]' : ''));
+    if (iaInput) {
+      const autoIa = getIa(row.baseType, row.baseCurrent);
+      iaInput.placeholder = autoIa != null ? autoIa : '';
+    }
+  }
+
+  // Recalculate
+  const result = calcSWZRow(row);
+  row.calculated = result;
+
+  // Update DOM: targeted update of computed cells
+  updateSWZComputedCells(rowId, result);
+}
+
+function updateSWZComputedCells(rowId, result) {
+  // Find cells by data-row-id attribute on the cells themselves
+  const idCell = document.querySelector('.id-cell[data-row-id="' + rowId + '"]');
+  const zsmaxCell = document.querySelector('.zsmax-cell[data-row-id="' + rowId + '"]');
+  const verdictCell = document.querySelector('.verdict-cell[data-row-id="' + rowId + '"]');
+
+  if (idCell) {
+    idCell.textContent = result.Id != null ? result.Id.toFixed(2) : '';
+  }
+  if (zsmaxCell) {
+    zsmaxCell.textContent = result.Zsmax != null ? result.Zsmax.toFixed(2) : '';
+  }
+  if (verdictCell) {
+    verdictCell.textContent = result.verdict || '';
+    verdictCell.classList.remove('text-green-700', 'text-red-700');
+    if (result.verdict === 'POZYTYWNA') verdictCell.classList.add('text-green-700');
+    if (result.verdict === 'NEGATYWNA') verdictCell.classList.add('text-red-700');
+  }
 }
 
 // === EVENT BUS SUBSCRIPTIONS ===
