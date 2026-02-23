@@ -149,6 +149,91 @@ function calcUZIEMRow(row) {
   return { Rpo, verdict };
 }
 
+// === ROW FACTORIES ===
+
+function createNewSWZRow() {
+  return {
+    id: crypto.randomUUID(),
+    circuit: '',
+    protType: '',
+    protCurrent: null,
+    baseType: 'B',
+    baseCurrent: 16,
+    Ia: null,
+    Usk: 230,
+    tw: '0.2',
+    Zs: null,
+    calculated: { Id: null, Zsmax: null, verdict: null }
+  };
+}
+
+function createNewIZOLRow() {
+  return {
+    id: crypto.randomUUID(),
+    name: '',
+    wireType: '',
+    phaseType: '1',
+    rp: { L1N: null, L2N: null, L3N: null, L1L2: null, L1L3: null,
+          L2L3: null, L1PE: null, L2PE: null, L3PE: null, NPE: null },
+    Rw: 1,
+    calculated: { verdict: null }
+  };
+}
+
+function createNewRCDRow() {
+  return {
+    id: crypto.randomUUID(),
+    deviceType: '',
+    testResult: 'TAK',
+    In: null,
+    Iw: null,
+    tw: null,
+    tz: 300,
+    calculated: { verdict: null }
+  };
+}
+
+function createNewUZIEMRow() {
+  return {
+    id: crypto.randomUUID(),
+    deviceName: '',
+    Rp: null,
+    Wk: null,
+    Rw: 10,
+    calculated: { Rpo: null, verdict: null }
+  };
+}
+
+// === LP NUMBERING ===
+
+function getSWZLpNumber(subId, rowId) {
+  let counter = 2; // 1 = fixed row
+  for (const section of AppState.sections) {
+    for (const sub of section.subsections) {
+      const rows = AppState.attachment1.rowsBySubsection[sub.id] || [];
+      for (const row of rows) {
+        if (sub.id === subId && row.id === rowId) return counter;
+        counter++;
+      }
+    }
+  }
+  return counter;
+}
+
+function getIZOLLpNumber(subId, rowId) {
+  let counter = 2; // 1 = fixed WLZ row
+  for (const section of AppState.sections) {
+    for (const sub of section.subsections) {
+      const rows = AppState.attachment2.rowsBySubsection[sub.id] || [];
+      for (const row of rows) {
+        if (sub.id === subId && row.id === rowId) return counter;
+        counter++;
+      }
+    }
+  }
+  return counter;
+}
+
 // === FORM RENDERER ===
 
 function renderTabs() {
@@ -174,22 +259,347 @@ function renderTabs() {
 
 function renderAttachment1() {
   const container = document.getElementById('attachment-1');
-  container.innerHTML = '<p class="text-gray-500">Zał. 1 - SWZ (w budowie)</p>';
+  let html = '';
+
+  html += '<h2 class="text-lg font-semibold mb-3">Załącznik nr 1 - Skuteczność ochrony przez samoczynne wyłączenie zasilania</h2>';
+  html += '<button data-action="add-section" class="mb-3 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Dodaj sekcję</button>';
+
+  html += '<div class="overflow-x-auto">';
+  html += '<table class="w-full border-collapse border border-gray-300 text-sm">';
+
+  // Header
+  html += '<thead>';
+  html += '<tr class="bg-gray-100">';
+  html += '<th class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
+  html += '<th class="border border-gray-300 px-2 py-1">Obwód</th>';
+  html += '<th class="border border-gray-300 px-2 py-1" colspan="2">Zabezp. dodatkowe</th>';
+  html += '<th class="border border-gray-300 px-2 py-1" colspan="2">Zabezp. podstawowe</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-16">U<sub>sk</sub></th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-16">I<sub>a</sub></th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-16">I<sub>d</sub></th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-16">Z<sub>s</sub></th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-16">Z<sub>s max</sub></th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-14">t<sub>w</sub></th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-20">Ocena</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-10"></th>';
+  html += '</tr>';
+  html += '<tr class="bg-gray-100 text-xs text-gray-500">';
+  html += '<td class="border border-gray-300 px-1 text-center"></td>';
+  html += '<td class="border border-gray-300 px-1"></td>';
+  html += '<td class="border border-gray-300 px-1 text-center">typ</td>';
+  html += '<td class="border border-gray-300 px-1 text-center">prąd [A]</td>';
+  html += '<td class="border border-gray-300 px-1 text-center">typ</td>';
+  html += '<td class="border border-gray-300 px-1 text-center">prąd I&Delta;n [A]</td>';
+  html += '<td class="border border-gray-300 px-1 text-center">[V]</td>';
+  html += '<td class="border border-gray-300 px-1 text-center">[A]</td>';
+  html += '<td class="border border-gray-300 px-1 text-center">[A]</td>';
+  html += '<td class="border border-gray-300 px-1 text-center">[&Omega;]</td>';
+  html += '<td class="border border-gray-300 px-1 text-center">[&Omega;]</td>';
+  html += '<td class="border border-gray-300 px-1 text-center">[s]</td>';
+  html += '<td class="border border-gray-300 px-1 text-center"></td>';
+  html += '<td class="border border-gray-300 px-1"></td>';
+  html += '</tr>';
+  html += '</thead>';
+
+  html += '<tbody>';
+
+  // Fixed row: Tablica rozdzielcza (Lp.1)
+  const fr = AppState.swzFixedRow;
+  const frCalc = calcSWZRow(fr);
+  const frIa = (fr.Ia != null) ? fr.Ia : getIa(fr.baseType, fr.baseCurrent);
+  html += '<tr class="bg-yellow-50">';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center font-medium">1</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 font-medium">Tablica rozdzielcza - zabezpieczenie główne</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400">-</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400">-</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + fr.baseType + '</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + fr.baseCurrent + '</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + (fr.Usk != null ? fr.Usk : '') + '</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + (frIa != null ? frIa : '') + '</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + (frCalc.Id != null ? frCalc.Id : '') + '</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + (fr.Zs != null ? fr.Zs : '') + '</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + (frCalc.Zsmax != null ? frCalc.Zsmax : '') + '</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + fr.tw + '</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold ' + (frCalc.verdict === 'POZYTYWNA' ? 'text-green-700' : frCalc.verdict === 'NEGATYWNA' ? 'text-red-700' : '') + '">' + (frCalc.verdict || '') + '</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" title="Wiersz stały - nie można usunąć">-</td>';
+  html += '</tr>';
+
+  // Dynamic sections
+  for (const section of AppState.sections) {
+    // Section header row
+    html += '<tr class="bg-gray-200">';
+    html += '<td colspan="12" class="border border-gray-300 px-2 py-1 font-bold">';
+    html += '<input type="text" data-field="section-title" data-section-id="' + section.id + '" value="' + escapeHtml(section.title) + '" class="bg-transparent font-bold w-64 outline-none focus:bg-white focus:ring-1 focus:ring-blue-400 rounded px-1">';
+    html += '<button data-action="add-subsection" data-section-id="' + section.id + '" class="ml-3 px-2 py-0.5 bg-blue-500 text-white rounded text-xs hover:bg-blue-600">Dodaj podtytuł</button>';
+    html += '</td>';
+    html += '<td colspan="2" class="border border-gray-300 px-2 py-1 text-right">';
+    html += '<button data-action="remove-section" data-section-id="' + section.id + '" class="px-2 py-0.5 bg-red-500 text-white rounded text-xs hover:bg-red-600">Usuń sekcję</button>';
+    html += '</td>';
+    html += '</tr>';
+
+    for (const sub of section.subsections) {
+      // Subsection header row
+      html += '<tr class="bg-gray-100">';
+      html += '<td colspan="12" class="border border-gray-300 px-2 py-1 italic">';
+      html += '<input type="text" data-field="subsection-title" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" value="' + escapeHtml(sub.title) + '" class="bg-transparent italic w-64 outline-none focus:bg-white focus:ring-1 focus:ring-blue-400 rounded px-1">';
+      html += '<button data-action="add-row-swz" data-sub-id="' + sub.id + '" class="ml-3 px-2 py-0.5 bg-green-500 text-white rounded text-xs hover:bg-green-600">Dodaj wiersz</button>';
+      html += '</td>';
+      html += '<td colspan="2" class="border border-gray-300 px-2 py-1 text-right">';
+      html += '<button data-action="remove-subsection" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" class="px-2 py-0.5 bg-red-400 text-white rounded text-xs hover:bg-red-500">Usuń podtytuł</button>';
+      html += '</td>';
+      html += '</tr>';
+
+      // Data rows for this subsection
+      const rows = AppState.attachment1.rowsBySubsection[sub.id] || [];
+      for (const row of rows) {
+        const lp = getSWZLpNumber(sub.id, row.id);
+        html += '<tr data-row-id="' + row.id + '" data-sub-id="' + sub.id + '">';
+        html += '<td class="border border-gray-300 px-2 py-1 text-center">' + lp + '</td>';
+        html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" colspan="11">wiersz pomiarowy (pełna edycja w Planie 02)</td>';
+        html += '<td class="border border-gray-300 px-1 py-1 text-center">';
+        html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-sub-id="' + sub.id + '" data-attachment="1" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
+        html += '</td>';
+        html += '</tr>';
+      }
+    }
+  }
+
+  html += '</tbody></table>';
+  html += '</div>';
+
+  // Legend SWZ-07
+  html += '<div class="mt-4 text-xs text-gray-600 grid grid-cols-2 gap-x-6 gap-y-1">';
+  html += '<div><strong>I<sub>n</sub></strong> - prąd znamionowy zabezpieczenia [A]</div>';
+  html += '<div><strong>I<sub>a</sub></strong> - prąd zapewniający samoczynne wyłączenie zasilania [A]</div>';
+  html += '<div><strong>I<sub>d</sub></strong> - prąd obliczeniowy zwarcia jednofazowego [A]</div>';
+  html += '<div><strong>t<sub>w</sub></strong> - wymagany czas wyłączenia [s]</div>';
+  html += '<div><strong>Z<sub>s</sub></strong> - zmierzona impedancja pętli zwarcia [&Omega;]</div>';
+  html += '<div><strong>Z<sub>s max</sub></strong> - dopuszczalna impedancja pętli zwarcia [&Omega;]</div>';
+  html += '<div><strong>U<sub>sk</sub></strong> - napięcie dotykowe dopuszczalne [V]</div>';
+  html += '</div>';
+
+  container.innerHTML = html;
 }
 
 function renderAttachment2() {
   const container = document.getElementById('attachment-2');
-  container.innerHTML = '<p class="text-gray-500">Zał. 2 - Izolacja (w budowie)</p>';
+  let html = '';
+
+  html += '<h2 class="text-lg font-semibold mb-3">Załącznik nr 2 - Rezystancja izolacji</h2>';
+  html += '<p class="mb-3 text-sm text-blue-600 italic">Sekcje zarządzane z Zał. 1</p>';
+
+  html += '<div class="overflow-x-auto">';
+  html += '<table class="w-full border-collapse border border-gray-300 text-sm min-w-max">';
+
+  // Header
+  html += '<thead>';
+  html += '<tr class="bg-gray-100">';
+  html += '<th class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
+  html += '<th class="border border-gray-300 px-2 py-1">Nazwa obwodu</th>';
+  html += '<th class="border border-gray-300 px-2 py-1">Typ przewodu</th>';
+  html += '<th class="border border-gray-300 px-2 py-1" colspan="10">Rezystancja izolacji R<sub>p</sub> [M&Omega;]</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-14">R<sub>w</sub></th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-20">Ocena</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-10"></th>';
+  html += '</tr>';
+  html += '<tr class="bg-gray-100 text-xs text-gray-500">';
+  html += '<td class="border border-gray-300 px-1 text-center"></td>';
+  html += '<td class="border border-gray-300 px-1"></td>';
+  html += '<td class="border border-gray-300 px-1"></td>';
+  const izolCols = ['L1-N','L2-N','L3-N','L1-L2','L1-L3','L2-L3','L1-PE','L2-PE','L3-PE','N-PE'];
+  for (const col of izolCols) {
+    html += '<td class="border border-gray-300 px-1 text-center">' + col + '</td>';
+  }
+  html += '<td class="border border-gray-300 px-1 text-center">[M&Omega;]</td>';
+  html += '<td class="border border-gray-300 px-1 text-center"></td>';
+  html += '<td class="border border-gray-300 px-1"></td>';
+  html += '</tr>';
+  html += '</thead>';
+
+  html += '<tbody>';
+
+  // Fixed row: WLZ (Lp.1)
+  const ifr = AppState.attachment2.fixedRow;
+  html += '<tr class="bg-yellow-50">';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center font-medium">1</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 font-medium">WLZ</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400">-</td>';
+  const izolFields = ['L1N','L2N','L3N','L1L2','L1L3','L2L3','L1PE','L2PE','L3PE','NPE'];
+  for (const field of izolFields) {
+    html += '<td class="border border-gray-300 px-2 py-1 text-center">' + (ifr.rp[field] != null ? ifr.rp[field] : '') + '</td>';
+  }
+  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + ifr.Rw + '</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold">' + (ifr.calculated.verdict || '') + '</td>';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" title="Wiersz stały - nie można usunąć">-</td>';
+  html += '</tr>';
+
+  // Shared sections from AppState.sections
+  for (const section of AppState.sections) {
+    // Section header row (read-only title)
+    html += '<tr class="bg-gray-200">';
+    html += '<td colspan="14" class="border border-gray-300 px-2 py-1 font-bold">' + escapeHtml(section.title) + '</td>';
+    html += '<td colspan="2" class="border border-gray-300 px-2 py-1"></td>';
+    html += '</tr>';
+
+    for (const sub of section.subsections) {
+      // Subsection header row (read-only title, add-row for Zal.2)
+      html += '<tr class="bg-gray-100">';
+      html += '<td colspan="14" class="border border-gray-300 px-2 py-1 italic">';
+      html += escapeHtml(sub.title);
+      html += '<button data-action="add-row-izol" data-sub-id="' + sub.id + '" class="ml-3 px-2 py-0.5 bg-green-500 text-white rounded text-xs hover:bg-green-600">Dodaj wiersz</button>';
+      html += '</td>';
+      html += '<td colspan="2" class="border border-gray-300 px-2 py-1"></td>';
+      html += '</tr>';
+
+      // Data rows for this subsection in Zal.2
+      const rows = AppState.attachment2.rowsBySubsection[sub.id] || [];
+      for (const row of rows) {
+        const lp = getIZOLLpNumber(sub.id, row.id);
+        html += '<tr data-row-id="' + row.id + '" data-sub-id="' + sub.id + '">';
+        html += '<td class="border border-gray-300 px-2 py-1 text-center">' + lp + '</td>';
+        html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" colspan="13">wiersz pomiarowy (pełna edycja w Planie 03)</td>';
+        html += '<td class="border border-gray-300 px-1 py-1 text-center">';
+        html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-sub-id="' + sub.id + '" data-attachment="2" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
+        html += '</td>';
+        html += '</tr>';
+      }
+    }
+  }
+
+  html += '</tbody></table>';
+  html += '</div>';
+
+  // Legend IZOL-07
+  html += '<div class="mt-4 text-xs text-gray-600 grid grid-cols-2 gap-x-6 gap-y-1">';
+  html += '<div><strong>R<sub>p</sub></strong> - zmierzona rezystancja izolacji [M&Omega;]</div>';
+  html += '<div><strong>R<sub>w</sub></strong> - wymagana (dopuszczalna) rezystancja izolacji [M&Omega;]</div>';
+  html += '</div>';
+
+  container.innerHTML = html;
 }
 
 function renderAttachment3() {
   const container = document.getElementById('attachment-3');
-  container.innerHTML = '<p class="text-gray-500">Zał. 3 - RCD (w budowie)</p>';
+  let html = '';
+
+  html += '<h2 class="text-lg font-semibold mb-3">Załącznik nr 3 - Badanie wyłączników różnicowoprądowych (RCD)</h2>';
+  html += '<button data-action="add-row-rcd" class="mb-3 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Dodaj wiersz</button>';
+
+  html += '<div class="overflow-x-auto">';
+  html += '<table class="w-full border-collapse border border-gray-300 text-sm">';
+
+  // Header
+  html += '<thead>';
+  html += '<tr class="bg-gray-100">';
+  html += '<th class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
+  html += '<th class="border border-gray-300 px-2 py-1">Typ urządzenia</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-14">TEST</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-16">I<sub>n</sub> [mA]</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-16">I<sub>w</sub> [mA]</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-16">t<sub>w</sub> [ms]</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-16">t<sub>z</sub> [ms]</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-20">Ocena</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-10"></th>';
+  html += '</tr>';
+  html += '</thead>';
+
+  html += '<tbody>';
+
+  for (let i = 0; i < AppState.attachment3.rows.length; i++) {
+    const row = AppState.attachment3.rows[i];
+    const lp = i + 1;
+    html += '<tr data-row-id="' + row.id + '">';
+    html += '<td class="border border-gray-300 px-2 py-1 text-center">' + lp + '</td>';
+    html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" colspan="6">wiersz pomiarowy (pełna edycja w Planie 03)</td>';
+    html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold">' + (row.calculated.verdict || '') + '</td>';
+    html += '<td class="border border-gray-300 px-1 py-1 text-center">';
+    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-attachment="3" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
+    html += '</td>';
+    html += '</tr>';
+  }
+
+  if (AppState.attachment3.rows.length === 0) {
+    html += '<tr><td colspan="9" class="border border-gray-300 px-2 py-4 text-center text-gray-400 italic">Brak wierszy - kliknij "Dodaj wiersz"</td></tr>';
+  }
+
+  html += '</tbody></table>';
+  html += '</div>';
+
+  // Legend RCD-05
+  html += '<div class="mt-4 text-xs text-gray-600 grid grid-cols-2 gap-x-6 gap-y-1">';
+  html += '<div><strong>I<sub>n</sub></strong> - znamionowy prąd różnicowy zadziałania [mA]</div>';
+  html += '<div><strong>I<sub>w</sub></strong> - zmierzony prąd zadziałania [mA]</div>';
+  html += '<div><strong>t<sub>w</sub></strong> - zmierzony czas wyłączenia [ms]</div>';
+  html += '<div><strong>t<sub>z</sub></strong> - wymagany czas wyłączenia [ms]</div>';
+  html += '</div>';
+
+  container.innerHTML = html;
 }
 
 function renderAttachment4() {
   const container = document.getElementById('attachment-4');
-  container.innerHTML = '<p class="text-gray-500">Zał. 4 - Uziemienie (w budowie)</p>';
+  let html = '';
+
+  html += '<h2 class="text-lg font-semibold mb-3">Załącznik nr 4 - Rezystancja uziemienia</h2>';
+  html += '<button data-action="add-row-uziem" class="mb-3 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Dodaj wiersz</button>';
+
+  html += '<div class="overflow-x-auto">';
+  html += '<table class="w-full border-collapse border border-gray-300 text-sm">';
+
+  // Header
+  html += '<thead>';
+  html += '<tr class="bg-gray-100">';
+  html += '<th class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
+  html += '<th class="border border-gray-300 px-2 py-1">Nazwa urządzenia</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-16">R<sub>E</sub> [&Omega;]</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-14">W<sub>k</sub></th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-16">R<sub>po</sub> [&Omega;]</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-16">R<sub>w</sub> [&Omega;]</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-20">Ocena</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 w-10"></th>';
+  html += '</tr>';
+  html += '</thead>';
+
+  html += '<tbody>';
+
+  for (let i = 0; i < AppState.attachment4.rows.length; i++) {
+    const row = AppState.attachment4.rows[i];
+    const lp = i + 1;
+    const calc = calcUZIEMRow(row);
+    html += '<tr data-row-id="' + row.id + '">';
+    html += '<td class="border border-gray-300 px-2 py-1 text-center">' + lp + '</td>';
+    html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" colspan="5">wiersz pomiarowy (pełna edycja w Planie 03)</td>';
+    html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold ' + (calc.verdict === 'POZYTYWNA' ? 'text-green-700' : calc.verdict === 'NEGATYWNA' ? 'text-red-700' : '') + '">' + (calc.verdict || '') + '</td>';
+    html += '<td class="border border-gray-300 px-1 py-1 text-center">';
+    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-attachment="4" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
+    html += '</td>';
+    html += '</tr>';
+  }
+
+  if (AppState.attachment4.rows.length === 0) {
+    html += '<tr><td colspan="8" class="border border-gray-300 px-2 py-4 text-center text-gray-400 italic">Brak wierszy - kliknij "Dodaj wiersz"</td></tr>';
+  }
+
+  html += '</tbody></table>';
+  html += '</div>';
+
+  // Legend UZIEM-06
+  html += '<div class="mt-4 text-xs text-gray-600 grid grid-cols-2 gap-x-6 gap-y-1">';
+  html += '<div><strong>R<sub>E</sub></strong> - zmierzona rezystancja uziemienia [&Omega;]</div>';
+  html += '<div><strong>W<sub>k</sub></strong> - współczynnik korekcyjny</div>';
+  html += '<div><strong>R<sub>po</sub></strong> - przeliczona rezystancja uziemienia R<sub>E</sub> &times; W<sub>k</sub> [&Omega;]</div>';
+  html += '<div><strong>R<sub>w</sub></strong> - wymagana (dopuszczalna) rezystancja uziemienia [&Omega;]</div>';
+  html += '</div>';
+
+  container.innerHTML = html;
+}
+
+// === HELPERS ===
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
 }
 
 // === FORM CONTROLLER ===
@@ -203,15 +613,196 @@ function bindTabEvents() {
   });
 }
 
+function bindAppEvents() {
+  const app = document.getElementById('app');
+
+  // Click delegation
+  app.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+
+    if (action === 'add-section') {
+      const newSection = {
+        id: crypto.randomUUID(),
+        title: 'Nowa sekcja',
+        subsections: []
+      };
+      AppState.sections.push(newSection);
+      EventBus.emit('sections:changed');
+    }
+
+    if (action === 'add-subsection') {
+      const sectionId = btn.dataset.sectionId;
+      const section = AppState.sections.find(s => s.id === sectionId);
+      if (!section) return;
+      const newSub = {
+        id: crypto.randomUUID(),
+        title: 'Nowy podtytuł'
+      };
+      section.subsections.push(newSub);
+      // Initialize rowsBySubsection for BOTH attachments (Pitfall 5)
+      AppState.attachment1.rowsBySubsection[newSub.id] = [];
+      AppState.attachment2.rowsBySubsection[newSub.id] = [];
+      EventBus.emit('sections:changed');
+    }
+
+    if (action === 'add-row-swz') {
+      const subId = btn.dataset.subId;
+      if (!AppState.attachment1.rowsBySubsection[subId]) {
+        AppState.attachment1.rowsBySubsection[subId] = [];
+      }
+      AppState.attachment1.rowsBySubsection[subId].push(createNewSWZRow());
+      EventBus.emit('attachment1:changed');
+    }
+
+    if (action === 'add-row-izol') {
+      const subId = btn.dataset.subId;
+      if (!AppState.attachment2.rowsBySubsection[subId]) {
+        AppState.attachment2.rowsBySubsection[subId] = [];
+      }
+      AppState.attachment2.rowsBySubsection[subId].push(createNewIZOLRow());
+      EventBus.emit('attachment2:changed');
+    }
+
+    if (action === 'add-row-rcd') {
+      AppState.attachment3.rows.push(createNewRCDRow());
+      EventBus.emit('attachment3:changed');
+    }
+
+    if (action === 'add-row-uziem') {
+      AppState.attachment4.rows.push(createNewUZIEMRow());
+      EventBus.emit('attachment4:changed');
+    }
+
+    if (action === 'remove-section') {
+      const sectionId = btn.dataset.sectionId;
+      const section = AppState.sections.find(s => s.id === sectionId);
+      if (!section) return;
+      // Remove all rows from both attachments for all subsections
+      for (const sub of section.subsections) {
+        delete AppState.attachment1.rowsBySubsection[sub.id];
+        delete AppState.attachment2.rowsBySubsection[sub.id];
+      }
+      AppState.sections = AppState.sections.filter(s => s.id !== sectionId);
+      EventBus.emit('sections:changed');
+    }
+
+    if (action === 'remove-subsection') {
+      const sectionId = btn.dataset.sectionId;
+      const subId = btn.dataset.subId;
+      const section = AppState.sections.find(s => s.id === sectionId);
+      if (!section) return;
+      section.subsections = section.subsections.filter(s => s.id !== subId);
+      // Remove rows from both attachments
+      delete AppState.attachment1.rowsBySubsection[subId];
+      delete AppState.attachment2.rowsBySubsection[subId];
+      EventBus.emit('sections:changed');
+    }
+
+    if (action === 'remove-row') {
+      const rowId = btn.dataset.rowId;
+      const subId = btn.dataset.subId;
+      const attachment = btn.dataset.attachment;
+
+      if (attachment === '1' && subId) {
+        const rows = AppState.attachment1.rowsBySubsection[subId];
+        if (rows) {
+          AppState.attachment1.rowsBySubsection[subId] = rows.filter(r => r.id !== rowId);
+        }
+        EventBus.emit('attachment1:changed');
+      }
+
+      if (attachment === '2' && subId) {
+        const rows = AppState.attachment2.rowsBySubsection[subId];
+        if (rows) {
+          AppState.attachment2.rowsBySubsection[subId] = rows.filter(r => r.id !== rowId);
+        }
+        EventBus.emit('attachment2:changed');
+      }
+
+      if (attachment === '3') {
+        AppState.attachment3.rows = AppState.attachment3.rows.filter(r => r.id !== rowId);
+        EventBus.emit('attachment3:changed');
+      }
+
+      if (attachment === '4') {
+        AppState.attachment4.rows = AppState.attachment4.rows.filter(r => r.id !== rowId);
+        EventBus.emit('attachment4:changed');
+      }
+    }
+  });
+
+  // Input delegation (for section/subsection title editing)
+  app.addEventListener('input', (e) => {
+    const field = e.target.dataset.field;
+    if (!field) return;
+
+    if (field === 'section-title') {
+      const sectionId = e.target.dataset.sectionId;
+      const section = AppState.sections.find(s => s.id === sectionId);
+      if (section) {
+        section.title = e.target.value;
+        // Re-render Zal.2 only (Zal.1 is being edited - no re-render needed for it)
+        renderAttachment2();
+      }
+    }
+
+    if (field === 'subsection-title') {
+      const sectionId = e.target.dataset.sectionId;
+      const subId = e.target.dataset.subId;
+      const section = AppState.sections.find(s => s.id === sectionId);
+      if (section) {
+        const sub = section.subsections.find(s => s.id === subId);
+        if (sub) {
+          sub.title = e.target.value;
+          // Re-render Zal.2 only
+          renderAttachment2();
+        }
+      }
+    }
+  });
+}
+
+// === EVENT BUS SUBSCRIPTIONS ===
+
+EventBus.on('sections:changed', () => {
+  renderAttachment1();
+  renderAttachment2();
+});
+
+EventBus.on('attachment1:changed', renderAttachment1);
+EventBus.on('attachment2:changed', renderAttachment2);
+EventBus.on('attachment3:changed', renderAttachment3);
+EventBus.on('attachment4:changed', renderAttachment4);
+
 // === INIT ===
 
 function init() {
+  // Initialize default content: one section with one subsection and one row
+  const defaultSubId = crypto.randomUUID();
+  const defaultSectionId = crypto.randomUUID();
+
+  AppState.sections.push({
+    id: defaultSectionId,
+    title: 'Parter',
+    subsections: [{
+      id: defaultSubId,
+      title: 'Obwód gniazd wtykowych'
+    }]
+  });
+
+  // Initialize rowsBySubsection for BOTH attachments (Pitfall 5 / DYN-06)
+  AppState.attachment1.rowsBySubsection[defaultSubId] = [createNewSWZRow()];
+  AppState.attachment2.rowsBySubsection[defaultSubId] = [];
+
   renderTabs();
   renderAttachment1();
   renderAttachment2();
   renderAttachment3();
   renderAttachment4();
   bindTabEvents();
+  bindAppEvents();
 }
 
 document.addEventListener('DOMContentLoaded', init);
