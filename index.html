@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoltProtokol - Protokół kontrolno-pomiarowy</title>
+
+  <!-- Tailwind CSS v4 Play CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <!-- pdfmake — załadowany od początku, używany w Fazie 3 -->
+  <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.3.5/build/pdfmake.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.3.5/build/vfs_fonts.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+  <div id="app" class="max-w-7xl mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-6">Protokół kontrolno-pomiarowy PN-HD 60364-6</h1>
+
+    <!-- Zakładki -->
+    <div id="tabs" class="flex border-b border-gray-300 mb-4">
+      <button data-tab="1" class="px-4 py-2 font-medium border-b-2 border-blue-600 text-blue-600">Zał. 1 - SWZ</button>
+      <button data-tab="2" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Zał. 2 - Izolacja</button>
+      <button data-tab="3" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Zał. 3 - RCD</button>
+      <button data-tab="4" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Zał. 4 - Uziemienie</button>
+    </div>
+
+    <!-- Kontenery załączników -->
+    <div id="attachment-1"></div>
+    <div id="attachment-2" class="hidden"></div>
+    <div id="attachment-3" class="hidden"></div>
+    <div id="attachment-4" class="hidden"></div>
+  </div>
+
+<script>
+// === CONSTANTS ===
+
+const PROTECTION_DB = Object.freeze({
+  B: { multiplier: 5,  ratings: [6, 8, 10, 13, 16, 20, 25, 32, 40, 50, 63] },
+  C: { multiplier: 10, ratings: [6, 8, 10, 13, 16, 20, 25, 32, 40, 50, 63] },
+  D: { multiplier: 20, ratings: [6, 8, 10, 13, 16, 20, 25, 32, 40, 50, 63] }
+});
+
+function getIa(type, rating) {
+  const spec = PROTECTION_DB[type];
+  if (!spec) return null;
+  if (!spec.ratings.includes(Number(rating))) return null;
+  return spec.multiplier * Number(rating);
+}
+
+const IZOL_FIELDS_1PHASE = ['L1N', 'L1PE', 'NPE'];
+const IZOL_FIELDS_3PHASE = ['L1N','L2N','L3N','L1L2','L1L3','L2L3','L1PE','L2PE','L3PE','NPE'];
+
+function getActiveIZOLFields(phaseType) {
+  return phaseType === '3' ? IZOL_FIELDS_3PHASE : IZOL_FIELDS_1PHASE;
+}
+
+// === STATE ===
+
+const AppState = {
+  sections: [],
+  swzFixedRow: {
+    circuit: 'Zabezpieczenie główne',
+    protType: '',
+    protCurrent: null,
+    baseType: 'C',
+    baseCurrent: 25,
+    Ia: null,
+    Usk: null,
+    tw: '5',
+    Zs: null,
+    calculated: { Id: null, Zsmax: null, verdict: null }
+  },
+  attachment1: {
+    rowsBySubsection: {}
+  },
+  attachment2: {
+    fixedRow: {
+      id: 'izol-fixed',
+      name: 'WLZ',
+      wireType: '',
+      phaseType: '3',
+      rp: { L1N: null, L2N: null, L3N: null, L1L2: null, L1L3: null,
+            L2L3: null, L1PE: null, L2PE: null, L3PE: null, NPE: null },
+      Rw: 1,
+      calculated: { verdict: null }
+    },
+    rowsBySubsection: {}
+  },
+  attachment3: {
+    rows: []
+  },
+  attachment4: {
+    rows: []
+  }
+};
+
+const UIState = { activeTab: 1 };
+
+// === EVENT BUS ===
+
+const EventBus = (() => {
+  const listeners = {};
+  return {
+    on(event, fn) {
+      (listeners[event] = listeners[event] || []).push(fn);
+    },
+    emit(event, data) {
+      (listeners[event] || []).forEach(fn => fn(data));
+    }
+  };
+})();
+
+// === CALCULATOR ===
+
+function roundTo3(val) {
+  return Math.round(val * 1000) / 1000;
+}
+
+function calcSWZRow(row) {
+  const Ia = (row.Ia != null) ? row.Ia : getIa(row.baseType, row.baseCurrent);
+  if (!Ia || !row.Usk || !row.Zs) return { Id: null, Zsmax: null, verdict: null };
+  const Id = roundTo3(row.Usk / row.Zs);
+  const Zsmax = roundTo3(row.Usk / Ia);
+  const verdict = roundTo3(row.Zs) <= Zsmax ? 'POZYTYWNA' : 'NEGATYWNA';
+  return { Id, Zsmax, verdict };
+}
+
+function calcIZOLRow(row) {
+  const activeFields = getActiveIZOLFields(row.phaseType);
+  const allMeasured = activeFields.every(f => row.rp[f] != null);
+  if (!allMeasured) return { verdict: null };
+  const allPass = activeFields.every(f => roundTo3(row.rp[f]) >= roundTo3(row.Rw));
+  return { verdict: allPass ? 'POZYTYWNA' : 'NEGATYWNA' };
+}
+
+function calcRCDRow(row) {
+  if (row.Iw == null || row.In == null || row.tw == null || row.tz == null) {
+    return { verdict: null };
+  }
+  const pass = roundTo3(row.Iw) <= roundTo3(row.In) && roundTo3(row.tw) <= roundTo3(row.tz);
+  return { verdict: pass ? 'POZYTYWNA' : 'NEGATYWNA' };
+}
+
+function calcUZIEMRow(row) {
+  if (row.Rp == null || row.Wk == null) return { Rpo: null, verdict: null };
+  const Rpo = roundTo3(row.Rp * row.Wk);
+  const verdict = Rpo <= roundTo3(row.Rw) ? 'POZYTYWNA' : 'NEGATYWNA';
+  return { Rpo, verdict };
+}
+
+// === FORM RENDERER ===
+
+function renderTabs() {
+  const tabsContainer = document.getElementById('tabs');
+  tabsContainer.querySelectorAll('[data-tab]').forEach(btn => {
+    const tabNum = Number(btn.dataset.tab);
+    if (tabNum === UIState.activeTab) {
+      btn.className = 'px-4 py-2 font-medium border-b-2 border-blue-600 text-blue-600';
+    } else {
+      btn.className = 'px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700';
+    }
+  });
+
+  for (let i = 1; i <= 4; i++) {
+    const container = document.getElementById('attachment-' + i);
+    if (i === UIState.activeTab) {
+      container.classList.remove('hidden');
+    } else {
+      container.classList.add('hidden');
+    }
+  }
+}
+
+function renderAttachment1() {
+  const container = document.getElementById('attachment-1');
+  container.innerHTML = '<p class="text-gray-500">Zał. 1 - SWZ (w budowie)</p>';
+}
+
+function renderAttachment2() {
+  const container = document.getElementById('attachment-2');
+  container.innerHTML = '<p class="text-gray-500">Zał. 2 - Izolacja (w budowie)</p>';
+}
+
+function renderAttachment3() {
+  const container = document.getElementById('attachment-3');
+  container.innerHTML = '<p class="text-gray-500">Zał. 3 - RCD (w budowie)</p>';
+}
+
+function renderAttachment4() {
+  const container = document.getElementById('attachment-4');
+  container.innerHTML = '<p class="text-gray-500">Zał. 4 - Uziemienie (w budowie)</p>';
+}
+
+// === FORM CONTROLLER ===
+
+function bindTabEvents() {
+  document.getElementById('tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-tab]');
+    if (!btn) return;
+    UIState.activeTab = Number(btn.dataset.tab);
+    renderTabs();
+  });
+}
+
+// === INIT ===
+
+function init() {
+  renderTabs();
+  renderAttachment1();
+  renderAttachment2();
+  renderAttachment3();
+  renderAttachment4();
+  bindTabEvents();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
