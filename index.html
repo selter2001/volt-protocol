@@ -257,6 +257,125 @@ function renderTabs() {
   }
 }
 
+function renderBaseCurrentOptions(selectedType, selectedCurrent) {
+  const spec = PROTECTION_DB[selectedType];
+  if (!spec) return '';
+  let opts = '';
+  for (const r of spec.ratings) {
+    opts += '<option value="' + r + '"' + (r === Number(selectedCurrent) ? ' selected' : '') + '>' + r + '</option>';
+  }
+  return opts;
+}
+
+function renderBaseTypeOptions(selectedType) {
+  let opts = '';
+  for (const t of ['B', 'C', 'D']) {
+    opts += '<option value="' + t + '"' + (t === selectedType ? ' selected' : '') + '>' + t + '</option>';
+  }
+  return opts;
+}
+
+function renderTwOptions(selectedTw) {
+  const twValues = ['0.2', '0.4', '5'];
+  let opts = '';
+  for (const tw of twValues) {
+    opts += '<option value="' + tw + '"' + (String(selectedTw) === tw ? ' selected' : '') + '>' + tw + '</option>';
+  }
+  return opts;
+}
+
+function renderSWZRowCells(row, lp, subId, isFixed) {
+  const rowIdAttr = isFixed ? 'fixed' : row.id;
+  const subIdAttr = subId || '';
+  const calc = row.calculated || { Id: null, Zsmax: null, verdict: null };
+  const autoIa = getIa(row.baseType, row.baseCurrent);
+
+  const dataAttrs = 'data-row-id="' + rowIdAttr + '"' + (subIdAttr ? ' data-sub-id="' + subIdAttr + '"' : '');
+  const inputCls = 'w-full border border-gray-300 rounded px-1 py-0.5 text-sm text-center';
+  const selectCls = 'w-full border border-gray-300 rounded px-1 py-0.5 text-sm';
+
+  let html = '';
+
+  // Lp.
+  html += '<td class="border border-gray-300 px-2 py-1 text-center font-medium">' + lp + '</td>';
+
+  // Obwod
+  if (isFixed) {
+    html += '<td class="border border-gray-300 px-2 py-1 font-medium">Zabezpieczenie główne</td>';
+  } else {
+    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<input type="text" data-field="circuit" ' + dataAttrs + ' value="' + escapeHtml(row.circuit || '') + '" class="' + inputCls + '" placeholder="nr obwodu">';
+    html += '</td>';
+  }
+
+  // Zabezpieczenia dodatkowe - typ
+  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<input type="text" data-field="protType" ' + dataAttrs + ' value="' + escapeHtml(row.protType || '') + '" class="' + inputCls + '" placeholder="typ">';
+  html += '</td>';
+
+  // Zabezpieczenia dodatkowe - prad
+  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<input type="number" data-field="protCurrent" ' + dataAttrs + ' value="' + (row.protCurrent != null ? row.protCurrent : '') + '" class="' + inputCls + '" placeholder="[A]" step="any">';
+  html += '</td>';
+
+  // Zabezpieczenia podstawowe - typ (select B/C/D)
+  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<select data-field="baseType" ' + dataAttrs + ' class="' + selectCls + '">';
+  html += renderBaseTypeOptions(row.baseType);
+  html += '</select>';
+  html += '</td>';
+
+  // Zabezpieczenia podstawowe - prad (select from PROTECTION_DB ratings)
+  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<select data-field="baseCurrent" ' + dataAttrs + ' class="' + selectCls + '">';
+  html += renderBaseCurrentOptions(row.baseType, row.baseCurrent);
+  html += '</select>';
+  html += '</td>';
+
+  // Usk
+  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<input type="number" data-field="Usk" ' + dataAttrs + ' value="' + (row.Usk != null ? row.Usk : '') + '" class="' + inputCls + '" step="0.1" placeholder="[V]">';
+  html += '</td>';
+
+  // Ia (editable, placeholder = auto value from DB)
+  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<input type="number" data-field="Ia" ' + dataAttrs + ' value="' + (row.Ia != null ? row.Ia : '') + '" class="' + inputCls + '" placeholder="' + (autoIa != null ? autoIa : '') + '" step="any">';
+  html += '</td>';
+
+  // Id (computed, display only)
+  html += '<td class="border border-gray-300 px-2 py-1 text-right text-sm font-mono id-cell" data-row-id="' + rowIdAttr + '">' + (calc.Id != null ? calc.Id.toFixed(2) : '') + '</td>';
+
+  // Zs
+  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<input type="number" data-field="Zs" ' + dataAttrs + ' value="' + (row.Zs != null ? row.Zs : '') + '" class="' + inputCls + '" step="0.001" placeholder="[&Omega;]">';
+  html += '</td>';
+
+  // Zsmax (computed, display only)
+  html += '<td class="border border-gray-300 px-2 py-1 text-right text-sm font-mono zsmax-cell" data-row-id="' + rowIdAttr + '">' + (calc.Zsmax != null ? calc.Zsmax.toFixed(2) : '') + '</td>';
+
+  // tw (select 0.2 / 0.4 / 5)
+  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<select data-field="tw" ' + dataAttrs + ' class="' + selectCls + '">';
+  html += renderTwOptions(row.tw);
+  html += '</select>';
+  html += '</td>';
+
+  // Ocena (verdict)
+  const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700' : calc.verdict === 'NEGATYWNA' ? 'text-red-700' : '';
+  html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold verdict-cell ' + verdictClass + '" data-row-id="' + rowIdAttr + '">' + (calc.verdict || '') + '</td>';
+
+  // Action (delete or fixed indicator)
+  if (isFixed) {
+    html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" title="Wiersz stały - nie można usunąć">-</td>';
+  } else {
+    html += '<td class="border border-gray-300 px-1 py-1 text-center">';
+    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-sub-id="' + subId + '" data-attachment="1" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
+    html += '</td>';
+  }
+
+  return html;
+}
+
 function renderAttachment1() {
   const container = document.getElementById('attachment-1');
   let html = '';
@@ -267,61 +386,54 @@ function renderAttachment1() {
   html += '<div class="overflow-x-auto">';
   html += '<table class="w-full border-collapse border border-gray-300 text-sm">';
 
-  // Header
-  html += '<thead>';
-  html += '<tr class="bg-gray-100">';
-  html += '<th class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
-  html += '<th class="border border-gray-300 px-2 py-1">Obwód</th>';
-  html += '<th class="border border-gray-300 px-2 py-1" colspan="2">Zabezp. dodatkowe</th>';
-  html += '<th class="border border-gray-300 px-2 py-1" colspan="2">Zabezp. podstawowe</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-16">U<sub>sk</sub></th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-16">I<sub>a</sub></th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-16">I<sub>d</sub></th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-16">Z<sub>s</sub></th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-16">Z<sub>s max</sub></th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-14">t<sub>w</sub></th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-20">Ocena</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-10"></th>';
+  // 4-row header (as in reference)
+  html += '<thead class="bg-gray-50 text-xs text-center">';
+
+  // Row 1: main headers
+  html += '<tr>';
+  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
+  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 min-w-[120px]">Obwód<br><span class="font-normal text-gray-500">numer gniazda</span></th>';
+  html += '<th colspan="4" class="border border-gray-300 px-2 py-1">Zabezpieczenia</th>';
+  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-16">U<sub>sk</sub></th>';
+  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-16">I<sub>a</sub></th>';
+  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-16">I<sub>d</sub></th>';
+  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-16">Z<sub>s</sub></th>';
+  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-20">Z<sub>s max</sub></th>';
+  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-14">t<sub>w</sub></th>';
+  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-24">Ocena</th>';
+  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-10"></th>';
   html += '</tr>';
-  html += '<tr class="bg-gray-100 text-xs text-gray-500">';
-  html += '<td class="border border-gray-300 px-1 text-center"></td>';
-  html += '<td class="border border-gray-300 px-1"></td>';
-  html += '<td class="border border-gray-300 px-1 text-center">typ</td>';
-  html += '<td class="border border-gray-300 px-1 text-center">prąd [A]</td>';
-  html += '<td class="border border-gray-300 px-1 text-center">typ</td>';
-  html += '<td class="border border-gray-300 px-1 text-center">prąd I&Delta;n [A]</td>';
-  html += '<td class="border border-gray-300 px-1 text-center">[V]</td>';
-  html += '<td class="border border-gray-300 px-1 text-center">[A]</td>';
-  html += '<td class="border border-gray-300 px-1 text-center">[A]</td>';
-  html += '<td class="border border-gray-300 px-1 text-center">[&Omega;]</td>';
-  html += '<td class="border border-gray-300 px-1 text-center">[&Omega;]</td>';
-  html += '<td class="border border-gray-300 px-1 text-center">[s]</td>';
-  html += '<td class="border border-gray-300 px-1 text-center"></td>';
-  html += '<td class="border border-gray-300 px-1"></td>';
+
+  // Row 2: zabezpieczenia sub-headers
+  html += '<tr>';
+  html += '<th colspan="2" class="border border-gray-300 px-2 py-1">dodatkowe</th>';
+  html += '<th colspan="2" class="border border-gray-300 px-2 py-1">podstawowe</th>';
   html += '</tr>';
+
+  // Row 3: typ / prad labels
+  html += '<tr>';
+  html += '<th class="border border-gray-300 px-1 py-0.5">typ</th>';
+  html += '<th class="border border-gray-300 px-1 py-0.5">prąd</th>';
+  html += '<th class="border border-gray-300 px-1 py-0.5">typ</th>';
+  html += '<th class="border border-gray-300 px-1 py-0.5">prąd I<sub>&Delta;n</sub></th>';
+  html += '</tr>';
+
+  // Row 4: units
+  html += '<tr class="text-gray-500">';
+  html += '<th class="border border-gray-300 px-1 py-0.5">-</th>';
+  html += '<th class="border border-gray-300 px-1 py-0.5">[A]</th>';
+  html += '<th class="border border-gray-300 px-1 py-0.5">-</th>';
+  html += '<th class="border border-gray-300 px-1 py-0.5">[A]</th>';
+  html += '</tr>';
+
   html += '</thead>';
 
   html += '<tbody>';
 
   // Fixed row: Tablica rozdzielcza (Lp.1)
   const fr = AppState.swzFixedRow;
-  const frCalc = calcSWZRow(fr);
-  const frIa = (fr.Ia != null) ? fr.Ia : getIa(fr.baseType, fr.baseCurrent);
-  html += '<tr class="bg-yellow-50">';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center font-medium">1</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 font-medium">Tablica rozdzielcza - zabezpieczenie główne</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400">-</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400">-</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + fr.baseType + '</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + fr.baseCurrent + '</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + (fr.Usk != null ? fr.Usk : '') + '</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + (frIa != null ? frIa : '') + '</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + (frCalc.Id != null ? frCalc.Id : '') + '</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + (fr.Zs != null ? fr.Zs : '') + '</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + (frCalc.Zsmax != null ? frCalc.Zsmax : '') + '</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center">' + fr.tw + '</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold ' + (frCalc.verdict === 'POZYTYWNA' ? 'text-green-700' : frCalc.verdict === 'NEGATYWNA' ? 'text-red-700' : '') + '">' + (frCalc.verdict || '') + '</td>';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" title="Wiersz stały - nie można usunąć">-</td>';
+  html += '<tr class="bg-yellow-50" data-row-id="fixed">';
+  html += renderSWZRowCells(fr, 1, null, true);
   html += '</tr>';
 
   // Dynamic sections
@@ -354,11 +466,7 @@ function renderAttachment1() {
       for (const row of rows) {
         const lp = getSWZLpNumber(sub.id, row.id);
         html += '<tr data-row-id="' + row.id + '" data-sub-id="' + sub.id + '">';
-        html += '<td class="border border-gray-300 px-2 py-1 text-center">' + lp + '</td>';
-        html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" colspan="11">wiersz pomiarowy (pełna edycja w Planie 02)</td>';
-        html += '<td class="border border-gray-300 px-1 py-1 text-center">';
-        html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-sub-id="' + sub.id + '" data-attachment="1" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
-        html += '</td>';
+        html += renderSWZRowCells(row, lp, sub.id, false);
         html += '</tr>';
       }
     }
