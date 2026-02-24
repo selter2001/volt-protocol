@@ -190,6 +190,89 @@ function calcUZIEMRow(row) {
   return { Rpo, verdict };
 }
 
+// === OCENA KONCOWA / ORZECZENIE ===
+
+function calcAttachmentVerdict(attachmentKey) {
+  const allVerdicts = [];
+
+  if (attachmentKey === 'attachment1') {
+    // Fixed row
+    const fixedCalc = calcSWZRow(AppState.swzFixedRow);
+    if (fixedCalc.verdict) allVerdicts.push(fixedCalc.verdict);
+    // Dynamic rows
+    for (const section of AppState.sections) {
+      for (const sub of section.subsections) {
+        const rows = AppState.attachment1.rowsBySubsection[sub.id] || [];
+        for (const row of rows) {
+          const calc = calcSWZRow(row);
+          if (calc.verdict) allVerdicts.push(calc.verdict);
+        }
+      }
+    }
+  }
+
+  if (attachmentKey === 'attachment2') {
+    // Fixed row
+    const fixedCalc = calcIZOLRow(AppState.attachment2.fixedRow);
+    if (fixedCalc.verdict) allVerdicts.push(fixedCalc.verdict);
+    // Dynamic rows
+    for (const section of AppState.sections) {
+      for (const sub of section.subsections) {
+        const rows = AppState.attachment2.rowsBySubsection[sub.id] || [];
+        for (const row of rows) {
+          const calc = calcIZOLRow(row);
+          if (calc.verdict) allVerdicts.push(calc.verdict);
+        }
+      }
+    }
+  }
+
+  if (attachmentKey === 'attachment3') {
+    for (const row of AppState.attachment3.rows) {
+      const calc = calcRCDRow(row);
+      if (calc.verdict) allVerdicts.push(calc.verdict);
+    }
+  }
+
+  if (attachmentKey === 'attachment4') {
+    for (const row of AppState.attachment4.rows) {
+      const calc = calcUZIEMRow(row);
+      if (calc.verdict) allVerdicts.push(calc.verdict);
+    }
+  }
+
+  if (allVerdicts.length === 0) return null;
+  return allVerdicts.every(v => v === 'POZYTYWNA') ? 'POZYTYWNY' : 'NEGATYWNY';
+}
+
+function calcFinalAssessment() {
+  return {
+    documentation: 'POZYTYWNY',
+    inspection: 'POZYTYWNY',
+    swz: calcAttachmentVerdict('attachment1'),
+    izol: calcAttachmentVerdict('attachment2'),
+    rcd: calcAttachmentVerdict('attachment3'),
+    uziem: calcAttachmentVerdict('attachment4')
+  };
+}
+
+function calcNextTestDate(testDateStr) {
+  const d = parseLocalDate(testDateStr);
+  if (!d) return null;
+  d.setFullYear(d.getFullYear() + 5);
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return dd + '.' + mm + '.' + yyyy;
+}
+
+function calcOrzeczenie() {
+  const assessment = calcFinalAssessment();
+  const allPositive = Object.values(assessment).every(v => v === 'POZYTYWNY');
+  const nextDate = calcNextTestDate(AppState.form.testDate);
+  return { allPositive, nextDate };
+}
+
 // === ROW FACTORIES ===
 
 function createNewSWZRow() {
@@ -518,11 +601,106 @@ function renderFormTab() {
   html += '</div>';
   html += '</div>';
 
-  // FORM-06: Ocena końcowa (placeholder - wypełniany w Task 2)
-  html += '<div id="assessment-section"></div>';
+  // FORM-06: Ocena końcowa
+  const assessment = calcFinalAssessment();
+  html += '<div id="assessment-section" class="bg-white border rounded p-4 mb-4">';
+  html += '<h3 class="text-md font-semibold mb-3 text-gray-800">Ocena wykonanych badań odbiorczych</h3>';
+  html += '<div class="overflow-x-auto">';
+  html += '<table class="w-full border-collapse text-sm">';
+  html += '<thead class="bg-gray-50">';
+  html += '<tr>';
+  html += '<th class="border border-gray-300 px-3 py-2 text-left font-medium">Wykonane badania odbiorcze</th>';
+  html += '<th class="border border-gray-300 px-3 py-2 text-center font-medium w-24">Załączniki</th>';
+  html += '<th class="border border-gray-300 px-3 py-2 text-center font-medium w-36">Ogólny wynik</th>';
+  html += '</tr>';
+  html += '</thead>';
+  html += '<tbody>';
 
-  // FORM-07: Orzeczenie (placeholder - wypełniany w Task 2)
-  html += '<div id="orzeczenie-section"></div>';
+  // Row 1: Dokumentacja (stały POZYTYWNY)
+  html += '<tr>';
+  html += '<td class="border border-gray-300 px-3 py-2">Sprawdzenie dokumentacji instalacji</td>';
+  html += '<td class="border border-gray-300 px-3 py-2 text-center text-gray-400">\u2014</td>';
+  html += '<td class="border border-gray-300 px-3 py-2 text-center font-bold text-green-700">POZYTYWNY</td>';
+  html += '</tr>';
+
+  // Row 2: Oględziny (stały POZYTYWNY)
+  html += '<tr>';
+  html += '<td class="border border-gray-300 px-3 py-2">Ogl\u0119dziny instalacji elektrycznej</td>';
+  html += '<td class="border border-gray-300 px-3 py-2 text-center text-gray-400">\u2014</td>';
+  html += '<td class="border border-gray-300 px-3 py-2 text-center font-bold text-green-700">POZYTYWNY</td>';
+  html += '</tr>';
+
+  // Row 3: SWZ
+  const swzClass = assessment.swz === 'POZYTYWNY' ? 'text-green-700' : assessment.swz === 'NEGATYWNY' ? 'text-red-700' : 'text-gray-400';
+  html += '<tr>';
+  html += '<td class="border border-gray-300 px-3 py-2">Badanie skuteczno\u015bci ochrony przeciwpora\u017ceniowej przez samoczynne wy\u0142\u0105czenie zasilania</td>';
+  html += '<td class="border border-gray-300 px-3 py-2 text-center">Za\u0142. 1</td>';
+  html += '<td id="assess-swz" class="border border-gray-300 px-3 py-2 text-center font-bold ' + swzClass + '">' + (assessment.swz || '\u2014') + '</td>';
+  html += '</tr>';
+
+  // Row 4: Izolacja
+  const izolClass = assessment.izol === 'POZYTYWNY' ? 'text-green-700' : assessment.izol === 'NEGATYWNY' ? 'text-red-700' : 'text-gray-400';
+  html += '<tr>';
+  html += '<td class="border border-gray-300 px-3 py-2">Badanie stanu rezystancji izolacji obwod\u00f3w</td>';
+  html += '<td class="border border-gray-300 px-3 py-2 text-center">Za\u0142. 2</td>';
+  html += '<td id="assess-izol" class="border border-gray-300 px-3 py-2 text-center font-bold ' + izolClass + '">' + (assessment.izol || '\u2014') + '</td>';
+  html += '</tr>';
+
+  // Row 5: RCD
+  const rcdClass = assessment.rcd === 'POZYTYWNY' ? 'text-green-700' : assessment.rcd === 'NEGATYWNY' ? 'text-red-700' : 'text-gray-400';
+  html += '<tr>';
+  html += '<td class="border border-gray-300 px-3 py-2">Badanie skuteczno\u015bci ochrony dodatkowej (RCD)</td>';
+  html += '<td class="border border-gray-300 px-3 py-2 text-center">Za\u0142. 3</td>';
+  html += '<td id="assess-rcd" class="border border-gray-300 px-3 py-2 text-center font-bold ' + rcdClass + '">' + (assessment.rcd || '\u2014') + '</td>';
+  html += '</tr>';
+
+  // Row 6: Uziemienie
+  const uziemClass = assessment.uziem === 'POZYTYWNY' ? 'text-green-700' : assessment.uziem === 'NEGATYWNY' ? 'text-red-700' : 'text-gray-400';
+  html += '<tr>';
+  html += '<td class="border border-gray-300 px-3 py-2">Badanie rezystancji uziemienia</td>';
+  html += '<td class="border border-gray-300 px-3 py-2 text-center">Za\u0142. 4</td>';
+  html += '<td id="assess-uziem" class="border border-gray-300 px-3 py-2 text-center font-bold ' + uziemClass + '">' + (assessment.uziem || '\u2014') + '</td>';
+  html += '</tr>';
+
+  html += '</tbody>';
+  html += '</table>';
+  html += '</div>';
+  html += '</div>';
+
+  // FORM-07: Orzeczenie
+  const orz = calcOrzeczenie();
+  html += '<div id="orzeczenie-section" class="bg-white border rounded p-4 mb-4">';
+  html += '<h3 class="text-md font-semibold mb-3 text-gray-800">Orzeczenie</h3>';
+
+  if (orz.allPositive) {
+    html += '<p id="orzeczenie-text" class="text-base font-bold text-green-700 mb-2">Na podstawie wykonanych bada\u0144 odbiorczych orzeka si\u0119, \u017ce instalacja elektryczna <strong>NADAJE SI\u0118</strong> do eksploatacji.</p>';
+  } else {
+    const hasAnyData = calcFinalAssessment();
+    const hasNegative = Object.values(hasAnyData).some(v => v === 'NEGATYWNY');
+    if (hasNegative) {
+      html += '<p id="orzeczenie-text" class="text-base font-bold text-red-700 mb-2">Na podstawie wykonanych bada\u0144 odbiorczych orzeka si\u0119, \u017ce instalacja elektryczna <strong>NIE NADAJE SI\u0118</strong> do eksploatacji.</p>';
+    } else {
+      html += '<p id="orzeczenie-text" class="text-base text-gray-400 mb-2">(uzupe\u0142nij dane pomiarowe)</p>';
+    }
+  }
+
+  if (orz.nextDate) {
+    html += '<p id="next-test-date" class="text-sm text-gray-700">Data nast\u0119pnego badania: <strong>' + orz.nextDate + ' r.</strong> lub po dokonaniu zmian.</p>';
+  } else {
+    html += '<p id="next-test-date" class="text-sm text-gray-400">(uzupe\u0142nij dat\u0119 badania)</p>';
+  }
+
+  html += '<div class="mt-8 flex gap-16">';
+  html += '<div class="text-center">';
+  html += '<div class="border-b border-gray-400 w-48 mb-1"></div>';
+  html += '<div class="text-xs text-gray-500">wykonawca</div>';
+  html += '</div>';
+  html += '<div class="text-center">';
+  html += '<div class="border-b border-gray-400 w-48 mb-1"></div>';
+  html += '<div class="text-xs text-gray-500">miejscowo\u015b\u0107 i data</div>';
+  html += '</div>';
+  html += '</div>';
+  html += '</div>';
 
   container.innerHTML = html;
 }
@@ -1326,6 +1504,7 @@ function handleSWZFieldChange(el) {
     const activeRowId = document.activeElement?.dataset?.rowId;
     const activeSubId = document.activeElement?.dataset?.subId;
     renderAttachment1();
+    updateFinalAssessmentDisplay();
     if (activeField && activeRowId) {
       const selector = '[data-field="' + activeField + '"][data-row-id="' + activeRowId + '"]' +
         (activeSubId ? '[data-sub-id="' + activeSubId + '"]' : '');
@@ -1352,6 +1531,8 @@ function handleSWZFieldChange(el) {
 
   // Update DOM: targeted update of computed cells
   updateSWZComputedCells(rowId, result);
+  // Aktualizuj ocenę końcową (no-op jeśli tab 0 nieaktywny)
+  updateFinalAssessmentDisplay();
 }
 
 function updateSWZComputedCells(rowId, result) {
@@ -1427,6 +1608,7 @@ function handleIZOLFieldChange(el) {
     row.rp[rpField] = val === '' ? null : parseFloat(val);
     row.calculated = calcIZOLRow(row);
     updateIZOLVerdict(rowId, row.calculated);
+    updateFinalAssessmentDisplay();
     return;
   }
 
@@ -1476,6 +1658,7 @@ function handleRCDFieldChange(el) {
     row[numericKey] = val === '' ? null : parseFloat(val);
     row.calculated = calcRCDRow(row);
     updateRCDVerdict(rowId, row.calculated);
+    updateFinalAssessmentDisplay();
     return;
   }
 
@@ -1527,6 +1710,7 @@ function handleUZIEMFieldChange(el) {
     row[numericKey] = val === '' ? null : parseFloat(val);
     row.calculated = calcUZIEMRow(row);
     updateUZIEMComputedCells(rowId, row.calculated);
+    updateFinalAssessmentDisplay();
     return;
   }
 
@@ -1554,6 +1738,63 @@ function updateUZIEMComputedCells(rowId, result) {
   }
 }
 
+// === TARGETED DOM UPDATE: OCENA KONCOWA / ORZECZENIE ===
+
+function updateAssessmentCell(id, verdict) {
+  const cell = document.getElementById(id);
+  if (!cell) return;
+  cell.textContent = verdict || '\u2014';
+  cell.classList.remove('text-green-700', 'text-red-700', 'text-gray-400');
+  if (verdict === 'POZYTYWNY') {
+    cell.classList.add('text-green-700');
+  } else if (verdict === 'NEGATYWNY') {
+    cell.classList.add('text-red-700');
+  } else {
+    cell.classList.add('text-gray-400');
+  }
+}
+
+function updateFinalAssessmentDisplay() {
+  if (!document.getElementById('assess-swz')) return;
+  const assessment = calcFinalAssessment();
+  updateAssessmentCell('assess-swz', assessment.swz);
+  updateAssessmentCell('assess-izol', assessment.izol);
+  updateAssessmentCell('assess-rcd', assessment.rcd);
+  updateAssessmentCell('assess-uziem', assessment.uziem);
+  updateOrzeczenieDisplay();
+}
+
+function updateOrzeczenieDisplay() {
+  const orzText = document.getElementById('orzeczenie-text');
+  const nextDateEl = document.getElementById('next-test-date');
+  if (!orzText || !nextDateEl) return;
+
+  const orz = calcOrzeczenie();
+
+  if (orz.allPositive) {
+    orzText.innerHTML = 'Na podstawie wykonanych bada\u0144 odbiorczych orzeka si\u0119, \u017ce instalacja elektryczna <strong>NADAJE SI\u0118</strong> do eksploatacji.';
+    orzText.className = 'text-base font-bold text-green-700 mb-2';
+  } else {
+    const assessment = calcFinalAssessment();
+    const hasNegative = Object.values(assessment).some(v => v === 'NEGATYWNY');
+    if (hasNegative) {
+      orzText.innerHTML = 'Na podstawie wykonanych bada\u0144 odbiorczych orzeka si\u0119, \u017ce instalacja elektryczna <strong>NIE NADAJE SI\u0118</strong> do eksploatacji.';
+      orzText.className = 'text-base font-bold text-red-700 mb-2';
+    } else {
+      orzText.textContent = '(uzupe\u0142nij dane pomiarowe)';
+      orzText.className = 'text-base text-gray-400 mb-2';
+    }
+  }
+
+  if (orz.nextDate) {
+    nextDateEl.innerHTML = 'Data nast\u0119pnego badania: <strong>' + orz.nextDate + ' r.</strong> lub po dokonaniu zmian.';
+    nextDateEl.className = 'text-sm text-gray-700';
+  } else {
+    nextDateEl.textContent = '(uzupe\u0142nij dat\u0119 badania)';
+    nextDateEl.className = 'text-sm text-gray-400';
+  }
+}
+
 // === EVENT BUS SUBSCRIPTIONS ===
 
 EventBus.on('sections:changed', () => {
@@ -1565,6 +1806,13 @@ EventBus.on('attachment1:changed', renderAttachment1);
 EventBus.on('attachment2:changed', renderAttachment2);
 EventBus.on('attachment3:changed', renderAttachment3);
 EventBus.on('attachment4:changed', renderAttachment4);
+
+// Aktualizacja oceny końcowej przy zmianach w załącznikach
+EventBus.on('attachment1:changed', updateFinalAssessmentDisplay);
+EventBus.on('attachment2:changed', updateFinalAssessmentDisplay);
+EventBus.on('attachment3:changed', updateFinalAssessmentDisplay);
+EventBus.on('attachment4:changed', updateFinalAssessmentDisplay);
+EventBus.on('sections:changed', updateFinalAssessmentDisplay);
 
 // === INIT ===
 
