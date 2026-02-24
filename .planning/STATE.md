@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Elektryk wypełnia dane pomiarowe w przeglądarce i jednym kliknięciem pobiera kompletny protokół PDF -- bez instalacji, bez rejestracji, za darmo
-**Current focus:** Phase 2 — kompletność normowa (formularz główny protokołu)
+**Current focus:** Phase 3 -- eksport i dane (PDF export, localStorage)
 
 ## Current Position
 
-Phase: 2 of 3 (Kompletność normowa)
-Plan: 1 of 1 in current phase — ALL DONE
-Status: Phase 2 complete
-Last activity: 2026-02-24 — Completed 02-01-PLAN.md (formularz główny protokołu z oceną końcową)
+Phase: 3 of 3 (Eksport i dane)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-24 -- Completed 03-01-PLAN.md (PDFExporter z formularzem i 4 zalacznikami)
 
-Progress: [█████░░░░░] 4/9 plans (44%)
+Progress: [██████░░░░] 5/9 plans (56%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 4.3min
-- Total execution time: 17min
+- Total plans completed: 5
+- Average duration: 4.0min
+- Total execution time: 20min
 
 **By Phase:**
 
@@ -29,10 +29,11 @@ Progress: [█████░░░░░] 4/9 plans (44%)
 |-------|-------|-------|----------|
 | 01-formularze-i-obliczenia | 3/3 | 11min | 3.7min |
 | 02-kompletnosc-normowa | 1/1 | 6min | 6min |
+| 03-eksport-i-dane | 1/2 | 3min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4min), 01-02 (3min), 01-03 (4min), 02-01 (6min)
-- Trend: stable
+- Last 5 plans: 01-02 (3min), 01-03 (4min), 02-01 (6min), 03-01 (3min)
+- Trend: stable/improving
 
 *Updated after each plan completion*
 
@@ -60,6 +61,10 @@ Recent decisions affecting current work:
 - [02-01]: Targeted DOM update dla oceny koncowej -- guard sprawdza istnienie elementow, no-op gdy tab 0 nieaktywny
 - [02-01]: Pelny re-render renderFormTab() przy przelaczeniu na tab 0 -- gwarantuje swieza tabele oceny
 - [02-01]: updateFinalAssessmentDisplay() wolany zarowno z EventBus jak i z targeted update handlers
+- [03-01]: Roboto font z vfs_fonts.min.js dla polskich znakow (Latin Extended-A)
+- [03-01]: Sekcje/podsekcje jako merged rows z fillColor szarosciami (#d1d5db/#f3f4f6)
+- [03-01]: Zalacznik 2 opakowany w stack z pageOrientation landscape
+- [03-01]: Spread operator w buildDocDefinition content array
 
 ### Pending Todos
 
@@ -68,10 +73,10 @@ None yet.
 ### Blockers/Concerns
 
 - [Phase 1]: RESOLVED -- Wartości Ia dla PROTECTION_DB zaimplementowane (B=5x, C=10x, D=20x) i zweryfikowane z wzorcem referencyjnym (B16=80, C25=250)
-- [Phase 1]: Referencyjny wzór protokołu (plik wzoru) powinien być dodany do repo przed projektowaniem tabel PDF -- struktura nagłówków i colSpan/rowSpan w Zał. 2 zależy od wzoru
+- [Phase 1]: RESOLVED -- Referencyjny wzór protokołu dodany jako reference-protokol-extracted.md
 
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 2 complete -- formularz główny protokołu z oceną końcową i orzeczeniem
-Resume file: .planning/ROADMAP.md -- Phase 3
+Stopped at: Phase 3 plan 01 complete -- PDFExporter z formularzem glownym i 4 zalacznikami
+Resume file: .planning/phases/03-eksport-i-dane/03-02-PLAN.md
