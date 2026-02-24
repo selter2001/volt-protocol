@@ -553,9 +553,9 @@ function renderTabs() {
   tabsContainer.querySelectorAll('[data-tab]').forEach(btn => {
     const tabNum = Number(btn.dataset.tab);
     if (tabNum === UIState.activeTab) {
-      btn.className = 'px-4 py-2 font-medium border-b-2 border-blue-600 text-blue-600';
+      btn.className = 'px-4 py-2 font-medium border-b-2 border-cyan text-cyan transition-colors duration-200';
     } else {
-      btn.className = 'px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700';
+      btn.className = 'px-4 py-2 font-medium border-b-2 border-transparent text-platinum/50 hover:text-platinum transition-colors duration-200';
     }
   });
 
@@ -603,70 +603,70 @@ function renderSWZRowCells(row, lp, subId, isFixed) {
   const autoIa = getIa(row.baseType, row.baseCurrent);
 
   const dataAttrs = 'data-row-id="' + rowIdAttr + '"' + (subIdAttr ? ' data-sub-id="' + subIdAttr + '"' : '');
-  const inputCls = 'w-full border border-gray-300 rounded px-1 py-0.5 text-sm text-center';
-  const selectCls = 'w-full border border-gray-300 rounded px-1 py-0.5 text-sm';
+  const inputCls = 'w-full input-glass px-1 py-0.5 text-sm text-center';
+  const selectCls = 'w-full select-glass px-1 py-0.5 text-sm';
 
   let html = '';
 
   // Lp.
-  html += '<td class="border border-gray-300 px-2 py-1 text-center font-medium">' + lp + '</td>';
+  html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-medium">' + lp + '</td>';
 
   // Obwod
   if (isFixed) {
-    html += '<td class="border border-gray-300 px-2 py-1 font-medium">Zabezpieczenie główne</td>';
+    html += '<td class="border border-white/[0.12] px-2 py-1 font-medium">Zabezpieczenie główne</td>';
   } else {
-    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<td class="border border-white/[0.12] px-1 py-0.5">';
     html += '<input type="text" data-field="circuit" ' + dataAttrs + ' value="' + escapeHtml(row.circuit || '') + '" class="' + inputCls + '" placeholder="nr obwodu">';
     html += '</td>';
   }
 
   // Zabezpieczenia dodatkowe - typ
-  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<td class="border border-white/[0.12] px-1 py-0.5">';
   html += '<input type="text" data-field="protType" ' + dataAttrs + ' value="' + escapeHtml(row.protType || '') + '" class="' + inputCls + '" placeholder="typ">';
   html += '</td>';
 
   // Zabezpieczenia dodatkowe - prad
-  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<td class="border border-white/[0.12] px-1 py-0.5">';
   html += '<input type="number" data-field="protCurrent" ' + dataAttrs + ' value="' + (row.protCurrent != null ? row.protCurrent : '') + '" class="' + inputCls + '" placeholder="[A]" step="any">';
   html += '</td>';
 
   // Zabezpieczenia podstawowe - typ (select B/C/D)
-  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<td class="border border-white/[0.12] px-1 py-0.5">';
   html += '<select data-field="baseType" ' + dataAttrs + ' class="' + selectCls + '">';
   html += renderBaseTypeOptions(row.baseType);
   html += '</select>';
   html += '</td>';
 
   // Zabezpieczenia podstawowe - prad (select from PROTECTION_DB ratings)
-  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<td class="border border-white/[0.12] px-1 py-0.5">';
   html += '<select data-field="baseCurrent" ' + dataAttrs + ' class="' + selectCls + '">';
   html += renderBaseCurrentOptions(row.baseType, row.baseCurrent);
   html += '</select>';
   html += '</td>';
 
   // Usk
-  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<td class="border border-white/[0.12] px-1 py-0.5">';
   html += '<input type="number" data-field="Usk" ' + dataAttrs + ' value="' + (row.Usk != null ? row.Usk : '') + '" class="' + inputCls + '" step="0.1" placeholder="[V]">';
   html += '</td>';
 
   // Ia (editable, placeholder = auto value from DB)
-  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<td class="border border-white/[0.12] px-1 py-0.5">';
   html += '<input type="number" data-field="Ia" ' + dataAttrs + ' value="' + (row.Ia != null ? row.Ia : '') + '" class="' + inputCls + '" placeholder="' + (autoIa != null ? autoIa : '') + '" step="any">';
   html += '</td>';
 
   // Id (computed, display only)
-  html += '<td class="border border-gray-300 px-2 py-1 text-right text-sm font-mono id-cell" data-row-id="' + rowIdAttr + '">' + (calc.Id != null ? calc.Id.toFixed(2) : '') + '</td>';
+  html += '<td class="border border-white/[0.12] px-2 py-1 text-right text-sm font-mono id-cell" data-row-id="' + rowIdAttr + '">' + (calc.Id != null ? calc.Id.toFixed(2) : '') + '</td>';
 
   // Zs
-  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<td class="border border-white/[0.12] px-1 py-0.5">';
   html += '<input type="number" data-field="Zs" ' + dataAttrs + ' value="' + (row.Zs != null ? row.Zs : '') + '" class="' + inputCls + '" step="0.001" placeholder="[&Omega;]">';
   html += '</td>';
 
   // Zsmax (computed, display only)
-  html += '<td class="border border-gray-300 px-2 py-1 text-right text-sm font-mono zsmax-cell" data-row-id="' + rowIdAttr + '">' + (calc.Zsmax != null ? calc.Zsmax.toFixed(2) : '') + '</td>';
+  html += '<td class="border border-white/[0.12] px-2 py-1 text-right text-sm font-mono zsmax-cell" data-row-id="' + rowIdAttr + '">' + (calc.Zsmax != null ? calc.Zsmax.toFixed(2) : '') + '</td>';
 
   // tw (select 0.2 / 0.4 / 5)
-  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<td class="border border-white/[0.12] px-1 py-0.5">';
   html += '<select data-field="tw" ' + dataAttrs + ' class="' + selectCls + '">';
   html += renderTwOptions(row.tw);
   html += '</select>';
@@ -674,14 +674,14 @@ function renderSWZRowCells(row, lp, subId, isFixed) {
 
   // Ocena (verdict)
   const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700' : calc.verdict === 'NEGATYWNA' ? 'text-red-700' : '';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold verdict-cell ' + verdictClass + '" data-row-id="' + rowIdAttr + '">' + (calc.verdict || '') + '</td>';
+  html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-bold verdict-cell ' + verdictClass + '" data-row-id="' + rowIdAttr + '">' + (calc.verdict || '') + '</td>';
 
   // Action (delete or fixed indicator)
   if (isFixed) {
-    html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" title="Wiersz stały - nie można usunąć">-</td>';
+    html += '<td class="border border-white/[0.12] px-2 py-1 text-center text-platinum/30" title="Wiersz stały - nie można usunąć">-</td>';
   } else {
-    html += '<td class="border border-gray-300 px-1 py-1 text-center">';
-    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-sub-id="' + subId + '" data-attachment="1" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
+    html += '<td class="border border-white/[0.12] px-1 py-1 text-center">';
+    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-sub-id="' + subId + '" data-attachment="1" class="text-red-400 hover:text-red-300 text-xs">Usuń</button>';
     html += '</td>';
   }
 
@@ -691,13 +691,13 @@ function renderSWZRowCells(row, lp, subId, isFixed) {
 function renderFormTab() {
   const container = document.getElementById('attachment-0');
   const f = AppState.form;
-  const inputCls = 'w-full border border-gray-300 rounded px-2 py-1.5 text-sm';
-  const labelCls = 'block text-sm font-medium text-gray-700 mb-1';
+  const inputCls = 'w-full input-glass px-2 py-1.5 text-sm';
+  const labelCls = 'block text-sm font-medium text-platinum/80 mb-1';
   let html = '';
 
   // FORM-01: Numer protokołu
-  html += '<div class="bg-white border rounded p-4 mb-4">';
-  html += '<h3 class="text-md font-semibold mb-3 text-gray-800">Numer protokołu</h3>';
+  html += '<div class="card-glass p-6 mb-4">';
+  html += '<h3 class="text-md font-semibold mb-3 text-platinum">Numer protokołu</h3>';
   html += '<div class="max-w-xs">';
   html += '<label class="' + labelCls + '">Numer</label>';
   html += '<input type="text" data-field="form-protocolNumber" value="' + escapeHtml(f.protocolNumber) + '" class="' + inputCls + '" placeholder="RRRR/MM/NNN">';
@@ -705,8 +705,8 @@ function renderFormTab() {
   html += '</div>';
 
   // FORM-02: Obiekt badany
-  html += '<div class="bg-white border rounded p-4 mb-4">';
-  html += '<h3 class="text-md font-semibold mb-3 text-gray-800">Obiekt badany</h3>';
+  html += '<div class="card-glass p-6 mb-4">';
+  html += '<h3 class="text-md font-semibold mb-3 text-platinum">Obiekt badany</h3>';
   html += '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">';
   html += '<div>';
   html += '<label class="' + labelCls + '">Nazwa obiektu</label>';
@@ -724,8 +724,8 @@ function renderFormTab() {
   html += '</div>';
 
   // FORM-03: Wykonawca
-  html += '<div class="bg-white border rounded p-4 mb-4">';
-  html += '<h3 class="text-md font-semibold mb-3 text-gray-800">Wykonawca badań</h3>';
+  html += '<div class="card-glass p-6 mb-4">';
+  html += '<h3 class="text-md font-semibold mb-3 text-platinum">Wykonawca badań</h3>';
   html += '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">';
   html += '<div>';
   html += '<label class="' + labelCls + '">Imię i nazwisko</label>';
@@ -743,8 +743,8 @@ function renderFormTab() {
   html += '</div>';
 
   // FORM-04: Warunki badań
-  html += '<div class="bg-white border rounded p-4 mb-4">';
-  html += '<h3 class="text-md font-semibold mb-3 text-gray-800">Warunki badań</h3>';
+  html += '<div class="card-glass p-6 mb-4">';
+  html += '<h3 class="text-md font-semibold mb-3 text-platinum">Warunki badań</h3>';
   html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-lg">';
   html += '<div>';
   html += '<label class="' + labelCls + '">Data badania</label>';
@@ -754,37 +754,37 @@ function renderFormTab() {
   html += '<label class="' + labelCls + '">Temperatura otoczenia</label>';
   html += '<div class="flex items-center gap-2">';
   html += '<input type="number" data-field="form-testTemp" value="' + (f.testTemp != null ? f.testTemp : '') + '" step="0.1" class="' + inputCls + '" placeholder="np. 22.5">';
-  html += '<span class="text-sm text-gray-500">\u00b0C</span>';
+  html += '<span class="text-sm text-platinum/50">\u00b0C</span>';
   html += '</div>';
   html += '</div>';
   html += '</div>';
   html += '</div>';
 
   // FORM-05: Przyrządy pomiarowe
-  html += '<div class="bg-white border rounded p-4 mb-4">';
-  html += '<h3 class="text-md font-semibold mb-3 text-gray-800">Przyrządy pomiarowe</h3>';
+  html += '<div class="card-glass p-6 mb-4">';
+  html += '<h3 class="text-md font-semibold mb-3 text-platinum">Przyrządy pomiarowe</h3>';
   html += '<div class="overflow-x-auto">';
   html += '<table class="w-full border-collapse text-sm">';
-  html += '<thead class="bg-gray-50">';
+  html += '<thead class="bg-white/[0.06]">';
   html += '<tr>';
-  html += '<th class="border border-gray-300 px-3 py-2 text-left font-medium">Wykonane pomiary</th>';
-  html += '<th class="border border-gray-300 px-3 py-2 text-left font-medium w-48">Przyrządy pomiarowe</th>';
-  html += '<th class="border border-gray-300 px-3 py-2 text-left font-medium w-36">Nr seryjny</th>';
-  html += '<th class="border border-gray-300 px-3 py-2 text-left font-medium w-44">Nr świadectwa wzorcowania</th>';
+  html += '<th class="border border-white/[0.12] px-3 py-2 text-left font-medium">Wykonane pomiary</th>';
+  html += '<th class="border border-white/[0.12] px-3 py-2 text-left font-medium w-48">Przyrządy pomiarowe</th>';
+  html += '<th class="border border-white/[0.12] px-3 py-2 text-left font-medium w-36">Nr seryjny</th>';
+  html += '<th class="border border-white/[0.12] px-3 py-2 text-left font-medium w-44">Nr świadectwa wzorcowania</th>';
   html += '</tr>';
   html += '</thead>';
   html += '<tbody>';
   for (const instr of f.instruments) {
     html += '<tr>';
-    html += '<td class="border border-gray-300 px-3 py-2 text-sm text-gray-700">' + escapeHtml(INSTRUMENT_LABELS[instr.type]) + '</td>';
-    html += '<td class="border border-gray-300 px-1 py-1">';
-    html += '<input type="text" data-field="form-instr-' + instr.type + '-name" value="' + escapeHtml(instr.name) + '" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="np. MPI-530">';
+    html += '<td class="border border-white/[0.12] px-3 py-2 text-sm text-platinum/70">' + escapeHtml(INSTRUMENT_LABELS[instr.type]) + '</td>';
+    html += '<td class="border border-white/[0.12] px-1 py-1">';
+    html += '<input type="text" data-field="form-instr-' + instr.type + '-name" value="' + escapeHtml(instr.name) + '" class="w-full input-glass px-2 py-1 text-sm" placeholder="np. MPI-530">';
     html += '</td>';
-    html += '<td class="border border-gray-300 px-1 py-1">';
-    html += '<input type="text" data-field="form-instr-' + instr.type + '-serial" value="' + escapeHtml(instr.serial) + '" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="nr seryjny">';
+    html += '<td class="border border-white/[0.12] px-1 py-1">';
+    html += '<input type="text" data-field="form-instr-' + instr.type + '-serial" value="' + escapeHtml(instr.serial) + '" class="w-full input-glass px-2 py-1 text-sm" placeholder="nr seryjny">';
     html += '</td>';
-    html += '<td class="border border-gray-300 px-1 py-1">';
-    html += '<input type="text" data-field="form-instr-' + instr.type + '-calibration" value="' + escapeHtml(instr.calibration) + '" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="nr świadectwa">';
+    html += '<td class="border border-white/[0.12] px-1 py-1">';
+    html += '<input type="text" data-field="form-instr-' + instr.type + '-calibration" value="' + escapeHtml(instr.calibration) + '" class="w-full input-glass px-2 py-1 text-sm" placeholder="nr świadectwa">';
     html += '</td>';
     html += '</tr>';
   }
@@ -795,63 +795,63 @@ function renderFormTab() {
 
   // FORM-06: Ocena końcowa
   const assessment = calcFinalAssessment();
-  html += '<div id="assessment-section" class="bg-white border rounded p-4 mb-4">';
-  html += '<h3 class="text-md font-semibold mb-3 text-gray-800">Ocena wykonanych badań odbiorczych</h3>';
+  html += '<div id="assessment-section" class="card-glass p-6 mb-4">';
+  html += '<h3 class="text-md font-semibold mb-3 text-platinum">Ocena wykonanych badań odbiorczych</h3>';
   html += '<div class="overflow-x-auto">';
   html += '<table class="w-full border-collapse text-sm">';
-  html += '<thead class="bg-gray-50">';
+  html += '<thead class="bg-white/[0.06]">';
   html += '<tr>';
-  html += '<th class="border border-gray-300 px-3 py-2 text-left font-medium">Wykonane badania odbiorcze</th>';
-  html += '<th class="border border-gray-300 px-3 py-2 text-center font-medium w-24">Załączniki</th>';
-  html += '<th class="border border-gray-300 px-3 py-2 text-center font-medium w-36">Ogólny wynik</th>';
+  html += '<th class="border border-white/[0.12] px-3 py-2 text-left font-medium">Wykonane badania odbiorcze</th>';
+  html += '<th class="border border-white/[0.12] px-3 py-2 text-center font-medium w-24">Załączniki</th>';
+  html += '<th class="border border-white/[0.12] px-3 py-2 text-center font-medium w-36">Ogólny wynik</th>';
   html += '</tr>';
   html += '</thead>';
   html += '<tbody>';
 
   // Row 1: Dokumentacja (stały POZYTYWNY)
   html += '<tr>';
-  html += '<td class="border border-gray-300 px-3 py-2">Sprawdzenie dokumentacji instalacji</td>';
-  html += '<td class="border border-gray-300 px-3 py-2 text-center text-gray-400">\u2014</td>';
-  html += '<td class="border border-gray-300 px-3 py-2 text-center font-bold text-green-700">POZYTYWNY</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2">Sprawdzenie dokumentacji instalacji</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2 text-center text-platinum/30">\u2014</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2 text-center font-bold text-green-700">POZYTYWNY</td>';
   html += '</tr>';
 
   // Row 2: Oględziny (stały POZYTYWNY)
   html += '<tr>';
-  html += '<td class="border border-gray-300 px-3 py-2">Ogl\u0119dziny instalacji elektrycznej</td>';
-  html += '<td class="border border-gray-300 px-3 py-2 text-center text-gray-400">\u2014</td>';
-  html += '<td class="border border-gray-300 px-3 py-2 text-center font-bold text-green-700">POZYTYWNY</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2">Ogl\u0119dziny instalacji elektrycznej</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2 text-center text-platinum/30">\u2014</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2 text-center font-bold text-green-700">POZYTYWNY</td>';
   html += '</tr>';
 
   // Row 3: SWZ
   const swzClass = assessment.swz === 'POZYTYWNY' ? 'text-green-700' : assessment.swz === 'NEGATYWNY' ? 'text-red-700' : 'text-gray-400';
   html += '<tr>';
-  html += '<td class="border border-gray-300 px-3 py-2">Badanie skuteczno\u015bci ochrony przeciwpora\u017ceniowej przez samoczynne wy\u0142\u0105czenie zasilania</td>';
-  html += '<td class="border border-gray-300 px-3 py-2 text-center">Za\u0142. 1</td>';
-  html += '<td id="assess-swz" class="border border-gray-300 px-3 py-2 text-center font-bold ' + swzClass + '">' + (assessment.swz || '\u2014') + '</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2">Badanie skuteczno\u015bci ochrony przeciwpora\u017ceniowej przez samoczynne wy\u0142\u0105czenie zasilania</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2 text-center">Za\u0142. 1</td>';
+  html += '<td id="assess-swz" class="border border-white/[0.12] px-3 py-2 text-center font-bold ' + swzClass + '">' + (assessment.swz || '\u2014') + '</td>';
   html += '</tr>';
 
   // Row 4: Izolacja
   const izolClass = assessment.izol === 'POZYTYWNY' ? 'text-green-700' : assessment.izol === 'NEGATYWNY' ? 'text-red-700' : 'text-gray-400';
   html += '<tr>';
-  html += '<td class="border border-gray-300 px-3 py-2">Badanie stanu rezystancji izolacji obwod\u00f3w</td>';
-  html += '<td class="border border-gray-300 px-3 py-2 text-center">Za\u0142. 2</td>';
-  html += '<td id="assess-izol" class="border border-gray-300 px-3 py-2 text-center font-bold ' + izolClass + '">' + (assessment.izol || '\u2014') + '</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2">Badanie stanu rezystancji izolacji obwod\u00f3w</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2 text-center">Za\u0142. 2</td>';
+  html += '<td id="assess-izol" class="border border-white/[0.12] px-3 py-2 text-center font-bold ' + izolClass + '">' + (assessment.izol || '\u2014') + '</td>';
   html += '</tr>';
 
   // Row 5: RCD
   const rcdClass = assessment.rcd === 'POZYTYWNY' ? 'text-green-700' : assessment.rcd === 'NEGATYWNY' ? 'text-red-700' : 'text-gray-400';
   html += '<tr>';
-  html += '<td class="border border-gray-300 px-3 py-2">Badanie skuteczno\u015bci ochrony dodatkowej (RCD)</td>';
-  html += '<td class="border border-gray-300 px-3 py-2 text-center">Za\u0142. 3</td>';
-  html += '<td id="assess-rcd" class="border border-gray-300 px-3 py-2 text-center font-bold ' + rcdClass + '">' + (assessment.rcd || '\u2014') + '</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2">Badanie skuteczno\u015bci ochrony dodatkowej (RCD)</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2 text-center">Za\u0142. 3</td>';
+  html += '<td id="assess-rcd" class="border border-white/[0.12] px-3 py-2 text-center font-bold ' + rcdClass + '">' + (assessment.rcd || '\u2014') + '</td>';
   html += '</tr>';
 
   // Row 6: Uziemienie
   const uziemClass = assessment.uziem === 'POZYTYWNY' ? 'text-green-700' : assessment.uziem === 'NEGATYWNY' ? 'text-red-700' : 'text-gray-400';
   html += '<tr>';
-  html += '<td class="border border-gray-300 px-3 py-2">Badanie rezystancji uziemienia</td>';
-  html += '<td class="border border-gray-300 px-3 py-2 text-center">Za\u0142. 4</td>';
-  html += '<td id="assess-uziem" class="border border-gray-300 px-3 py-2 text-center font-bold ' + uziemClass + '">' + (assessment.uziem || '\u2014') + '</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2">Badanie rezystancji uziemienia</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2 text-center">Za\u0142. 4</td>';
+  html += '<td id="assess-uziem" class="border border-white/[0.12] px-3 py-2 text-center font-bold ' + uziemClass + '">' + (assessment.uziem || '\u2014') + '</td>';
   html += '</tr>';
 
   html += '</tbody>';
@@ -861,8 +861,8 @@ function renderFormTab() {
 
   // FORM-07: Orzeczenie
   const orz = calcOrzeczenie();
-  html += '<div id="orzeczenie-section" class="bg-white border rounded p-4 mb-4">';
-  html += '<h3 class="text-md font-semibold mb-3 text-gray-800">Orzeczenie</h3>';
+  html += '<div id="orzeczenie-section" class="hero-result-card p-6 mb-4">';
+  html += '<h3 class="text-md font-semibold mb-3 text-platinum">Orzeczenie</h3>';
 
   if (orz.allPositive) {
     html += '<p id="orzeczenie-text" class="text-base font-bold text-green-700 mb-2">Na podstawie wykonanych bada\u0144 odbiorczych orzeka si\u0119, \u017ce instalacja elektryczna <strong>NADAJE SI\u0118</strong> do eksploatacji.</p>';
@@ -872,24 +872,24 @@ function renderFormTab() {
     if (hasNegative) {
       html += '<p id="orzeczenie-text" class="text-base font-bold text-red-700 mb-2">Na podstawie wykonanych bada\u0144 odbiorczych orzeka si\u0119, \u017ce instalacja elektryczna <strong>NIE NADAJE SI\u0118</strong> do eksploatacji.</p>';
     } else {
-      html += '<p id="orzeczenie-text" class="text-base text-gray-400 mb-2">(uzupe\u0142nij dane pomiarowe)</p>';
+      html += '<p id="orzeczenie-text" class="text-base text-platinum/30 mb-2">(uzupe\u0142nij dane pomiarowe)</p>';
     }
   }
 
   if (orz.nextDate) {
-    html += '<p id="next-test-date" class="text-sm text-gray-700">Data nast\u0119pnego badania: <strong>' + orz.nextDate + ' r.</strong> lub po dokonaniu zmian.</p>';
+    html += '<p id="next-test-date" class="text-sm text-platinum/70">Data nast\u0119pnego badania: <strong>' + orz.nextDate + ' r.</strong> lub po dokonaniu zmian.</p>';
   } else {
-    html += '<p id="next-test-date" class="text-sm text-gray-400">(uzupe\u0142nij dat\u0119 badania)</p>';
+    html += '<p id="next-test-date" class="text-sm text-platinum/30">(uzupe\u0142nij dat\u0119 badania)</p>';
   }
 
   html += '<div class="mt-8 flex gap-16">';
   html += '<div class="text-center">';
-  html += '<div class="border-b border-gray-400 w-48 mb-1"></div>';
-  html += '<div class="text-xs text-gray-500">wykonawca</div>';
+  html += '<div class="border-b border-platinum/30 w-48 mb-1"></div>';
+  html += '<div class="text-xs text-platinum/50">wykonawca</div>';
   html += '</div>';
   html += '<div class="text-center">';
-  html += '<div class="border-b border-gray-400 w-48 mb-1"></div>';
-  html += '<div class="text-xs text-gray-500">miejscowo\u015b\u0107 i data</div>';
+  html += '<div class="border-b border-platinum/30 w-48 mb-1"></div>';
+  html += '<div class="text-xs text-platinum/50">miejscowo\u015b\u0107 i data</div>';
   html += '</div>';
   html += '</div>';
   html += '</div>';
@@ -901,50 +901,50 @@ function renderAttachment1() {
   const container = document.getElementById('attachment-1');
   let html = '';
 
-  html += '<h2 class="text-lg font-semibold mb-3">Załącznik nr 1 - Skuteczność ochrony przez samoczynne wyłączenie zasilania</h2>';
-  html += '<button data-action="add-section" class="mb-3 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Dodaj sekcję</button>';
+  html += '<h2 class="text-lg font-semibold mb-3 text-platinum">Załącznik nr 1 - Skuteczność ochrony przez samoczynne wyłączenie zasilania</h2>';
+  html += '<button data-action="add-section" class="mb-3 px-3 py-1 btn-primary-glass text-sm">Dodaj sekcję</button>';
 
   html += '<div class="overflow-x-auto">';
-  html += '<table class="w-full border-collapse border border-gray-300 text-sm">';
+  html += '<table class="w-full border-collapse border border-white/[0.12] text-sm">';
 
   // 4-row header (as in reference)
-  html += '<thead class="bg-gray-50 text-xs text-center">';
+  html += '<thead class="bg-white/[0.06] text-xs text-center text-platinum/70">';
 
   // Row 1: main headers
   html += '<tr>';
-  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
-  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 min-w-[120px]">Obwód<br><span class="font-normal text-gray-500">numer gniazda</span></th>';
-  html += '<th colspan="4" class="border border-gray-300 px-2 py-1">Zabezpieczenia</th>';
-  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-16">U<sub>sk</sub></th>';
-  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-16">I<sub>a</sub></th>';
-  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-16">I<sub>d</sub></th>';
-  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-16">Z<sub>s</sub></th>';
-  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-20">Z<sub>s max</sub></th>';
-  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-14">t<sub>w</sub></th>';
-  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-24">Ocena</th>';
-  html += '<th rowspan="4" class="border border-gray-300 px-2 py-1 w-10"></th>';
+  html += '<th rowspan="4" class="border border-white/[0.12] px-2 py-1 w-10">Lp.</th>';
+  html += '<th rowspan="4" class="border border-white/[0.12] px-2 py-1 min-w-[120px]">Obwód<br><span class="font-normal text-platinum/50">numer gniazda</span></th>';
+  html += '<th colspan="4" class="border border-white/[0.12] px-2 py-1">Zabezpieczenia</th>';
+  html += '<th rowspan="4" class="border border-white/[0.12] px-2 py-1 w-16">U<sub>sk</sub></th>';
+  html += '<th rowspan="4" class="border border-white/[0.12] px-2 py-1 w-16">I<sub>a</sub></th>';
+  html += '<th rowspan="4" class="border border-white/[0.12] px-2 py-1 w-16">I<sub>d</sub></th>';
+  html += '<th rowspan="4" class="border border-white/[0.12] px-2 py-1 w-16">Z<sub>s</sub></th>';
+  html += '<th rowspan="4" class="border border-white/[0.12] px-2 py-1 w-20">Z<sub>s max</sub></th>';
+  html += '<th rowspan="4" class="border border-white/[0.12] px-2 py-1 w-14">t<sub>w</sub></th>';
+  html += '<th rowspan="4" class="border border-white/[0.12] px-2 py-1 w-24">Ocena</th>';
+  html += '<th rowspan="4" class="border border-white/[0.12] px-2 py-1 w-10"></th>';
   html += '</tr>';
 
   // Row 2: zabezpieczenia sub-headers
   html += '<tr>';
-  html += '<th colspan="2" class="border border-gray-300 px-2 py-1">dodatkowe</th>';
-  html += '<th colspan="2" class="border border-gray-300 px-2 py-1">podstawowe</th>';
+  html += '<th colspan="2" class="border border-white/[0.12] px-2 py-1">dodatkowe</th>';
+  html += '<th colspan="2" class="border border-white/[0.12] px-2 py-1">podstawowe</th>';
   html += '</tr>';
 
   // Row 3: typ / prad labels
   html += '<tr>';
-  html += '<th class="border border-gray-300 px-1 py-0.5">typ</th>';
-  html += '<th class="border border-gray-300 px-1 py-0.5">prąd</th>';
-  html += '<th class="border border-gray-300 px-1 py-0.5">typ</th>';
-  html += '<th class="border border-gray-300 px-1 py-0.5">prąd I<sub>&Delta;n</sub></th>';
+  html += '<th class="border border-white/[0.12] px-1 py-0.5">typ</th>';
+  html += '<th class="border border-white/[0.12] px-1 py-0.5">prąd</th>';
+  html += '<th class="border border-white/[0.12] px-1 py-0.5">typ</th>';
+  html += '<th class="border border-white/[0.12] px-1 py-0.5">prąd I<sub>&Delta;n</sub></th>';
   html += '</tr>';
 
   // Row 4: units
-  html += '<tr class="text-gray-500">';
-  html += '<th class="border border-gray-300 px-1 py-0.5">-</th>';
-  html += '<th class="border border-gray-300 px-1 py-0.5">[A]</th>';
-  html += '<th class="border border-gray-300 px-1 py-0.5">-</th>';
-  html += '<th class="border border-gray-300 px-1 py-0.5">[A]</th>';
+  html += '<tr class="text-platinum/50">';
+  html += '<th class="border border-white/[0.12] px-1 py-0.5">-</th>';
+  html += '<th class="border border-white/[0.12] px-1 py-0.5">[A]</th>';
+  html += '<th class="border border-white/[0.12] px-1 py-0.5">-</th>';
+  html += '<th class="border border-white/[0.12] px-1 py-0.5">[A]</th>';
   html += '</tr>';
 
   html += '</thead>';
@@ -953,32 +953,32 @@ function renderAttachment1() {
 
   // Fixed row: Tablica rozdzielcza (Lp.1)
   const fr = AppState.swzFixedRow;
-  html += '<tr class="bg-yellow-50" data-row-id="fixed">';
+  html += '<tr class="bg-cyan/5" data-row-id="fixed">';
   html += renderSWZRowCells(fr, 1, null, true);
   html += '</tr>';
 
   // Dynamic sections
   for (const section of AppState.sections) {
     // Section header row
-    html += '<tr class="bg-gray-200">';
-    html += '<td colspan="12" class="border border-gray-300 px-2 py-1 font-bold">';
-    html += '<input type="text" data-field="section-title" data-section-id="' + section.id + '" value="' + escapeHtml(section.title) + '" class="bg-transparent font-bold w-64 outline-none focus:bg-white focus:ring-1 focus:ring-blue-400 rounded px-1">';
-    html += '<button data-action="add-subsection" data-section-id="' + section.id + '" class="ml-3 px-2 py-0.5 bg-blue-500 text-white rounded text-xs hover:bg-blue-600">Dodaj podtytuł</button>';
+    html += '<tr class="bg-white/[0.08]">';
+    html += '<td colspan="12" class="border border-white/[0.12] px-2 py-1 font-bold">';
+    html += '<input type="text" data-field="section-title" data-section-id="' + section.id + '" value="' + escapeHtml(section.title) + '" class="bg-transparent font-bold w-64 outline-none focus:bg-white/10 focus:ring-1 focus:ring-cyan/40 rounded px-1">';
+    html += '<button data-action="add-subsection" data-section-id="' + section.id + '" class="ml-3 px-2 py-0.5 btn-glass text-cyan text-xs">Dodaj podtytuł</button>';
     html += '</td>';
-    html += '<td colspan="2" class="border border-gray-300 px-2 py-1 text-right">';
-    html += '<button data-action="remove-section" data-section-id="' + section.id + '" class="px-2 py-0.5 bg-red-500 text-white rounded text-xs hover:bg-red-600">Usuń sekcję</button>';
+    html += '<td colspan="2" class="border border-white/[0.12] px-2 py-1 text-right">';
+    html += '<button data-action="remove-section" data-section-id="' + section.id + '" class="px-2 py-0.5 btn-glass text-red-400 text-xs">Usuń sekcję</button>';
     html += '</td>';
     html += '</tr>';
 
     for (const sub of section.subsections) {
       // Subsection header row
-      html += '<tr class="bg-gray-100">';
-      html += '<td colspan="12" class="border border-gray-300 px-2 py-1 italic">';
-      html += '<input type="text" data-field="subsection-title" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" value="' + escapeHtml(sub.title) + '" class="bg-transparent italic w-64 outline-none focus:bg-white focus:ring-1 focus:ring-blue-400 rounded px-1">';
-      html += '<button data-action="add-row-swz" data-sub-id="' + sub.id + '" class="ml-3 px-2 py-0.5 bg-green-500 text-white rounded text-xs hover:bg-green-600">Dodaj wiersz</button>';
+      html += '<tr class="bg-white/[0.04]">';
+      html += '<td colspan="12" class="border border-white/[0.12] px-2 py-1 italic">';
+      html += '<input type="text" data-field="subsection-title" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" value="' + escapeHtml(sub.title) + '" class="bg-transparent italic w-64 outline-none focus:bg-white/10 focus:ring-1 focus:ring-cyan/40 rounded px-1">';
+      html += '<button data-action="add-row-swz" data-sub-id="' + sub.id + '" class="ml-3 px-2 py-0.5 btn-glass text-green-400 text-xs">Dodaj wiersz</button>';
       html += '</td>';
-      html += '<td colspan="2" class="border border-gray-300 px-2 py-1 text-right">';
-      html += '<button data-action="remove-subsection" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" class="px-2 py-0.5 bg-red-400 text-white rounded text-xs hover:bg-red-500">Usuń podtytuł</button>';
+      html += '<td colspan="2" class="border border-white/[0.12] px-2 py-1 text-right">';
+      html += '<button data-action="remove-subsection" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" class="px-2 py-0.5 btn-glass text-red-400 text-xs">Usuń podtytuł</button>';
       html += '</td>';
       html += '</tr>';
 
@@ -997,7 +997,7 @@ function renderAttachment1() {
   html += '</div>';
 
   // Legend SWZ-07
-  html += '<div class="mt-4 text-xs text-gray-600 grid grid-cols-2 gap-x-6 gap-y-1">';
+  html += '<div class="mt-4 text-xs text-platinum/60 grid grid-cols-2 gap-x-6 gap-y-1">';
   html += '<div><strong>I<sub>n</sub></strong> - prąd znamionowy zabezpieczenia [A]</div>';
   html += '<div><strong>I<sub>a</sub></strong> - prąd zapewniający samoczynne wyłączenie zasilania [A]</div>';
   html += '<div><strong>I<sub>d</sub></strong> - prąd obliczeniowy zwarcia jednofazowego [A]</div>';
@@ -1018,33 +1018,33 @@ function renderIZOLRowCells(row, lp, subId, isFixed) {
   const activeFields = getActiveIZOLFields(row.phaseType);
 
   const dataAttrs = 'data-row-id="' + rowIdAttr + '"' + (subIdAttr ? ' data-sub-id="' + subIdAttr + '"' : '') + ' data-attachment="2"';
-  const inputCls = 'w-full border border-gray-300 rounded px-1 py-0.5 text-sm text-center';
+  const inputCls = 'w-full input-glass px-1 py-0.5 text-sm text-center';
 
   let html = '';
 
   // Lp.
-  html += '<td class="border border-gray-300 px-2 py-1 text-center font-medium">' + lp + '</td>';
+  html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-medium">' + lp + '</td>';
 
   // Nazwa obwodu
   if (isFixed) {
-    html += '<td class="border border-gray-300 px-2 py-1 font-medium">WLZ</td>';
+    html += '<td class="border border-white/[0.12] px-2 py-1 font-medium">WLZ</td>';
   } else {
-    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<td class="border border-white/[0.12] px-1 py-0.5">';
     html += '<input type="text" data-field="izol-name" ' + dataAttrs + ' value="' + escapeHtml(row.name || '') + '" class="' + inputCls + '" placeholder="nazwa obwodu">';
     html += '</td>';
   }
 
   // Typ przewodu
-  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<td class="border border-white/[0.12] px-1 py-0.5">';
   html += '<input type="text" data-field="izol-wireType" ' + dataAttrs + ' value="' + escapeHtml(row.wireType || '') + '" class="' + inputCls + '" placeholder="typ przewodu">';
   html += '</td>';
 
   // Fazy select
-  html += '<td class="border border-gray-300 px-1 py-0.5">';
+  html += '<td class="border border-white/[0.12] px-1 py-0.5">';
   if (isFixed) {
-    html += '<span class="text-sm text-gray-500">3-faz</span>';
+    html += '<span class="text-sm text-platinum/50">3-faz</span>';
   } else {
-    html += '<select data-field="izol-phaseType" ' + dataAttrs + ' class="w-full border border-gray-300 rounded px-1 py-0.5 text-sm">';
+    html += '<select data-field="izol-phaseType" ' + dataAttrs + ' class="w-full select-glass px-1 py-0.5 text-sm">';
     html += '<option value="1"' + (row.phaseType === '1' ? ' selected' : '') + '>1-fazowy</option>';
     html += '<option value="3"' + (row.phaseType === '3' ? ' selected' : '') + '>3-fazowy</option>';
     html += '</select>';
@@ -1056,25 +1056,25 @@ function renderIZOLRowCells(row, lp, subId, isFixed) {
     const isActive = activeFields.includes(field);
     const val = row.rp[field] != null ? row.rp[field] : '';
     const disabledAttr = isActive ? '' : ' disabled';
-    const disabledCls = isActive ? '' : ' bg-gray-100 text-gray-400 cursor-not-allowed';
-    html += '<td class="border border-gray-300 px-0.5 py-0.5">';
-    html += '<input type="number" data-field="izol-rp-' + field + '" ' + dataAttrs + ' value="' + val + '" step="0.01" class="w-14 border border-gray-300 rounded px-0.5 py-0.5 text-sm text-center font-mono' + disabledCls + '"' + disabledAttr + '>';
+    const disabledCls = isActive ? '' : ' bg-white/[0.03] text-platinum/30 cursor-not-allowed';
+    html += '<td class="border border-white/[0.12] px-0.5 py-0.5">';
+    html += '<input type="number" data-field="izol-rp-' + field + '" ' + dataAttrs + ' value="' + val + '" step="0.01" class="w-14 input-glass px-0.5 py-0.5 text-sm text-center font-mono' + disabledCls + '"' + disabledAttr + '>';
     html += '</td>';
   }
 
   // Rw (not editable, display "1")
-  html += '<td class="border border-gray-300 px-2 py-1 text-center font-mono">' + row.Rw + '</td>';
+  html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-mono">' + row.Rw + '</td>';
 
   // Verdict
   const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700' : calc.verdict === 'NEGATYWNA' ? 'text-red-700' : '';
-  html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold izol-verdict-cell ' + verdictClass + '" data-row-id="' + rowIdAttr + '">' + (calc.verdict || '') + '</td>';
+  html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-bold izol-verdict-cell ' + verdictClass + '" data-row-id="' + rowIdAttr + '">' + (calc.verdict || '') + '</td>';
 
   // Action
   if (isFixed) {
-    html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" title="Wiersz stały - nie można usunąć">-</td>';
+    html += '<td class="border border-white/[0.12] px-2 py-1 text-center text-platinum/30" title="Wiersz stały - nie można usunąć">-</td>';
   } else {
-    html += '<td class="border border-gray-300 px-1 py-1 text-center">';
-    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-sub-id="' + subId + '" data-attachment="2" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
+    html += '<td class="border border-white/[0.12] px-1 py-1 text-center">';
+    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-sub-id="' + subId + '" data-attachment="2" class="text-red-400 hover:text-red-300 text-xs">Usuń</button>';
     html += '</td>';
   }
 
@@ -1085,30 +1085,30 @@ function renderAttachment2() {
   const container = document.getElementById('attachment-2');
   let html = '';
 
-  html += '<h2 class="text-lg font-semibold mb-3">Załącznik nr 2 - Rezystancja izolacji</h2>';
-  html += '<button data-action="add-section" class="mb-3 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Dodaj sekcję</button>';
+  html += '<h2 class="text-lg font-semibold mb-3 text-platinum">Załącznik nr 2 - Rezystancja izolacji</h2>';
+  html += '<button data-action="add-section" class="mb-3 px-3 py-1 btn-primary-glass text-sm">Dodaj sekcję</button>';
 
   html += '<div class="overflow-x-auto">';
   html += '<table class="min-w-max border-collapse text-sm">';
 
   // Header Row 1
-  html += '<thead class="bg-gray-50 text-xs text-center">';
+  html += '<thead class="bg-white/[0.06] text-xs text-center text-platinum/70">';
   html += '<tr>';
-  html += '<th rowspan="2" class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
-  html += '<th rowspan="2" class="border border-gray-300 px-2 py-1 min-w-[120px]">Nazwa obwodu</th>';
-  html += '<th rowspan="2" class="border border-gray-300 px-2 py-1 min-w-[100px]">Typ przewodu</th>';
-  html += '<th rowspan="2" class="border border-gray-300 px-2 py-1 w-20">Fazy</th>';
-  html += '<th colspan="10" class="border border-gray-300 px-2 py-1">R<sub>p</sub> [M&Omega;]</th>';
-  html += '<th rowspan="2" class="border border-gray-300 px-2 py-1 w-14">R<sub>w</sub><br>[M&Omega;]</th>';
-  html += '<th rowspan="2" class="border border-gray-300 px-2 py-1 w-24">Ocena</th>';
-  html += '<th rowspan="2" class="border border-gray-300 px-2 py-1 w-10"></th>';
+  html += '<th rowspan="2" class="border border-white/[0.12] px-2 py-1 w-10">Lp.</th>';
+  html += '<th rowspan="2" class="border border-white/[0.12] px-2 py-1 min-w-[120px]">Nazwa obwodu</th>';
+  html += '<th rowspan="2" class="border border-white/[0.12] px-2 py-1 min-w-[100px]">Typ przewodu</th>';
+  html += '<th rowspan="2" class="border border-white/[0.12] px-2 py-1 w-20">Fazy</th>';
+  html += '<th colspan="10" class="border border-white/[0.12] px-2 py-1">R<sub>p</sub> [M&Omega;]</th>';
+  html += '<th rowspan="2" class="border border-white/[0.12] px-2 py-1 w-14">R<sub>w</sub><br>[M&Omega;]</th>';
+  html += '<th rowspan="2" class="border border-white/[0.12] px-2 py-1 w-24">Ocena</th>';
+  html += '<th rowspan="2" class="border border-white/[0.12] px-2 py-1 w-10"></th>';
   html += '</tr>';
 
   // Header Row 2 - Rp sub-columns
   html += '<tr>';
   const izolCols = ['L1-N','L2-N','L3-N','L1-L2','L1-L3','L2-L3','L1-PE','L2-PE','L3-PE','N-PE'];
   for (const col of izolCols) {
-    html += '<th class="border border-gray-300 px-1 py-0.5 text-xs font-normal text-gray-600">' + col + '</th>';
+    html += '<th class="border border-white/[0.12] px-1 py-0.5 text-xs font-normal text-platinum/60">' + col + '</th>';
   }
   html += '</tr>';
   html += '</thead>';
@@ -1118,32 +1118,32 @@ function renderAttachment2() {
   // Fixed row: WLZ (Lp.1) - always 3-phase
   const ifr = AppState.attachment2.fixedRow;
   ifr.calculated = calcIZOLRow(ifr);
-  html += '<tr class="bg-yellow-50" data-row-id="izol-fixed">';
+  html += '<tr class="bg-cyan/5" data-row-id="izol-fixed">';
   html += renderIZOLRowCells(ifr, 1, null, true);
   html += '</tr>';
 
   // Shared sections from AppState.sections (DYN-06)
   for (const section of AppState.sections) {
     // Section header row with editable title and management buttons
-    html += '<tr class="bg-gray-200">';
-    html += '<td colspan="15" class="border border-gray-300 px-2 py-1 font-bold">';
-    html += '<input type="text" data-field="section-title" data-section-id="' + section.id + '" value="' + escapeHtml(section.title) + '" class="bg-transparent font-bold w-64 outline-none focus:bg-white focus:ring-1 focus:ring-blue-400 rounded px-1">';
-    html += '<button data-action="add-subsection" data-section-id="' + section.id + '" class="ml-3 px-2 py-0.5 bg-blue-500 text-white rounded text-xs hover:bg-blue-600">Dodaj podtytuł</button>';
+    html += '<tr class="bg-white/[0.08]">';
+    html += '<td colspan="15" class="border border-white/[0.12] px-2 py-1 font-bold">';
+    html += '<input type="text" data-field="section-title" data-section-id="' + section.id + '" value="' + escapeHtml(section.title) + '" class="bg-transparent font-bold w-64 outline-none focus:bg-white/10 focus:ring-1 focus:ring-cyan/40 rounded px-1">';
+    html += '<button data-action="add-subsection" data-section-id="' + section.id + '" class="ml-3 px-2 py-0.5 btn-glass text-cyan text-xs">Dodaj podtytuł</button>';
     html += '</td>';
-    html += '<td colspan="2" class="border border-gray-300 px-2 py-1 text-right">';
-    html += '<button data-action="remove-section" data-section-id="' + section.id + '" class="px-2 py-0.5 bg-red-500 text-white rounded text-xs hover:bg-red-600">Usuń sekcję</button>';
+    html += '<td colspan="2" class="border border-white/[0.12] px-2 py-1 text-right">';
+    html += '<button data-action="remove-section" data-section-id="' + section.id + '" class="px-2 py-0.5 btn-glass text-red-400 text-xs">Usuń sekcję</button>';
     html += '</td>';
     html += '</tr>';
 
     for (const sub of section.subsections) {
       // Subsection header row with editable title
-      html += '<tr class="bg-gray-100">';
-      html += '<td colspan="15" class="border border-gray-300 px-2 py-1 italic">';
-      html += '<input type="text" data-field="subsection-title" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" value="' + escapeHtml(sub.title) + '" class="bg-transparent italic w-64 outline-none focus:bg-white focus:ring-1 focus:ring-blue-400 rounded px-1">';
-      html += '<button data-action="add-row-izol" data-sub-id="' + sub.id + '" class="ml-3 px-2 py-0.5 bg-green-500 text-white rounded text-xs hover:bg-green-600 not-italic font-normal">Dodaj wiersz</button>';
+      html += '<tr class="bg-white/[0.04]">';
+      html += '<td colspan="15" class="border border-white/[0.12] px-2 py-1 italic">';
+      html += '<input type="text" data-field="subsection-title" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" value="' + escapeHtml(sub.title) + '" class="bg-transparent italic w-64 outline-none focus:bg-white/10 focus:ring-1 focus:ring-cyan/40 rounded px-1">';
+      html += '<button data-action="add-row-izol" data-sub-id="' + sub.id + '" class="ml-3 px-2 py-0.5 btn-glass text-green-400 text-xs not-italic font-normal">Dodaj wiersz</button>';
       html += '</td>';
-      html += '<td colspan="2" class="border border-gray-300 px-2 py-1 text-right">';
-      html += '<button data-action="remove-subsection" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" class="px-2 py-0.5 bg-red-400 text-white rounded text-xs hover:bg-red-500">Usuń podtytuł</button>';
+      html += '<td colspan="2" class="border border-white/[0.12] px-2 py-1 text-right">';
+      html += '<button data-action="remove-subsection" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" class="px-2 py-0.5 btn-glass text-red-400 text-xs">Usuń podtytuł</button>';
       html += '</td>';
       html += '</tr>';
 
@@ -1163,7 +1163,7 @@ function renderAttachment2() {
   html += '</div>';
 
   // Legend IZOL-07
-  html += '<div class="mt-4 text-xs text-gray-600 grid grid-cols-2 gap-x-6 gap-y-1">';
+  html += '<div class="mt-4 text-xs text-platinum/60 grid grid-cols-2 gap-x-6 gap-y-1">';
   html += '<div><strong>R<sub>p</sub></strong> - Zmierzona wartość rezystancji izolacji [M&Omega;]</div>';
   html += '<div><strong>R<sub>w</sub></strong> - Wymagana wartość rezystancji izolacji [M&Omega;]</div>';
   html += '</div>';
@@ -1173,27 +1173,27 @@ function renderAttachment2() {
 
 function renderAttachment3() {
   const container = document.getElementById('attachment-3');
-  const inputCls = 'w-full border border-gray-300 rounded px-1 py-0.5 text-sm text-center';
-  const selectCls = 'w-full border border-gray-300 rounded px-1 py-0.5 text-sm';
+  const inputCls = 'w-full input-glass px-1 py-0.5 text-sm text-center';
+  const selectCls = 'w-full select-glass px-1 py-0.5 text-sm';
   let html = '';
 
-  html += '<h2 class="text-lg font-semibold mb-3">Załącznik nr 3 - Badanie wyłączników różnicowoprądowych (RCD)</h2>';
+  html += '<h2 class="text-lg font-semibold mb-3 text-platinum">Załącznik nr 3 - Badanie wyłączników różnicowoprądowych (RCD)</h2>';
 
   html += '<div class="overflow-x-auto">';
   html += '<table class="w-full border-collapse text-sm">';
 
   // Header (1 row)
   html += '<thead>';
-  html += '<tr class="bg-gray-50 text-center font-semibold">';
-  html += '<th class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 min-w-[180px]">Typ urządzenia</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-16">TEST</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-20">I<sub>n</sub> [mA]</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-20">I<sub>w</sub> [mA]</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-20">t<sub>w</sub> [ms]</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-20">t<sub>z</sub> [ms]</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-24">Ocena</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-10"></th>';
+  html += '<tr class="bg-white/[0.06] text-center font-semibold text-platinum/70">';
+  html += '<th class="border border-white/[0.12] px-2 py-1 w-10">Lp.</th>';
+  html += '<th class="border border-white/[0.12] px-2 py-1 min-w-[180px]">Typ urządzenia</th>';
+  html += '<th class="border border-white/[0.12] px-2 py-1 w-16">TEST</th>';
+  html += '<th class="border border-white/[0.12] px-2 py-1 w-20">I<sub>n</sub> [mA]</th>';
+  html += '<th class="border border-white/[0.12] px-2 py-1 w-20">I<sub>w</sub> [mA]</th>';
+  html += '<th class="border border-white/[0.12] px-2 py-1 w-20">t<sub>w</sub> [ms]</th>';
+  html += '<th class="border border-white/[0.12] px-2 py-1 w-20">t<sub>z</sub> [ms]</th>';
+  html += '<th class="border border-white/[0.12] px-2 py-1 w-24">Ocena</th>';
+  html += '<th class="border border-white/[0.12] px-2 py-1 w-10"></th>';
   html += '</tr>';
   html += '</thead>';
 
@@ -1209,15 +1209,15 @@ function renderAttachment3() {
     html += '<tr data-row-id="' + row.id + '">';
 
     // Lp.
-    html += '<td class="border border-gray-300 px-2 py-1 text-center font-medium">' + lp + '</td>';
+    html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-medium">' + lp + '</td>';
 
     // Typ urzadzenia
-    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<td class="border border-white/[0.12] px-1 py-0.5">';
     html += '<input type="text" data-field="rcd-deviceType" ' + dataAttrs + ' value="' + escapeHtml(row.deviceType || '') + '" class="' + inputCls + '" placeholder="np. Eaton PF7-25/2/003-A">';
     html += '</td>';
 
     // TEST (TAK/NIE)
-    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<td class="border border-white/[0.12] px-1 py-0.5">';
     html += '<select data-field="rcd-testResult" ' + dataAttrs + ' class="' + selectCls + '">';
     html += '<option value="TAK"' + (row.testResult === 'TAK' ? ' selected' : '') + '>TAK</option>';
     html += '<option value="NIE"' + (row.testResult === 'NIE' ? ' selected' : '') + '>NIE</option>';
@@ -1225,49 +1225,49 @@ function renderAttachment3() {
     html += '</td>';
 
     // In [mA]
-    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<td class="border border-white/[0.12] px-1 py-0.5">';
     html += '<input type="number" data-field="rcd-In" ' + dataAttrs + ' value="' + (row.In != null ? row.In : '') + '" step="1" class="' + inputCls + ' font-mono" placeholder="mA">';
     html += '</td>';
 
     // Iw [mA]
-    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<td class="border border-white/[0.12] px-1 py-0.5">';
     html += '<input type="number" data-field="rcd-Iw" ' + dataAttrs + ' value="' + (row.Iw != null ? row.Iw : '') + '" step="0.1" class="' + inputCls + ' font-mono" placeholder="mA">';
     html += '</td>';
 
     // tw [ms]
-    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<td class="border border-white/[0.12] px-1 py-0.5">';
     html += '<input type="number" data-field="rcd-tw" ' + dataAttrs + ' value="' + (row.tw != null ? row.tw : '') + '" step="1" class="' + inputCls + ' font-mono" placeholder="ms">';
     html += '</td>';
 
     // tz [ms] (default 300)
-    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<td class="border border-white/[0.12] px-1 py-0.5">';
     html += '<input type="number" data-field="rcd-tz" ' + dataAttrs + ' value="' + (row.tz != null ? row.tz : '') + '" step="1" class="' + inputCls + ' font-mono" placeholder="ms">';
     html += '</td>';
 
     // Verdict
     const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700' : calc.verdict === 'NEGATYWNA' ? 'text-red-700' : '';
-    html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold rcd-verdict-cell ' + verdictClass + '" data-row-id="' + row.id + '">' + (calc.verdict || '') + '</td>';
+    html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-bold rcd-verdict-cell ' + verdictClass + '" data-row-id="' + row.id + '">' + (calc.verdict || '') + '</td>';
 
     // Usun
-    html += '<td class="border border-gray-300 px-1 py-1 text-center">';
-    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-attachment="3" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
+    html += '<td class="border border-white/[0.12] px-1 py-1 text-center">';
+    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-attachment="3" class="text-red-400 hover:text-red-300 text-xs">Usuń</button>';
     html += '</td>';
 
     html += '</tr>';
   }
 
   if (AppState.attachment3.rows.length === 0) {
-    html += '<tr><td colspan="9" class="border border-gray-300 px-2 py-4 text-center text-gray-400 italic">Brak wierszy - kliknij "Dodaj wiersz RCD"</td></tr>';
+    html += '<tr><td colspan="9" class="border border-white/[0.12] px-2 py-4 text-center text-platinum/30 italic">Brak wierszy - kliknij "Dodaj wiersz RCD"</td></tr>';
   }
 
   html += '</tbody></table>';
   html += '</div>';
 
   // "Dodaj wiersz RCD" button below table
-  html += '<button data-action="add-row-rcd" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Dodaj wiersz RCD</button>';
+  html += '<button data-action="add-row-rcd" class="mt-2 px-4 py-2 btn-primary-glass text-sm">Dodaj wiersz RCD</button>';
 
   // Legend RCD-05
-  html += '<div class="mt-4 text-xs text-gray-600 grid grid-cols-2 gap-x-6 gap-y-1">';
+  html += '<div class="mt-4 text-xs text-platinum/60 grid grid-cols-2 gap-x-6 gap-y-1">';
   html += '<div><strong>I<sub>n</sub></strong> - Znamionowy prąd różnicowy wyłącznika [mA]</div>';
   html += '<div><strong>I<sub>w</sub></strong> - Zmierzony prąd wyłączający [mA]</div>';
   html += '<div><strong>t<sub>w</sub></strong> - Zmierzony czas wyłączenia [ms]</div>';
@@ -1279,25 +1279,25 @@ function renderAttachment3() {
 
 function renderAttachment4() {
   const container = document.getElementById('attachment-4');
-  const inputCls = 'w-full border border-gray-300 rounded px-1 py-0.5 text-sm text-center';
+  const inputCls = 'w-full input-glass px-1 py-0.5 text-sm text-center';
   let html = '';
 
-  html += '<h2 class="text-lg font-semibold mb-3">Załącznik nr 4 - Rezystancja uziemienia</h2>';
+  html += '<h2 class="text-lg font-semibold mb-3 text-platinum">Załącznik nr 4 - Rezystancja uziemienia</h2>';
 
   html += '<div class="overflow-x-auto">';
   html += '<table class="w-full border-collapse text-sm">';
 
   // Header (1 row)
   html += '<thead>';
-  html += '<tr class="bg-gray-50 text-center font-semibold">';
-  html += '<th class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 min-w-[180px]">Nazwa urządzenia</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-20">R<sub>E</sub> [&Omega;]</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-16">W<sub>k</sub></th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-20">R<sub>po</sub> [&Omega;]</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-20">R<sub>w</sub> [&Omega;]</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-24">Ocena</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 w-10"></th>';
+  html += '<tr class="bg-white/[0.06] text-center font-semibold text-platinum/70">';
+  html += '<th class="border border-white/[0.12] px-2 py-1 w-10">Lp.</th>';
+  html += '<th class="border border-white/[0.12] px-2 py-1 min-w-[180px]">Nazwa urządzenia</th>';
+  html += '<th class="border border-white/[0.12] px-2 py-1 w-20">R<sub>E</sub> [&Omega;]</th>';
+  html += '<th class="border border-white/[0.12] px-2 py-1 w-16">W<sub>k</sub></th>';
+  html += '<th class="border border-white/[0.12] px-2 py-1 w-20">R<sub>po</sub> [&Omega;]</th>';
+  html += '<th class="border border-white/[0.12] px-2 py-1 w-20">R<sub>w</sub> [&Omega;]</th>';
+  html += '<th class="border border-white/[0.12] px-2 py-1 w-24">Ocena</th>';
+  html += '<th class="border border-white/[0.12] px-2 py-1 w-10"></th>';
   html += '</tr>';
   html += '</thead>';
 
@@ -1313,55 +1313,55 @@ function renderAttachment4() {
     html += '<tr data-row-id="' + row.id + '">';
 
     // Lp.
-    html += '<td class="border border-gray-300 px-2 py-1 text-center font-medium">' + lp + '</td>';
+    html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-medium">' + lp + '</td>';
 
     // Nazwa urzadzenia
-    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<td class="border border-white/[0.12] px-1 py-0.5">';
     html += '<input type="text" data-field="uziem-deviceName" ' + dataAttrs + ' value="' + escapeHtml(row.deviceName || '') + '" class="' + inputCls + '" placeholder="np. Instalacja odgromowa">';
     html += '</td>';
 
     // Rp (RE) [Ohm]
-    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<td class="border border-white/[0.12] px-1 py-0.5">';
     html += '<input type="number" data-field="uziem-Rp" ' + dataAttrs + ' value="' + (row.Rp != null ? row.Rp : '') + '" step="0.01" class="' + inputCls + ' font-mono" placeholder="&Omega;">';
     html += '</td>';
 
     // Wk
-    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<td class="border border-white/[0.12] px-1 py-0.5">';
     html += '<input type="number" data-field="uziem-Wk" ' + dataAttrs + ' value="' + (row.Wk != null ? row.Wk : '') + '" step="0.01" class="' + inputCls + ' font-mono" placeholder="Wk">';
     html += '</td>';
 
     // Rpo (computed, display only)
-    html += '<td class="border border-gray-300 px-2 py-1 text-right font-mono uziem-rpo-cell" data-row-id="' + row.id + '">' + (calc.Rpo != null ? calc.Rpo.toFixed(2) : '') + '</td>';
+    html += '<td class="border border-white/[0.12] px-2 py-1 text-right font-mono uziem-rpo-cell" data-row-id="' + row.id + '">' + (calc.Rpo != null ? calc.Rpo.toFixed(2) : '') + '</td>';
 
     // Rw [Ohm] (editable, default 10)
-    html += '<td class="border border-gray-300 px-1 py-0.5">';
+    html += '<td class="border border-white/[0.12] px-1 py-0.5">';
     html += '<input type="number" data-field="uziem-Rw" ' + dataAttrs + ' value="' + (row.Rw != null ? row.Rw : '') + '" step="0.1" class="' + inputCls + ' font-mono" placeholder="&Omega;">';
     html += '</td>';
 
     // Verdict
     const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700' : calc.verdict === 'NEGATYWNA' ? 'text-red-700' : '';
-    html += '<td class="border border-gray-300 px-2 py-1 text-center font-bold uziem-verdict-cell ' + verdictClass + '" data-row-id="' + row.id + '">' + (calc.verdict || '') + '</td>';
+    html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-bold uziem-verdict-cell ' + verdictClass + '" data-row-id="' + row.id + '">' + (calc.verdict || '') + '</td>';
 
     // Usun
-    html += '<td class="border border-gray-300 px-1 py-1 text-center">';
-    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-attachment="4" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
+    html += '<td class="border border-white/[0.12] px-1 py-1 text-center">';
+    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-attachment="4" class="text-red-400 hover:text-red-300 text-xs">Usuń</button>';
     html += '</td>';
 
     html += '</tr>';
   }
 
   if (AppState.attachment4.rows.length === 0) {
-    html += '<tr><td colspan="8" class="border border-gray-300 px-2 py-4 text-center text-gray-400 italic">Brak wierszy - kliknij "Dodaj wiersz"</td></tr>';
+    html += '<tr><td colspan="8" class="border border-white/[0.12] px-2 py-4 text-center text-platinum/30 italic">Brak wierszy - kliknij "Dodaj wiersz"</td></tr>';
   }
 
   html += '</tbody></table>';
   html += '</div>';
 
   // "Dodaj wiersz" button below table (UZIEM-05)
-  html += '<button data-action="add-row-uziem" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Dodaj wiersz</button>';
+  html += '<button data-action="add-row-uziem" class="mt-2 px-4 py-2 btn-primary-glass text-sm">Dodaj wiersz</button>';
 
   // Legend UZIEM-06
-  html += '<div class="mt-4 text-xs text-gray-600 grid grid-cols-2 gap-x-6 gap-y-1">';
+  html += '<div class="mt-4 text-xs text-platinum/60 grid grid-cols-2 gap-x-6 gap-y-1">';
   html += '<div><strong>R<sub>E</sub></strong> - Zmierzona wartość rezystancji uziemienia [&Omega;]</div>';
   html += '<div><strong>W<sub>k</sub></strong> - Współczynnik korekcyjny</div>';
   html += '<div><strong>R<sub>po</sub></strong> - Obliczona wartość rezystancji uziemienia [&Omega;]</div>';
@@ -1983,16 +1983,16 @@ function updateOrzeczenieDisplay() {
       orzText.className = 'text-base font-bold text-red-700 mb-2';
     } else {
       orzText.textContent = '(uzupe\u0142nij dane pomiarowe)';
-      orzText.className = 'text-base text-gray-400 mb-2';
+      orzText.className = 'text-base text-platinum/30 mb-2';
     }
   }
 
   if (orz.nextDate) {
     nextDateEl.innerHTML = 'Data nast\u0119pnego badania: <strong>' + orz.nextDate + ' r.</strong> lub po dokonaniu zmian.';
-    nextDateEl.className = 'text-sm text-gray-700';
+    nextDateEl.className = 'text-sm text-platinum/70';
   } else {
     nextDateEl.textContent = '(uzupe\u0142nij dat\u0119 badania)';
-    nextDateEl.className = 'text-sm text-gray-400';
+    nextDateEl.className = 'text-sm text-platinum/30';
   }
 }
 
@@ -2002,7 +2002,7 @@ const STORAGE_KEY = 'voltprotokol-state';
 
 function showToast(message) {
   const toast = document.createElement('div');
-  toast.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded shadow-lg text-sm z-50';
+  toast.className = 'fixed bottom-4 right-4 bg-void-2/90 backdrop-blur-xl border border-white/[0.12] text-platinum px-4 py-2 rounded-xl shadow-lg text-sm z-50';
   toast.textContent = message;
   document.body.appendChild(toast);
   setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 2500);
