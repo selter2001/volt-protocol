@@ -580,8 +580,9 @@ function renderFormTab() {
   html += '<thead class="bg-gray-50">';
   html += '<tr>';
   html += '<th class="border border-gray-300 px-3 py-2 text-left font-medium">Wykonane pomiary</th>';
-  html += '<th class="border border-gray-300 px-3 py-2 text-left font-medium w-56">Przyrządy pomiarowe</th>';
-  html += '<th class="border border-gray-300 px-3 py-2 text-left font-medium w-48">Nr świadectwa wzorcowania</th>';
+  html += '<th class="border border-gray-300 px-3 py-2 text-left font-medium w-48">Przyrządy pomiarowe</th>';
+  html += '<th class="border border-gray-300 px-3 py-2 text-left font-medium w-36">Nr seryjny</th>';
+  html += '<th class="border border-gray-300 px-3 py-2 text-left font-medium w-44">Nr świadectwa wzorcowania</th>';
   html += '</tr>';
   html += '</thead>';
   html += '<tbody>';
@@ -590,6 +591,9 @@ function renderFormTab() {
     html += '<td class="border border-gray-300 px-3 py-2 text-sm text-gray-700">' + escapeHtml(INSTRUMENT_LABELS[instr.type]) + '</td>';
     html += '<td class="border border-gray-300 px-1 py-1">';
     html += '<input type="text" data-field="form-instr-' + instr.type + '-name" value="' + escapeHtml(instr.name) + '" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="np. MPI-530">';
+    html += '</td>';
+    html += '<td class="border border-gray-300 px-1 py-1">';
+    html += '<input type="text" data-field="form-instr-' + instr.type + '-serial" value="' + escapeHtml(instr.serial) + '" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="nr seryjny">';
     html += '</td>';
     html += '<td class="border border-gray-300 px-1 py-1">';
     html += '<input type="text" data-field="form-instr-' + instr.type + '-calibration" value="' + escapeHtml(instr.calibration) + '" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="nr świadectwa">';
@@ -1221,7 +1225,7 @@ function handleFormFieldChange(field, value) {
 }
 
 function handleInstrumentFieldChange(field, value) {
-  const match = field.match(/^form-instr-(SWZ|RCD|IZOL|UZIEM)-(name|calibration)$/);
+  const match = field.match(/^form-instr-(SWZ|RCD|IZOL|UZIEM)-(name|serial|calibration)$/);
   if (!match) return;
   const type = match[1];
   const prop = match[2];
