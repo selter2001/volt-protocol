@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 1 of 3 (Visual Foundation)
-Plan: 0 of 2 in current phase
-Status: Ready to execute (both plans created and verified)
-Last activity: 2026-02-24 — Phase 1 planned (2 plans: 01-01, 01-02)
+Plan: 1 of 2 in current phase (01-01 awaiting checkpoint verification)
+Status: 01-01 Task 1 complete, awaiting human-verify checkpoint (Task 2)
+Last activity: 2026-02-24 — Plan 01-01 executed (design tokens, body, noise, orbs)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 10%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: 0 hours
+- Total plans completed: 0 (01-01 at checkpoint)
+- Average duration: ~1.5 min (01-01 Task 1)
+- Total execution time: ~1.5 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 1 | 0 (01-01 at checkpoint) | ~1.5 min | ~1.5 min |
 
 **Recent Trend:**
-- Last 5 plans: —
-- Trend: —
+- Last 5 plans: 01-01 (at checkpoint)
+- Trend: Starting
 
 *Updated after each plan completion*
 
@@ -46,6 +46,9 @@ Recent decisions affecting current work:
 - [Init]: Void Black + Cyan + Platinum jako system kolorów
 - [Init]: Darmowe fonty (Space Grotesk + JetBrains Mono) z Google Fonts CDN
 - [Init]: Pełne animacje z briefu (spring, glow, flow) — bez kompromisów
+- [01-01]: Google Fonts @import inside style block (not separate link) for Tailwind v4 CDN compatibility
+- [01-01]: Noise texture as inline SVG data URI to maintain single-file architecture
+- [01-01]: Ambient orbs via #app pseudo-elements to avoid extra DOM nodes
 
 ### Pending Todos
 
@@ -61,6 +64,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 1 zaplanowana — 2 plany (01-01: tokeny+body, 01-02: glassmorphism+nawigacja) gotowe do wykonania
-Resume file: None
-Next action: /gsd:execute-phase 1
+Stopped at: Plan 01-01 Task 1 complete, awaiting human-verify checkpoint (Task 2)
+Resume file: .planning/phase-1/01-01/01-01-SUMMARY.md
+Next action: Verify 01-01 visually in browser, then continue to 01-02

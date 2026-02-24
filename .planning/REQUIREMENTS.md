@@ -9,12 +9,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Visual Foundation
 
-- [ ] **VIS-01**: Body ma Void Black (#0a0a0f) tło z inline SVG noise texture (feTurbulence, 3-5% opacity)
-- [ ] **VIS-02**: Tailwind v4 `@theme` block definiuje pełny system design tokenów (kolory, border-radius, spacing, shadows)
-- [ ] **VIS-03**: Color system: Void Black (#0a0a0f) base, Electric Cyan (#00f0ff) akcenty interaktywne, Soft Platinum (#e0e0e8) tekst/bordery
-- [ ] **VIS-04**: Premium geometric sans font (np. Space Grotesk) na labele i nagłówki
-- [ ] **VIS-05**: Monospaced font (np. JetBrains Mono) na wartości numeryczne w tabelach i inputach
-- [ ] **VIS-06**: Ambient gradient orbs (rozmyte kolorowe koła) za glassmorphism panelami dla głębi wizualnej
+- [x] **VIS-01**: Body ma Void Black (#0a0a0f) tło z inline SVG noise texture (feTurbulence, 3-5% opacity)
+- [x] **VIS-02**: Tailwind v4 `@theme` block definiuje pełny system design tokenów (kolory, border-radius, spacing, shadows)
+- [x] **VIS-03**: Color system: Void Black (#0a0a0f) base, Electric Cyan (#00f0ff) akcenty interaktywne, Soft Platinum (#e0e0e8) tekst/bordery
+- [x] **VIS-04**: Premium geometric sans font (np. Space Grotesk) na labele i nagłówki
+- [x] **VIS-05**: Monospaced font (np. JetBrains Mono) na wartości numeryczne w tabelach i inputach
+- [x] **VIS-06**: Ambient gradient orbs (rozmyte kolorowe koła) za glassmorphism panelami dla głębi wizualnej
 
 ### Glassmorphism Components
 
@@ -38,7 +38,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **ANIM-04**: Flow Effect — animowane SVG linie między sekcjami symulujące przepływ prądu, świecące po wypełnieniu sekcji
 - [ ] **ANIM-05**: Glowing focus states na inputach (Electric Cyan glow ring via pseudo-element)
 - [ ] **ANIM-06**: Verdict cells (POZYTYWNA/NEGATYWNA) z subtlnym glow effect odpowiednim do wyniku (green/red)
-- [ ] **ANIM-07**: `prefers-reduced-motion` media query wyłącza wszystkie animacje keyframe, zachowuje instant state changes
+- [x] **ANIM-07**: `prefers-reduced-motion` media query wyłącza wszystkie animacje keyframe, zachowuje instant state changes
 
 ### Functional Preservation
 
@@ -84,12 +84,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VIS-01 | Phase 1 | Pending |
-| VIS-02 | Phase 1 | Pending |
-| VIS-03 | Phase 1 | Pending |
-| VIS-04 | Phase 1 | Pending |
-| VIS-05 | Phase 1 | Pending |
-| VIS-06 | Phase 1 | Pending |
+| VIS-01 | Phase 1 | Done (01-01) |
+| VIS-02 | Phase 1 | Done (01-01) |
+| VIS-03 | Phase 1 | Done (01-01) |
+| VIS-04 | Phase 1 | Done (01-01) |
+| VIS-05 | Phase 1 | Done (01-01) |
+| VIS-06 | Phase 1 | Done (01-01) |
 | GLASS-01 | Phase 1 | Pending |
 | GLASS-02 | Phase 1 | Pending |
 | GLASS-03 | Phase 1 | Pending |
@@ -100,7 +100,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NAV-03 | Phase 1 | Pending |
 | ANIM-01 | Phase 1 | Pending |
 | ANIM-05 | Phase 1 | Pending |
-| ANIM-07 | Phase 1 | Pending |
+| ANIM-07 | Phase 1 | Done (01-01) |
 | PRES-07 | Phase 1 | Pending |
 | PRES-08 | Phase 1 | Pending |
 | ANIM-02 | Phase 2 | Pending |
