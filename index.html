@@ -22,6 +22,8 @@
         <button id="btn-load" class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm font-medium">Wczytaj</button>
         <button id="btn-export-json" class="bg-gray-600 text-white px-3 py-2 rounded hover:bg-gray-700 text-sm font-medium">Eksport JSON</button>
         <button id="btn-import-json" class="bg-gray-600 text-white px-3 py-2 rounded hover:bg-gray-700 text-sm font-medium">Import JSON</button>
+        <button id="btn-export-word" class="bg-purple-600 text-white px-3 py-2 rounded hover:bg-purple-700 text-sm font-medium">Eksport Word</button>
+        <button id="btn-import-word" class="bg-purple-600 text-white px-3 py-2 rounded hover:bg-purple-700 text-sm font-medium">Import Word</button>
         <button id="btn-export-pdf" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm font-medium">Eksportuj PDF</button>
       </div>
     </div>
@@ -912,7 +914,7 @@ function renderAttachment2() {
   let html = '';
 
   html += '<h2 class="text-lg font-semibold mb-3">Załącznik nr 2 - Rezystancja izolacji</h2>';
-  html += '<p class="mb-3 text-sm text-blue-600 italic">Sekcje zarządzane z Zał. 1</p>';
+  html += '<button data-action="add-section" class="mb-3 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Dodaj sekcję</button>';
 
   html += '<div class="overflow-x-auto">';
   html += '<table class="min-w-max border-collapse text-sm">';
@@ -950,19 +952,27 @@ function renderAttachment2() {
 
   // Shared sections from AppState.sections (DYN-06)
   for (const section of AppState.sections) {
-    // Section header row (read-only title)
-    html += '<tr class="bg-gray-200 font-bold">';
-    html += '<td colspan="17" class="border border-gray-300 px-2 py-1">' + escapeHtml(section.title) + '</td>';
+    // Section header row with editable title and management buttons
+    html += '<tr class="bg-gray-200">';
+    html += '<td colspan="15" class="border border-gray-300 px-2 py-1 font-bold">';
+    html += '<input type="text" data-field="section-title" data-section-id="' + section.id + '" value="' + escapeHtml(section.title) + '" class="bg-transparent font-bold w-64 outline-none focus:bg-white focus:ring-1 focus:ring-blue-400 rounded px-1">';
+    html += '<button data-action="add-subsection" data-section-id="' + section.id + '" class="ml-3 px-2 py-0.5 bg-blue-500 text-white rounded text-xs hover:bg-blue-600">Dodaj podtytuł</button>';
+    html += '</td>';
+    html += '<td colspan="2" class="border border-gray-300 px-2 py-1 text-right">';
+    html += '<button data-action="remove-section" data-section-id="' + section.id + '" class="px-2 py-0.5 bg-red-500 text-white rounded text-xs hover:bg-red-600">Usuń sekcję</button>';
+    html += '</td>';
     html += '</tr>';
 
     for (const sub of section.subsections) {
-      // Subsection header row (read-only title, add-row for Zal.2)
-      html += '<tr class="bg-gray-100 italic">';
-      html += '<td colspan="15" class="border border-gray-300 px-2 py-1">';
-      html += escapeHtml(sub.title);
+      // Subsection header row with editable title
+      html += '<tr class="bg-gray-100">';
+      html += '<td colspan="15" class="border border-gray-300 px-2 py-1 italic">';
+      html += '<input type="text" data-field="subsection-title" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" value="' + escapeHtml(sub.title) + '" class="bg-transparent italic w-64 outline-none focus:bg-white focus:ring-1 focus:ring-blue-400 rounded px-1">';
       html += '<button data-action="add-row-izol" data-sub-id="' + sub.id + '" class="ml-3 px-2 py-0.5 bg-green-500 text-white rounded text-xs hover:bg-green-600 not-italic font-normal">Dodaj wiersz</button>';
       html += '</td>';
-      html += '<td colspan="2" class="border border-gray-300 px-2 py-1"></td>';
+      html += '<td colspan="2" class="border border-gray-300 px-2 py-1 text-right">';
+      html += '<button data-action="remove-subsection" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" class="px-2 py-0.5 bg-red-400 text-white rounded text-xs hover:bg-red-500">Usuń podtytuł</button>';
+      html += '</td>';
       html += '</tr>';
 
       // Data rows for this subsection in Zal.2
@@ -1400,8 +1410,9 @@ function bindAppEvents() {
       const section = AppState.sections.find(s => s.id === sectionId);
       if (section) {
         section.title = e.target.value;
-        // Re-render Zal.2 only (Zal.1 is being edited - no re-render needed for it)
-        renderAttachment2();
+        // Re-render the other attachment (not the one being edited)
+        if (UIState.activeTab === 1) renderAttachment2();
+        else if (UIState.activeTab === 2) renderAttachment1();
       }
       return;
     }
@@ -1414,8 +1425,8 @@ function bindAppEvents() {
         const sub = section.subsections.find(s => s.id === subId);
         if (sub) {
           sub.title = e.target.value;
-          // Re-render Zal.2 only
-          renderAttachment2();
+          if (UIState.activeTab === 1) renderAttachment2();
+          else if (UIState.activeTab === 2) renderAttachment1();
         }
       }
       return;
@@ -1918,6 +1929,402 @@ function importFromJSON() {
   input.click();
 }
 
+// === WORD EXPORTER ===
+
+function wordEsc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function buildWordHTML() {
+  const f = AppState.form;
+  const orz = calcOrzeczenie();
+  const assessment = calcFinalAssessment();
+
+  let testDateFormatted = '';
+  if (f.testDate) {
+    const pd = parseLocalDate(f.testDate);
+    if (pd) {
+      testDateFormatted = String(pd.getDate()).padStart(2,'0') + '.' + String(pd.getMonth()+1).padStart(2,'0') + '.' + pd.getFullYear();
+    }
+  }
+
+  let html = '';
+  html += '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">\n';
+  html += '<head><meta charset="utf-8">\n';
+  html += '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]-->\n';
+  html += '<style>\n';
+  html += '@page Section1 { size: 210mm 297mm; margin: 2cm 2cm 2cm 2cm; }\n';
+  html += '@page Section2 { size: 297mm 210mm; mso-page-orientation: landscape; margin: 1.5cm 1.5cm 1.5cm 1.5cm; }\n';
+  html += '@page Section3 { size: 210mm 297mm; margin: 2cm 2cm 2cm 2cm; }\n';
+  html += 'div.Section1 { page: Section1; }\n';
+  html += 'div.Section2 { page: Section2; }\n';
+  html += 'div.Section3 { page: Section3; }\n';
+  html += 'body { font-family: "Times New Roman", serif; font-size: 10pt; }\n';
+  html += 'table { border-collapse: collapse; width: 100%; }\n';
+  html += 'td, th { border: 1px solid black; padding: 2pt 4pt; font-size: 9pt; vertical-align: middle; }\n';
+  html += 'th { background-color: #f0f0f0; font-weight: bold; text-align: center; }\n';
+  html += '.title { font-size: 13pt; font-weight: bold; text-align: center; margin-bottom: 12pt; }\n';
+  html += '.att-title { font-size: 11pt; font-weight: bold; margin-bottom: 3pt; }\n';
+  html += '.att-subtitle { font-size: 9pt; font-weight: bold; text-align: center; margin-bottom: 8pt; }\n';
+  html += '.section-hdr td { background-color: #d1d5db; font-weight: bold; }\n';
+  html += '.subsection-hdr td { background-color: #f3f4f6; font-style: italic; }\n';
+  html += '.pos { color: green; font-weight: bold; }\n';
+  html += '.neg { color: red; font-weight: bold; }\n';
+  html += '.c { text-align: center; }\n';
+  html += '.nb { border: none; }\n';
+  html += '</style>\n';
+  html += '</head>\n<body>\n';
+
+  // Embedded data for round-trip import (base64 encoded for safety)
+  html += '<!-- VOLTPROTOCOL_DATA:' + btoa(unescape(encodeURIComponent(JSON.stringify(AppState)))) + ' -->\n';
+
+  // === SECTION 1: Main protocol + Attachment 1 ===
+  html += '<div class="Section1">\n';
+
+  // Main protocol title
+  html += '<p class="title">PROTOK\u00d3\u0141 KONTROLNO-POMIAROWY NR ' + wordEsc(f.protocolNumber) + '</p>\n';
+
+  // 1. Obiekt badany
+  html += '<p><b>1. Obiekt badany:</b></p>\n';
+  html += '<p>' + wordEsc(f.objectName || '') + (f.objectParcel ? ', dz. ' + wordEsc(f.objectParcel) : '') + (f.objectAddress ? ', ' + wordEsc(f.objectAddress) : '') + '</p>\n';
+
+  // 2. Wykonawca
+  html += '<p><b>2. Wykonawca:</b></p>\n';
+  let execText = 'Protok\u00f3\u0142 oraz badania wykona\u0142 oraz zatwierdzi\u0142 ' + wordEsc(f.executorName || '') + '.';
+  if (f.executorSepE || f.executorSepD) {
+    execText += ' \u015awiadectwa Kwalifikacyjne SEP';
+    if (f.executorSepE) execText += ' na stanowisku eksploatacji nr ' + wordEsc(f.executorSepE);
+    if (f.executorSepD) execText += ' oraz na stanowisku dozoru ' + wordEsc(f.executorSepD);
+    execText += '.';
+  }
+  html += '<p>' + execText + '</p>\n';
+
+  // 3. Warunki badan
+  html += '<p><b>3. Warunki bada\u0144:</b></p>\n';
+  html += '<p style="margin-left:20pt">1. Badania wykonano w dniu ' + wordEsc(testDateFormatted) + '</p>\n';
+  html += '<p style="margin-left:20pt">2. Temperatura otoczenia w dniu bada\u0144: ' + (f.testTemp != null ? f.testTemp : '') + '\u00b0C.</p>\n';
+  html += '<p style="margin-left:20pt">3. Przyrz\u0105dy pomiarowe</p>\n';
+
+  // Instruments table
+  html += '<table>\n';
+  html += '<tr><th>Wykonane pomiary</th><th>Przyrz\u0105dy pomiarowe</th><th>Nr \u015bwiadectwa wzorcowania</th></tr>\n';
+  for (const instr of f.instruments) {
+    html += '<tr>';
+    html += '<td>' + wordEsc(INSTRUMENT_LABELS[instr.type]) + '</td>';
+    html += '<td>' + wordEsc(instr.name || '') + (instr.serial ? ' nr ' + wordEsc(instr.serial) : '') + '</td>';
+    html += '<td>' + wordEsc(instr.calibration || '') + '</td>';
+    html += '</tr>\n';
+  }
+  html += '</table>\n';
+
+  // 4. Ocena
+  html += '<p><b>4. Ocena wykonanych bada\u0144 odbiorczych:</b></p>\n';
+  html += '<table>\n';
+  html += '<tr><th>Wykonane badania odbiorcze</th><th style="width:60pt">Za\u0142\u0105czniki</th><th style="width:80pt">Og\u00f3lny wynik</th></tr>\n';
+
+  const assessRows = [
+    ['Sprawdzenie dokumentacji instalacji', '\u2014', 'POZYTYWNY'],
+    ['Ogl\u0119dziny instalacji elektrycznej', '\u2014', 'POZYTYWNY'],
+    ['Badanie skuteczno\u015bci ochrony przeciwpora\u017ceniowej przez samoczynne wy\u0142\u0105czenie zasilania', 'Za\u0142. 1', assessment.swz],
+    ['Badanie stanu rezystancji izolacji obwod\u00f3w', 'Za\u0142. 2', assessment.izol],
+    ['Badanie skuteczno\u015bci ochrony dodatkowej (RCD)', 'Za\u0142. 3', assessment.rcd],
+    ['Badanie rezystancji uziemienia', 'Za\u0142. 4', assessment.uziem]
+  ];
+  for (const [label, att, verdict] of assessRows) {
+    const cls = verdict === 'POZYTYWNY' ? 'pos' : verdict === 'NEGATYWNY' ? 'neg' : '';
+    html += '<tr><td>' + label + '</td><td class="c">' + att + '</td><td class="c ' + cls + '">' + (verdict || '\u2014') + '</td></tr>\n';
+  }
+  html += '</table>\n';
+
+  // 5. Orzeczenie
+  html += '<p><b>5. Orzeczenie:</b></p>\n';
+  if (orz.allPositive) {
+    html += '<p><b>Na podstawie wykonanych bada\u0144 odbiorczych orzeka si\u0119, \u017ce instalacja elektryczna NADAJE SI\u0118 do eksploatacji.</b></p>\n';
+  } else {
+    const hasNeg = Object.values(assessment).some(v => v === 'NEGATYWNY');
+    if (hasNeg) {
+      html += '<p style="color:red"><b>Na podstawie wykonanych bada\u0144 odbiorczych orzeka si\u0119, \u017ce instalacja elektryczna NIE NADAJE SI\u0118 do eksploatacji.</b></p>\n';
+    } else {
+      html += '<p style="color:gray"><i>(uzupe\u0142nij dane pomiarowe)</i></p>\n';
+    }
+  }
+  if (orz.nextDate) {
+    html += '<p>Data nast\u0119pnego badania: <b>' + orz.nextDate + ' r.</b> lub po dokonaniu zmian.</p>\n';
+  }
+
+  // Signatures
+  html += '<br><br>\n';
+  html += '<table style="border:none;width:70%">\n';
+  html += '<tr><td class="nb" style="width:45%;border-top:1px solid black;text-align:center;font-size:8pt">wykonawca</td>';
+  html += '<td class="nb" style="width:10%"></td>';
+  html += '<td class="nb" style="width:45%;border-top:1px solid black;text-align:center;font-size:8pt">miejscowo\u015b\u0107 i data</td></tr>\n';
+  html += '</table>\n';
+
+  // === ATTACHMENT 1: SWZ ===
+  html += '<br clear="all" style="page-break-before:always">\n';
+  html += '<p class="att-title">ZA\u0141\u0104CZNIK NR 1 DO PROTOKO\u0141U KONTROLNO-POMIAROWEGO NR ' + wordEsc(f.protocolNumber) + '</p>\n';
+  html += '<p class="att-subtitle">SKUTECZNO\u015a\u0106 OCHRONY PODSTAWOWEJ ORAZ DODATKOWEJ PRZECIWPORA\u017bENIOWEJ PRZEZ SAMOCZYNNE WY\u0141\u0104CZENIE ZASILANIA</p>\n';
+
+  html += '<table>\n';
+  // 4-row header
+  html += '<tr>';
+  html += '<th rowspan="4" style="width:20pt">Lp.</th>';
+  html += '<th rowspan="4">Obw\u00f3d<br><span style="font-weight:normal;color:gray">numer gniazda</span></th>';
+  html += '<th colspan="4">Zabezpieczenia</th>';
+  html += '<th rowspan="4" style="width:30pt">U<sub>sk</sub><br>[V]</th>';
+  html += '<th rowspan="4" style="width:30pt">I<sub>a</sub><br>[A]</th>';
+  html += '<th rowspan="4" style="width:30pt">I<sub>d</sub><br>[A]</th>';
+  html += '<th rowspan="4" style="width:30pt">Z<sub>s</sub><br>[\u03a9]</th>';
+  html += '<th rowspan="4" style="width:35pt">Z<sub>s max</sub><br>[\u03a9]</th>';
+  html += '<th rowspan="4" style="width:25pt">t<sub>w</sub><br>[s]</th>';
+  html += '<th rowspan="4" style="width:55pt">Ocena</th>';
+  html += '</tr>\n';
+  html += '<tr><th colspan="2">dodatkowe</th><th colspan="2">podstawowe</th></tr>\n';
+  html += '<tr><th>typ</th><th>pr\u0105d</th><th>typ</th><th>pr\u0105d I<sub>\u0394n</sub></th></tr>\n';
+  html += '<tr><th style="color:gray">-</th><th style="color:gray">[A]</th><th style="color:gray">-</th><th style="color:gray">[A]</th></tr>\n';
+
+  // Fixed row
+  const wfr = AppState.swzFixedRow;
+  const wfrCalc = calcSWZRow(wfr);
+  const wfrIa = wfr.Ia != null ? wfr.Ia : getIa(wfr.baseType, wfr.baseCurrent);
+  html += '<tr style="background:#fefce8">';
+  html += '<td class="c">1</td>';
+  html += '<td><b>Zabezpieczenie g\u0142\u00f3wne</b></td>';
+  html += '<td class="c">' + wordEsc(wfr.protType) + '</td>';
+  html += '<td class="c">' + (wfr.protCurrent != null ? wfr.protCurrent : '') + '</td>';
+  html += '<td class="c">' + wordEsc(wfr.baseType) + '</td>';
+  html += '<td class="c">' + wfr.baseCurrent + '</td>';
+  html += '<td class="c">' + (wfr.Usk != null ? wfr.Usk : '') + '</td>';
+  html += '<td class="c">' + (wfrIa != null ? wfrIa : '') + '</td>';
+  html += '<td class="c">' + (wfrCalc.Id != null ? wfrCalc.Id.toFixed(2) : '') + '</td>';
+  html += '<td class="c">' + (wfr.Zs != null ? wfr.Zs : '') + '</td>';
+  html += '<td class="c">' + (wfrCalc.Zsmax != null ? wfrCalc.Zsmax.toFixed(2) : '') + '</td>';
+  html += '<td class="c">' + wordEsc(wfr.tw) + '</td>';
+  html += '<td class="c ' + (wfrCalc.verdict === 'POZYTYWNA' ? 'pos' : wfrCalc.verdict === 'NEGATYWNA' ? 'neg' : '') + '">' + (wfrCalc.verdict || '') + '</td>';
+  html += '</tr>\n';
+
+  // Dynamic sections
+  let wLp = 2;
+  for (const section of AppState.sections) {
+    html += '<tr class="section-hdr"><td colspan="13">' + wordEsc(section.title) + '</td></tr>\n';
+    for (const sub of section.subsections) {
+      html += '<tr class="subsection-hdr"><td colspan="13">' + wordEsc(sub.title) + '</td></tr>\n';
+      const rows = AppState.attachment1.rowsBySubsection[sub.id] || [];
+      for (const row of rows) {
+        const calc = calcSWZRow(row);
+        const rowIa = row.Ia != null ? row.Ia : getIa(row.baseType, row.baseCurrent);
+        const vCls = calc.verdict === 'POZYTYWNA' ? 'pos' : calc.verdict === 'NEGATYWNA' ? 'neg' : '';
+        html += '<tr>';
+        html += '<td class="c">' + wLp + '</td>';
+        html += '<td>' + wordEsc(row.circuit) + '</td>';
+        html += '<td class="c">' + wordEsc(row.protType) + '</td>';
+        html += '<td class="c">' + (row.protCurrent != null ? row.protCurrent : '') + '</td>';
+        html += '<td class="c">' + wordEsc(row.baseType) + '</td>';
+        html += '<td class="c">' + row.baseCurrent + '</td>';
+        html += '<td class="c">' + (row.Usk != null ? row.Usk : '') + '</td>';
+        html += '<td class="c">' + (rowIa != null ? rowIa : '') + '</td>';
+        html += '<td class="c">' + (calc.Id != null ? calc.Id.toFixed(2) : '') + '</td>';
+        html += '<td class="c">' + (row.Zs != null ? row.Zs : '') + '</td>';
+        html += '<td class="c">' + (calc.Zsmax != null ? calc.Zsmax.toFixed(2) : '') + '</td>';
+        html += '<td class="c">' + wordEsc(row.tw) + '</td>';
+        html += '<td class="c ' + vCls + '">' + (calc.verdict || '') + '</td>';
+        html += '</tr>\n';
+        wLp++;
+      }
+    }
+  }
+  html += '</table>\n';
+  html += '</div>\n';
+
+  // === SECTION 2: Attachment 2 (landscape) ===
+  html += '<div class="Section2">\n';
+  html += '<p class="att-title">ZA\u0141\u0104CZNIK NR 2 DO PROTOKO\u0141U KONTROLNO-POMIAROWEGO NR ' + wordEsc(f.protocolNumber) + '</p>\n';
+  html += '<p class="att-subtitle">REZYSTANCJA IZOLACJI</p>\n';
+
+  const wRpCols = ['L1-N','L2-N','L3-N','L1-L2','L1-L3','L2-L3','L1-PE','L2-PE','L3-PE','N-PE'];
+  const wRpKeys = ['L1N','L2N','L3N','L1L2','L1L3','L2L3','L1PE','L2PE','L3PE','NPE'];
+
+  html += '<table>\n';
+  html += '<tr>';
+  html += '<th rowspan="2" style="width:20pt">Lp.</th>';
+  html += '<th rowspan="2">Nazwa obwodu</th>';
+  html += '<th rowspan="2" style="width:60pt">Typ przewodu</th>';
+  html += '<th colspan="10">R<sub>p</sub> [M\u03a9]</th>';
+  html += '<th rowspan="2" style="width:25pt">R<sub>w</sub><br>[M\u03a9]</th>';
+  html += '<th rowspan="2" style="width:50pt">Ocena</th>';
+  html += '</tr>\n';
+  html += '<tr>';
+  for (const col of wRpCols) {
+    html += '<th style="font-size:7pt;font-weight:normal;color:#555;width:35pt">' + col + '</th>';
+  }
+  html += '</tr>\n';
+
+  // Fixed row (WLZ)
+  const wifr = AppState.attachment2.fixedRow;
+  const wifrCalc = calcIZOLRow(wifr);
+  const wifrActive = getActiveIZOLFields(wifr.phaseType);
+  html += '<tr style="background:#fefce8">';
+  html += '<td class="c">1</td>';
+  html += '<td><b>WLZ</b></td>';
+  html += '<td class="c">' + wordEsc(wifr.wireType) + '</td>';
+  for (const key of wRpKeys) {
+    if (wifrActive.includes(key)) {
+      html += '<td class="c">' + (wifr.rp[key] != null ? wifr.rp[key] : '') + '</td>';
+    } else {
+      html += '<td class="c" style="background:#f0f0f0">-</td>';
+    }
+  }
+  html += '<td class="c">' + wifr.Rw + '</td>';
+  html += '<td class="c ' + (wifrCalc.verdict === 'POZYTYWNA' ? 'pos' : wifrCalc.verdict === 'NEGATYWNA' ? 'neg' : '') + '">' + (wifrCalc.verdict || '') + '</td>';
+  html += '</tr>\n';
+
+  // Dynamic sections
+  let wLp2 = 2;
+  for (const section of AppState.sections) {
+    html += '<tr class="section-hdr"><td colspan="15">' + wordEsc(section.title) + '</td></tr>\n';
+    for (const sub of section.subsections) {
+      html += '<tr class="subsection-hdr"><td colspan="15">' + wordEsc(sub.title) + '</td></tr>\n';
+      const rows = AppState.attachment2.rowsBySubsection[sub.id] || [];
+      for (const row of rows) {
+        const calc = calcIZOLRow(row);
+        const activeFields = getActiveIZOLFields(row.phaseType);
+        const vCls = calc.verdict === 'POZYTYWNA' ? 'pos' : calc.verdict === 'NEGATYWNA' ? 'neg' : '';
+        html += '<tr>';
+        html += '<td class="c">' + wLp2 + '</td>';
+        html += '<td>' + wordEsc(row.name) + '</td>';
+        html += '<td class="c">' + wordEsc(row.wireType) + '</td>';
+        for (const key of wRpKeys) {
+          if (activeFields.includes(key)) {
+            html += '<td class="c">' + (row.rp[key] != null ? row.rp[key] : '') + '</td>';
+          } else {
+            html += '<td class="c" style="background:#f0f0f0">-</td>';
+          }
+        }
+        html += '<td class="c">' + row.Rw + '</td>';
+        html += '<td class="c ' + vCls + '">' + (calc.verdict || '') + '</td>';
+        html += '</tr>\n';
+        wLp2++;
+      }
+    }
+  }
+  html += '</table>\n';
+  html += '</div>\n';
+
+  // === SECTION 3: Attachments 3 & 4 (portrait) ===
+  html += '<div class="Section3">\n';
+
+  // Attachment 3: RCD
+  html += '<p class="att-title">ZA\u0141\u0104CZNIK NR 3 DO PROTOKO\u0141U KONTROLNO-POMIAROWEGO NR ' + wordEsc(f.protocolNumber) + '</p>\n';
+  html += '<p class="att-subtitle">BADANIE WY\u0141\u0104CZNIK\u00d3W R\u00d3\u017bNICOWOPR\u0104DOWYCH (RCD)</p>\n';
+
+  html += '<table>\n';
+  html += '<tr><th style="width:25pt">Lp.</th><th>Typ wy\u0142\u0105cznika</th><th style="width:60pt">TEST<br>TAK/NIE</th>';
+  html += '<th style="width:40pt">I<sub>n</sub><br>[mA]</th><th style="width:40pt">I<sub>w</sub><br>[mA]</th>';
+  html += '<th style="width:40pt">t<sub>w</sub><br>[ms]</th><th style="width:40pt">t<sub>z</sub><br>[ms]</th>';
+  html += '<th style="width:55pt">Ocena</th></tr>\n';
+
+  if (AppState.attachment3.rows.length === 0) {
+    html += '<tr><td colspan="8" class="c" style="color:gray"><i>Brak danych</i></td></tr>\n';
+  }
+  for (let i = 0; i < AppState.attachment3.rows.length; i++) {
+    const row = AppState.attachment3.rows[i];
+    const calc = calcRCDRow(row);
+    const vCls = calc.verdict === 'POZYTYWNA' ? 'pos' : calc.verdict === 'NEGATYWNA' ? 'neg' : '';
+    html += '<tr>';
+    html += '<td class="c">' + (i+1) + '</td>';
+    html += '<td>' + wordEsc(row.deviceType) + '</td>';
+    html += '<td class="c">' + wordEsc(row.testResult) + '</td>';
+    html += '<td class="c">' + (row.In != null ? row.In : '') + '</td>';
+    html += '<td class="c">' + (row.Iw != null ? row.Iw : '') + '</td>';
+    html += '<td class="c">' + (row.tw != null ? row.tw : '') + '</td>';
+    html += '<td class="c">' + (row.tz != null ? row.tz : '') + '</td>';
+    html += '<td class="c ' + vCls + '">' + (calc.verdict || '') + '</td>';
+    html += '</tr>\n';
+  }
+  html += '</table>\n';
+
+  // Page break before Att.4
+  html += '<br clear="all" style="page-break-before:always">\n';
+
+  // Attachment 4: Earthing
+  html += '<p class="att-title">ZA\u0141\u0104CZNIK NR 4 DO PROTOKO\u0141U KONTROLNO-POMIAROWEGO NR ' + wordEsc(f.protocolNumber) + '</p>\n';
+  html += '<p class="att-subtitle">REZYSTANCJA UZIEMIENIA</p>\n';
+
+  html += '<table>\n';
+  html += '<tr><th style="width:25pt">Lp.</th><th>Nazwa</th>';
+  html += '<th style="width:50pt">R<sub>E</sub><br>[\u03a9]</th><th style="width:50pt">W<sub>k</sub></th>';
+  html += '<th style="width:50pt">R<sub>po</sub><br>[\u03a9]</th><th style="width:50pt">R<sub>w</sub><br>[\u03a9]</th>';
+  html += '<th style="width:55pt">Ocena</th></tr>\n';
+
+  if (AppState.attachment4.rows.length === 0) {
+    html += '<tr><td colspan="7" class="c" style="color:gray"><i>Brak danych</i></td></tr>\n';
+  }
+  for (let i = 0; i < AppState.attachment4.rows.length; i++) {
+    const row = AppState.attachment4.rows[i];
+    const calc = calcUZIEMRow(row);
+    const vCls = calc.verdict === 'POZYTYWNA' ? 'pos' : calc.verdict === 'NEGATYWNA' ? 'neg' : '';
+    html += '<tr>';
+    html += '<td class="c">' + (i+1) + '</td>';
+    html += '<td>' + wordEsc(row.deviceName) + '</td>';
+    html += '<td class="c">' + (row.Rp != null ? row.Rp : '') + '</td>';
+    html += '<td class="c">' + (row.Wk != null ? row.Wk : '') + '</td>';
+    html += '<td class="c">' + (calc.Rpo != null ? calc.Rpo.toFixed(2) : '') + '</td>';
+    html += '<td class="c">' + (row.Rw != null ? row.Rw : '') + '</td>';
+    html += '<td class="c ' + vCls + '">' + (calc.verdict || '') + '</td>';
+    html += '</tr>\n';
+  }
+  html += '</table>\n';
+
+  html += '</div>\n';
+  html += '</body></html>';
+  return html;
+}
+
+function exportToWord() {
+  const html = buildWordHTML();
+  const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const filename = 'protokol-' + (AppState.form.protocolNumber || 'draft').replace(/\//g, '-') + '.doc';
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importFromWord() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.doc,.html';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target.result;
+      const match = text.match(/<!-- VOLTPROTOCOL_DATA:([\s\S]*?) -->/);
+      if (match) {
+        try {
+          const jsonStr = decodeURIComponent(escape(atob(match[1].trim())));
+          const saved = JSON.parse(jsonStr);
+          restoreAppState(saved);
+          showToast('Wczytano dane z pliku Word.');
+          return;
+        } catch(err) {
+          showToast('B\u0142\u0105d: uszkodzone dane w pliku.');
+          return;
+        }
+      }
+      showToast('Nie znaleziono danych VoltProtocol. U\u017cyj pliku wyeksportowanego z aplikacji.');
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
 // === PDF EXPORTER ===
 
 function pdfVal(v) {
@@ -1942,7 +2349,7 @@ function buildFormMainContent() {
 
   // Tytuł
   content.push({
-    text: 'PROTOKÓŁ KONTROLNO POMIAROWY NR ' + (f.protocolNumber || ''),
+    text: 'PROTOKÓŁ KONTROLNO-POMIAROWY NR ' + (f.protocolNumber || ''),
     bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 15]
   });
 
@@ -2075,7 +2482,7 @@ function buildAttachment1Content() {
   var content = [];
 
   content.push({
-    text: 'ZAŁĄCZNIK NR 1 DO PROTOKOŁU KONTROLNO POMIAROWEGO NR ' + (AppState.form.protocolNumber || ''),
+    text: 'ZAŁĄCZNIK NR 1 DO PROTOKOŁU KONTROLNO-POMIAROWEGO NR ' + (AppState.form.protocolNumber || ''),
     bold: true, fontSize: 11, pageBreak: 'before', margin: [0, 0, 0, 3]
   });
   content.push({
@@ -2198,7 +2605,7 @@ function buildAttachment2Content() {
   var content = [];
 
   content.push({
-    text: 'ZAŁĄCZNIK NR 2 DO PROTOKOŁU KONTROLNO POMIAROWEGO NR ' + (AppState.form.protocolNumber || ''),
+    text: 'ZAŁĄCZNIK NR 2 DO PROTOKOŁU KONTROLNO-POMIAROWEGO NR ' + (AppState.form.protocolNumber || ''),
     bold: true, fontSize: 11, margin: [0, 0, 0, 3]
   });
   content.push({
@@ -2310,7 +2717,7 @@ function buildAttachment3Content() {
   var content = [];
 
   content.push({
-    text: 'ZAŁĄCZNIK NR 3 DO PROTOKOŁU KONTROLNO POMIAROWEGO NR ' + (AppState.form.protocolNumber || ''),
+    text: 'ZAŁĄCZNIK NR 3 DO PROTOKOŁU KONTROLNO-POMIAROWEGO NR ' + (AppState.form.protocolNumber || ''),
     bold: true, fontSize: 11, margin: [0, 0, 0, 3]
   });
   content.push({
@@ -2370,7 +2777,7 @@ function buildAttachment4Content() {
   var content = [];
 
   content.push({
-    text: 'ZAŁĄCZNIK NR 4 DO PROTOKOŁU KONTROLNO POMIAROWEGO NR ' + (AppState.form.protocolNumber || ''),
+    text: 'ZAŁĄCZNIK NR 4 DO PROTOKOŁU KONTROLNO-POMIAROWEGO NR ' + (AppState.form.protocolNumber || ''),
     bold: true, fontSize: 11, pageBreak: 'before', margin: [0, 0, 0, 3]
   });
   content.push({
@@ -2504,6 +2911,8 @@ function init() {
   document.getElementById('btn-load').addEventListener('click', loadFromLocalStorage);
   document.getElementById('btn-export-json').addEventListener('click', exportToJSON);
   document.getElementById('btn-import-json').addEventListener('click', importFromJSON);
+  document.getElementById('btn-export-word').addEventListener('click', exportToWord);
+  document.getElementById('btn-import-word').addEventListener('click', importFromWord);
 }
 
 document.addEventListener('DOMContentLoaded', init);
