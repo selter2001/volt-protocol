@@ -43,10 +43,10 @@ Plans:
   1. Użytkownik może wypełnić numer protokołu (auto-generowany z datą), dane obiektu, dane wykonawcy z numerami SEP, datę badania i temperaturę
   2. Użytkownik może wpisać przyrządy pomiarowe (nazwa, nr seryjny, nr świadectwa wzorcowania) dla 4 typów pomiarów
   3. Tabela oceny końcowej generuje się automatycznie na podstawie wyników z 4 załączników, orzeczenie zawiera datę następnego badania (+5 lat)
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 02-01: Formularz główny (meta-dane, przyrządy, ocena końcowa, orzeczenie)
+- [ ] 02-01-PLAN.md — Zakładka Protokół (tab 0): AppState.form, pola metadanych FORM-01–05, tabela przyrządów, ocena końcowa FORM-06, orzeczenie FORM-07
 
 ### Phase 3: Eksport i Dane
 **Goal**: Elektryk może wygenerować profesjonalny plik PDF do pobrania, zapisać i wczytać stan formularza
