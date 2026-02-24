@@ -1799,6 +1799,537 @@ function updateOrzeczenieDisplay() {
   }
 }
 
+// === PDF EXPORTER ===
+
+function pdfVal(v) {
+  return v != null ? String(v) : '';
+}
+
+function makeSectionRow(title, numCols) {
+  var row = [{ text: title, bold: true, fillColor: '#d1d5db', colSpan: numCols }];
+  for (var i = 1; i < numCols; i++) { row.push({}); }
+  return row;
+}
+
+function makeSubsectionRow(title, numCols) {
+  var row = [{ text: title, italics: true, fillColor: '#f3f4f6', colSpan: numCols }];
+  for (var i = 1; i < numCols; i++) { row.push({}); }
+  return row;
+}
+
+function buildFormMainContent() {
+  var f = AppState.form;
+  var content = [];
+
+  // Tytuł
+  content.push({
+    text: 'PROTOKÓŁ KONTROLNO POMIAROWY NR ' + (f.protocolNumber || ''),
+    bold: true, fontSize: 14, alignment: 'center', margin: [0, 0, 0, 15]
+  });
+
+  // 1. Obiekt badany
+  content.push({ text: '1. Obiekt badany:', bold: true, fontSize: 10, margin: [0, 0, 0, 5] });
+  content.push({ text: [f.objectName || '', f.objectParcel ? ', dz. ' + f.objectParcel : '', f.objectAddress ? ', ' + f.objectAddress : ''].join(''), margin: [0, 0, 0, 10] });
+
+  // 2. Wykonawca
+  content.push({ text: '2. Wykonawca:', bold: true, fontSize: 10, margin: [0, 0, 0, 5] });
+  var executorText = 'Protokół oraz badania wykonał oraz zatwierdził ' + (f.executorName || '') + '.';
+  if (f.executorSepE || f.executorSepD) {
+    executorText += ' Świadectwa Kwalifikacyjne SEP';
+    if (f.executorSepE) executorText += ' na stanowisku eksploatacji nr ' + f.executorSepE;
+    if (f.executorSepD) executorText += ' oraz na stanowisku dozoru ' + f.executorSepD;
+    executorText += '.';
+  }
+  content.push({ text: executorText, margin: [0, 0, 0, 10] });
+
+  // 3. Warunki badań
+  content.push({ text: '3. Warunki badań:', bold: true, fontSize: 10, margin: [0, 0, 0, 5] });
+
+  var testDateFormatted = '';
+  if (f.testDate) {
+    var pd = parseLocalDate(f.testDate);
+    if (pd) {
+      testDateFormatted = String(pd.getDate()).padStart(2, '0') + '.' + String(pd.getMonth() + 1).padStart(2, '0') + '.' + pd.getFullYear();
+    }
+  }
+  content.push({ text: '    1. Badania wykonano w dniu ' + testDateFormatted, margin: [0, 0, 0, 3] });
+  content.push({ text: '    2. Temperatura otoczenia w dniu badań: ' + (f.testTemp != null ? f.testTemp : '') + '\u00b0C.', margin: [0, 0, 0, 5] });
+  content.push({ text: '    3. Przyrządy pomiarowe', margin: [0, 0, 0, 5] });
+
+  // Tabela przyrządów
+  var instrBody = [
+    [
+      { text: 'Wykonane pomiary', bold: true },
+      { text: 'Przyrządy pomiarowe', bold: true },
+      { text: 'Nr świadectwa wzorcowania', bold: true }
+    ]
+  ];
+  for (var i = 0; i < f.instruments.length; i++) {
+    var instr = f.instruments[i];
+    instrBody.push([
+      INSTRUMENT_LABELS[instr.type] || '',
+      [instr.name || '', instr.serial ? ' nr ' + instr.serial : ''].join(''),
+      instr.calibration || ''
+    ]);
+  }
+  content.push({
+    table: {
+      headerRows: 1,
+      widths: ['*', 'auto', 'auto'],
+      body: instrBody
+    },
+    layout: { hLineWidth: function() { return 0.5; }, vLineWidth: function() { return 0.5; } },
+    margin: [0, 0, 0, 10]
+  });
+
+  // 4. Ocena wykonanych badań
+  content.push({ text: '4. Ocena wykonanych badań odbiorczych:', bold: true, fontSize: 10, margin: [0, 0, 0, 5] });
+
+  var assessBody = [
+    [
+      { text: 'Wykonane badania odbiorcze', bold: true },
+      { text: 'Załączniki', bold: true, alignment: 'center' },
+      { text: 'Ogólny wynik', bold: true, alignment: 'center' }
+    ],
+    ['Sprawdzenie dokumentacji instalacji', { text: '\u2014', alignment: 'center' }, { text: 'POZYTYWNY', bold: true, alignment: 'center' }],
+    ['Oględziny instalacji elektrycznej', { text: '\u2014', alignment: 'center' }, { text: 'POZYTYWNY', bold: true, alignment: 'center' }],
+    ['Badanie skuteczności ochrony przeciwporażeniowej przez samoczynne wyłączenie zasilania', { text: 'Zał. 1', alignment: 'center' }, { text: calcAttachmentVerdict('attachment1') || '\u2014', bold: true, alignment: 'center' }],
+    ['Badanie stanu rezystancji izolacji obwodów', { text: 'Zał. 2', alignment: 'center' }, { text: calcAttachmentVerdict('attachment2') || '\u2014', bold: true, alignment: 'center' }],
+    ['Badanie skuteczności ochrony dodatkowej (RCD)', { text: 'Zał. 3', alignment: 'center' }, { text: calcAttachmentVerdict('attachment3') || '\u2014', bold: true, alignment: 'center' }],
+    ['Badanie rezystancji uziemienia', { text: 'Zał. 4', alignment: 'center' }, { text: calcAttachmentVerdict('attachment4') || '\u2014', bold: true, alignment: 'center' }]
+  ];
+  content.push({
+    table: {
+      headerRows: 1,
+      widths: ['*', 60, 80],
+      body: assessBody
+    },
+    layout: { hLineWidth: function() { return 0.5; }, vLineWidth: function() { return 0.5; } },
+    margin: [0, 0, 0, 10]
+  });
+
+  // 5. Orzeczenie
+  content.push({ text: '5. Orzeczenie:', bold: true, fontSize: 10, margin: [0, 0, 0, 5] });
+  var orz = calcOrzeczenie();
+  if (orz.allPositive) {
+    content.push({ text: 'Na podstawie wykonanych badań odbiorczych orzeka się, że instalacja elektryczna NADAJE SIĘ do eksploatacji.', bold: true, margin: [0, 0, 0, 5] });
+  } else {
+    var assessment = calcFinalAssessment();
+    var hasNegative = Object.values(assessment).some(function(v) { return v === 'NEGATYWNY'; });
+    if (hasNegative) {
+      content.push({ text: 'Na podstawie wykonanych badań odbiorczych orzeka się, że instalacja elektryczna NIE NADAJE SIĘ do eksploatacji.', bold: true, margin: [0, 0, 0, 5] });
+    } else {
+      content.push({ text: '(uzupełnij dane pomiarowe)', color: '#9ca3af', margin: [0, 0, 0, 5] });
+    }
+  }
+
+  // 6. Data następnego badania
+  if (orz.nextDate) {
+    content.push({ text: 'Data następnego badania: ' + orz.nextDate + ' r. lub po dokonaniu zmian.', margin: [0, 0, 0, 15] });
+  }
+
+  // Podpisy
+  content.push({
+    columns: [
+      {
+        width: '*',
+        stack: [
+          { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 140, y2: 0, lineWidth: 0.5 }], margin: [0, 30, 0, 2] },
+          { text: 'wykonawca', fontSize: 7, alignment: 'center', width: 140 }
+        ]
+      },
+      {
+        width: '*',
+        stack: [
+          { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 140, y2: 0, lineWidth: 0.5 }], margin: [0, 30, 0, 2] },
+          { text: 'miejscowość i data', fontSize: 7, alignment: 'center', width: 140 }
+        ]
+      }
+    ],
+    margin: [0, 0, 0, 0]
+  });
+
+  return content;
+}
+
+function buildAttachment1Content() {
+  var content = [];
+
+  content.push({
+    text: 'ZAŁĄCZNIK NR 1 DO PROTOKOŁU KONTROLNO POMIAROWEGO NR ' + (AppState.form.protocolNumber || ''),
+    bold: true, fontSize: 11, pageBreak: 'before', margin: [0, 0, 0, 3]
+  });
+  content.push({
+    text: 'SKUTECZNOŚĆ OCHRONY PODSTAWOWEJ ORAZ DODATKOWEJ PRZECIWPORAŻENIOWEJ PRZEZ SAMOCZYNNE WYŁĄCZENIE ZASILANIA',
+    bold: true, fontSize: 9, alignment: 'center', margin: [0, 0, 0, 10]
+  });
+
+  // 4-wierszowy nagłówek tabeli SWZ — 13 kolumn
+  var headerRow1 = [
+    { text: 'Lp.', rowSpan: 4, alignment: 'center', bold: true },
+    { text: 'Obwód\nnumer gniazda', rowSpan: 4, alignment: 'center', bold: true },
+    { text: 'Zabezpieczenia', colSpan: 4, alignment: 'center', bold: true }, {}, {}, {},
+    { text: 'Usk\n[V]', rowSpan: 4, alignment: 'center', bold: true },
+    { text: 'Ia\n[A]', rowSpan: 4, alignment: 'center', bold: true },
+    { text: 'Id\n[A]', rowSpan: 4, alignment: 'center', bold: true },
+    { text: 'Zs\n[\u03a9]', rowSpan: 4, alignment: 'center', bold: true },
+    { text: 'Zs max\n[\u03a9]', rowSpan: 4, alignment: 'center', bold: true },
+    { text: 'tw\n[s]', rowSpan: 4, alignment: 'center', bold: true },
+    { text: 'Ocena', rowSpan: 4, alignment: 'center', bold: true }
+  ];
+  var headerRow2 = [
+    {}, {},
+    { text: 'dodatkowe', colSpan: 2, alignment: 'center', bold: true }, {},
+    { text: 'podstawowe', colSpan: 2, alignment: 'center', bold: true }, {},
+    {}, {}, {}, {}, {}, {}, {}
+  ];
+  var headerRow3 = [
+    {}, {},
+    { text: 'typ', alignment: 'center', bold: true },
+    { text: 'prąd', alignment: 'center', bold: true },
+    { text: 'typ', alignment: 'center', bold: true },
+    { text: 'prąd I\u0394n', alignment: 'center', bold: true },
+    {}, {}, {}, {}, {}, {}, {}
+  ];
+  var headerRow4 = [
+    {}, {},
+    { text: '-', alignment: 'center' },
+    { text: '[A]', alignment: 'center' },
+    { text: '-', alignment: 'center' },
+    { text: '[A]', alignment: 'center' },
+    {}, {}, {}, {}, {}, {}, {}
+  ];
+
+  var body = [headerRow1, headerRow2, headerRow3, headerRow4];
+
+  // Numeracja Lp ciągła
+  var lpCounter = 1;
+
+  // Stały wiersz (swzFixedRow)
+  var fr = AppState.swzFixedRow;
+  var frCalc = calcSWZRow(fr);
+  var frIa = fr.Ia != null ? fr.Ia : getIa(fr.baseType, fr.baseCurrent);
+  body.push([
+    { text: String(lpCounter), alignment: 'center' },
+    'Zabezpieczenie główne',
+    pdfVal(fr.protType),
+    pdfVal(fr.protCurrent),
+    pdfVal(fr.baseType),
+    pdfVal(fr.baseCurrent),
+    pdfVal(fr.Usk),
+    frIa != null ? String(frIa) : '',
+    frCalc.Id != null ? frCalc.Id.toFixed(2) : '',
+    pdfVal(fr.Zs),
+    frCalc.Zsmax != null ? frCalc.Zsmax.toFixed(2) : '',
+    pdfVal(fr.tw),
+    frCalc.verdict || ''
+  ]);
+  lpCounter++;
+
+  // Dynamiczne sekcje/podsekcje/wiersze
+  for (var si = 0; si < AppState.sections.length; si++) {
+    var section = AppState.sections[si];
+    body.push(makeSectionRow(section.title, 13));
+
+    for (var sbi = 0; sbi < section.subsections.length; sbi++) {
+      var sub = section.subsections[sbi];
+      body.push(makeSubsectionRow(sub.title, 13));
+
+      var rows = AppState.attachment1.rowsBySubsection[sub.id] || [];
+      for (var ri = 0; ri < rows.length; ri++) {
+        var row = rows[ri];
+        var calc = calcSWZRow(row);
+        var rowIa = row.Ia != null ? row.Ia : getIa(row.baseType, row.baseCurrent);
+        body.push([
+          { text: String(lpCounter), alignment: 'center' },
+          pdfVal(row.circuit),
+          pdfVal(row.protType),
+          pdfVal(row.protCurrent),
+          pdfVal(row.baseType),
+          pdfVal(row.baseCurrent),
+          pdfVal(row.Usk),
+          rowIa != null ? String(rowIa) : '',
+          calc.Id != null ? calc.Id.toFixed(2) : '',
+          pdfVal(row.Zs),
+          calc.Zsmax != null ? calc.Zsmax.toFixed(2) : '',
+          pdfVal(row.tw),
+          calc.verdict || ''
+        ]);
+        lpCounter++;
+      }
+    }
+  }
+
+  content.push({
+    table: {
+      headerRows: 4,
+      widths: [20, '*', 25, 30, 25, 35, 30, 30, 30, 30, 35, 25, 55],
+      body: body
+    },
+    layout: {
+      hLineWidth: function() { return 0.5; },
+      vLineWidth: function() { return 0.5; }
+    }
+  });
+
+  return content;
+}
+
+function buildAttachment2Content() {
+  var content = [];
+
+  content.push({
+    text: 'ZAŁĄCZNIK NR 2 DO PROTOKOŁU KONTROLNO POMIAROWEGO NR ' + (AppState.form.protocolNumber || ''),
+    bold: true, fontSize: 11, margin: [0, 0, 0, 3]
+  });
+  content.push({
+    text: 'REZYSTANCJA IZOLACJI',
+    bold: true, fontSize: 9, alignment: 'center', margin: [0, 0, 0, 10]
+  });
+
+  // 2-wierszowy nagłówek — 15 kolumn
+  var headerRow1 = [
+    { text: 'Lp.', rowSpan: 2, alignment: 'center', bold: true },
+    { text: 'Nazwa obwodu', rowSpan: 2, alignment: 'center', bold: true },
+    { text: 'Typ przewodu', rowSpan: 2, alignment: 'center', bold: true },
+    { text: 'Rp [M\u03a9]', colSpan: 10, alignment: 'center', bold: true },
+    {}, {}, {}, {}, {}, {}, {}, {}, {},
+    { text: 'Rw\n[M\u03a9]', rowSpan: 2, alignment: 'center', bold: true },
+    { text: 'Ocena', rowSpan: 2, alignment: 'center', bold: true }
+  ];
+  var rpCols = ['L1-N', 'L2-N', 'L3-N', 'L1-L2', 'L1-L3', 'L2-L3', 'L1-PE', 'L2-PE', 'L3-PE', 'N-PE'];
+  var headerRow2 = [{}, {}, {}];
+  for (var ci = 0; ci < rpCols.length; ci++) {
+    headerRow2.push({ text: rpCols[ci], alignment: 'center', fontSize: 7 });
+  }
+  headerRow2.push({});
+  headerRow2.push({});
+
+  var body = [headerRow1, headerRow2];
+
+  var rpFieldKeys = ['L1N', 'L2N', 'L3N', 'L1L2', 'L1L3', 'L2L3', 'L1PE', 'L2PE', 'L3PE', 'NPE'];
+  var lpCounter = 1;
+
+  // Helper: build Rp cells respecting phaseType
+  function buildRpCells(row) {
+    var activeFields = getActiveIZOLFields(row.phaseType);
+    var cells = [];
+    for (var k = 0; k < rpFieldKeys.length; k++) {
+      var key = rpFieldKeys[k];
+      if (activeFields.includes(key)) {
+        cells.push(row.rp[key] != null ? String(row.rp[key]) : '');
+      } else {
+        cells.push('-');
+      }
+    }
+    return cells;
+  }
+
+  // Stały wiersz (fixedRow) — zawsze 3-fazowy
+  var ifr = AppState.attachment2.fixedRow;
+  var ifrCalc = calcIZOLRow(ifr);
+  var fixedRpCells = buildRpCells(ifr);
+  var fixedDataRow = [
+    { text: String(lpCounter), alignment: 'center' },
+    'WLZ',
+    pdfVal(ifr.wireType)
+  ];
+  for (var fc = 0; fc < fixedRpCells.length; fc++) {
+    fixedDataRow.push({ text: fixedRpCells[fc], alignment: 'center' });
+  }
+  fixedDataRow.push({ text: String(ifr.Rw), alignment: 'center' });
+  fixedDataRow.push(ifrCalc.verdict || '');
+  body.push(fixedDataRow);
+  lpCounter++;
+
+  // Dynamiczne sekcje/podsekcje/wiersze
+  for (var si = 0; si < AppState.sections.length; si++) {
+    var section = AppState.sections[si];
+    body.push(makeSectionRow(section.title, 15));
+
+    for (var sbi = 0; sbi < section.subsections.length; sbi++) {
+      var sub = section.subsections[sbi];
+      body.push(makeSubsectionRow(sub.title, 15));
+
+      var rows = AppState.attachment2.rowsBySubsection[sub.id] || [];
+      for (var ri = 0; ri < rows.length; ri++) {
+        var row = rows[ri];
+        var calc = calcIZOLRow(row);
+        var rpCells = buildRpCells(row);
+        var dataRow = [
+          { text: String(lpCounter), alignment: 'center' },
+          pdfVal(row.name),
+          pdfVal(row.wireType)
+        ];
+        for (var rc = 0; rc < rpCells.length; rc++) {
+          dataRow.push({ text: rpCells[rc], alignment: 'center' });
+        }
+        dataRow.push({ text: String(row.Rw), alignment: 'center' });
+        dataRow.push(calc.verdict || '');
+        body.push(dataRow);
+        lpCounter++;
+      }
+    }
+  }
+
+  content.push({
+    table: {
+      headerRows: 2,
+      widths: [20, '*', 40, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 25, 50],
+      body: body
+    },
+    layout: {
+      hLineWidth: function() { return 0.5; },
+      vLineWidth: function() { return 0.5; }
+    }
+  });
+
+  return content;
+}
+
+function buildAttachment3Content() {
+  var content = [];
+
+  content.push({
+    text: 'ZAŁĄCZNIK NR 3 DO PROTOKOŁU KONTROLNO POMIAROWEGO NR ' + (AppState.form.protocolNumber || ''),
+    bold: true, fontSize: 11, margin: [0, 0, 0, 3]
+  });
+  content.push({
+    text: 'BADANIE WYŁĄCZNIKÓW RÓŻNICOWOPRĄDOWYCH (RCD)',
+    bold: true, fontSize: 9, alignment: 'center', margin: [0, 0, 0, 10]
+  });
+
+  var body = [
+    [
+      { text: 'Lp.', bold: true, alignment: 'center' },
+      { text: 'Typ wyłącznika', bold: true, alignment: 'center' },
+      { text: 'TEST\nTAK/NIE', bold: true, alignment: 'center' },
+      { text: 'In\n[mA]', bold: true, alignment: 'center' },
+      { text: 'Iw\n[mA]', bold: true, alignment: 'center' },
+      { text: 'tw\n[ms]', bold: true, alignment: 'center' },
+      { text: 'tz\n[ms]', bold: true, alignment: 'center' },
+      { text: 'Ocena', bold: true, alignment: 'center' }
+    ]
+  ];
+
+  for (var i = 0; i < AppState.attachment3.rows.length; i++) {
+    var row = AppState.attachment3.rows[i];
+    var calc = calcRCDRow(row);
+    body.push([
+      { text: String(i + 1), alignment: 'center' },
+      pdfVal(row.deviceType),
+      { text: pdfVal(row.testResult), alignment: 'center' },
+      { text: pdfVal(row.In), alignment: 'center' },
+      { text: pdfVal(row.Iw), alignment: 'center' },
+      { text: pdfVal(row.tw), alignment: 'center' },
+      { text: pdfVal(row.tz), alignment: 'center' },
+      calc.verdict || ''
+    ]);
+  }
+
+  // Jeśli brak wierszy, dodaj pusty wiersz placeholder
+  if (AppState.attachment3.rows.length === 0) {
+    body.push([{ text: 'Brak danych', colSpan: 8, alignment: 'center', italics: true }, {}, {}, {}, {}, {}, {}, {}]);
+  }
+
+  content.push({
+    table: {
+      headerRows: 1,
+      widths: [25, '*', 60, 40, 40, 40, 40, 55],
+      body: body
+    },
+    layout: {
+      hLineWidth: function() { return 0.5; },
+      vLineWidth: function() { return 0.5; }
+    }
+  });
+
+  return content;
+}
+
+function buildAttachment4Content() {
+  var content = [];
+
+  content.push({
+    text: 'ZAŁĄCZNIK NR 4 DO PROTOKOŁU KONTROLNO POMIAROWEGO NR ' + (AppState.form.protocolNumber || ''),
+    bold: true, fontSize: 11, pageBreak: 'before', margin: [0, 0, 0, 3]
+  });
+  content.push({
+    text: 'REZYSTANCJA UZIEMIENIA',
+    bold: true, fontSize: 9, alignment: 'center', margin: [0, 0, 0, 10]
+  });
+
+  var body = [
+    [
+      { text: 'Lp.', bold: true, alignment: 'center' },
+      { text: 'Nazwa', bold: true, alignment: 'center' },
+      { text: 'Rp\n[\u03a9]', bold: true, alignment: 'center' },
+      { text: 'Wk', bold: true, alignment: 'center' },
+      { text: 'Rpo\n[\u03a9]', bold: true, alignment: 'center' },
+      { text: 'Rw\n[\u03a9]', bold: true, alignment: 'center' },
+      { text: 'Ocena', bold: true, alignment: 'center' }
+    ]
+  ];
+
+  for (var i = 0; i < AppState.attachment4.rows.length; i++) {
+    var row = AppState.attachment4.rows[i];
+    var calc = calcUZIEMRow(row);
+    body.push([
+      { text: String(i + 1), alignment: 'center' },
+      pdfVal(row.deviceName),
+      { text: pdfVal(row.Rp), alignment: 'center' },
+      { text: pdfVal(row.Wk), alignment: 'center' },
+      { text: calc.Rpo != null ? calc.Rpo.toFixed(2) : '', alignment: 'center' },
+      { text: pdfVal(row.Rw), alignment: 'center' },
+      calc.verdict || ''
+    ]);
+  }
+
+  // Jeśli brak wierszy, dodaj pusty wiersz placeholder
+  if (AppState.attachment4.rows.length === 0) {
+    body.push([{ text: 'Brak danych', colSpan: 7, alignment: 'center', italics: true }, {}, {}, {}, {}, {}, {}]);
+  }
+
+  content.push({
+    table: {
+      headerRows: 1,
+      widths: [25, '*', 50, 50, 50, 50, 55],
+      body: body
+    },
+    layout: {
+      hLineWidth: function() { return 0.5; },
+      vLineWidth: function() { return 0.5; }
+    }
+  });
+
+  return content;
+}
+
+function buildDocDefinition() {
+  return {
+    pageSize: 'A4',
+    pageOrientation: 'portrait',
+    pageMargins: [40, 60, 40, 60],
+    defaultStyle: { font: 'Roboto', fontSize: 9 },
+    footer: function(currentPage, pageCount) {
+      return { text: currentPage + ' / ' + pageCount, alignment: 'center', fontSize: 8, margin: [0, 10, 0, 0] };
+    },
+    content: [
+      ...buildFormMainContent(),
+      ...buildAttachment1Content(),
+      { stack: buildAttachment2Content(), pageOrientation: 'landscape', pageBreak: 'before' },
+      { stack: buildAttachment3Content(), pageOrientation: 'portrait', pageBreak: 'before' },
+      ...buildAttachment4Content()
+    ]
+  };
+}
+
+function exportPDF() {
+  var dd = buildDocDefinition();
+  var filename = 'protokol-' + (AppState.form.protocolNumber || 'draft').replace(/\//g, '-') + '.pdf';
+  pdfMake.createPdf(dd).download(filename);
+}
+
 // === EVENT BUS SUBSCRIPTIONS ===
 
 EventBus.on('sections:changed', () => {
