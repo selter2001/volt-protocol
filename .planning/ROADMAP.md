@@ -13,7 +13,7 @@ Aplikacja jest budowana jako kompletny generator protokołów PN-HD 60364-6 w je
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Formularze i Obliczenia** — Wszystkie 4 załączniki z dynamicznymi sekcjami, obliczeniami i bazą zabezpieczeń
-- [ ] **Phase 2: Kompletność Normowa** — Formularz główny z danymi ogólnymi, ocena końcowa i legendy
+- [x] **Phase 2: Kompletność Normowa** — Formularz główny z danymi ogólnymi, ocena końcowa i legendy
 - [ ] **Phase 3: Eksport i Dane** — PDF do pobrania, localStorage, JSON import/eksport
 
 ## Phase Details
@@ -70,5 +70,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Formularze i Obliczenia | 3/3 | Complete | 2026-02-24 |
-| 2. Kompletność Normowa | 0/1 | Not started | - |
+| 2. Kompletność Normowa | 1/1 | Complete | 2026-02-24 |
 | 3. Eksport i Dane | 0/2 | Not started | - |
