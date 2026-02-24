@@ -4,6 +4,8 @@
 
 Electrical inspection protocol generator per PN-HD 60364-6 — runs entirely in the browser, no installation required.
 
+> Created by **Wojciech Olszak**
+
 <h3 align="center">
   <a href="https://selter2001.github.io/volt-protocol/">Otwórz aplikację / Open App</a>
 </h3>
@@ -80,6 +82,10 @@ Free web application for generating electrical measurement protocols according t
 - [pdfmake 0.3.5](https://pdfmake.github.io/docs/) for PDF generation
 - Roboto font for Polish character support (Latin Extended-A)
 
+## Author
+
+**Wojciech Olszak** — [GitHub](https://github.com/selter2001)
+
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) © 2026 Wojciech Olszak
