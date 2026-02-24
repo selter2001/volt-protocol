@@ -35,7 +35,7 @@ Plans:
 ### Phase 2: Interactive Layer
 **Goal**: Aplikacja daje pełne odczucie premium "Industrial Elegance" — wyniki obliczeń animują się count-up'em, przyciski mają haptic pressed-in feel, verdykty świecą odpowiednim kolorem.
 **Depends on**: Phase 1
-**Requirements**: ANIM-02, ANIM-03, ANIM-04, ANIM-06
+**Requirements**: ANIM-02, ANIM-03, ANIM-06
 **Success Criteria** (what must be TRUE):
   1. Po zmianie wartości wejściowych (np. prąd zabezpieczenia) liczby wyników (Id, Zsmax, Ia, Rpo) animują się count-up'em do nowej wartości zamiast przeskakiwać
   2. Kliknięcie przycisku eksportu (PDF, Word, JSON) pokazuje wizualny pressed-in efekt (inset shadow) przez czas kliknięcia
@@ -48,7 +48,7 @@ Plans:
 ### Phase 3: Flow Effect & Stress Test
 **Goal**: Opcjonalny Flow Effect wdrożony (lub świadomie odrzucony), aplikacja zweryfikowana pod pełnym obciążeniem danych — 20+ wierszy we wszystkich zakładkach, wszystkie eksporty, prefers-reduced-motion.
 **Depends on**: Phase 2
-**Requirements**: PRES-01, PRES-02, PRES-03, PRES-04, PRES-05, PRES-06
+**Requirements**: ANIM-04, PRES-01, PRES-02, PRES-03, PRES-04, PRES-05, PRES-06
 **Success Criteria** (what must be TRUE):
   1. Wypełniona zakładka z 20+ wierszami danych działa płynnie — brak janku przy animacjach, przewijaniu i edycji pól
   2. PDF export, Word export i JSON export/import zwracają identyczne wyniki jak przed redesignem przy pełnym zestawie danych
