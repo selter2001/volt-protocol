@@ -19,14 +19,16 @@
 
     <!-- Zakładki -->
     <div id="tabs" class="flex border-b border-gray-300 mb-4">
-      <button data-tab="1" class="px-4 py-2 font-medium border-b-2 border-blue-600 text-blue-600">Zał. 1 - SWZ</button>
+      <button data-tab="0" class="px-4 py-2 font-medium border-b-2 border-blue-600 text-blue-600">Protokół</button>
+      <button data-tab="1" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Zał. 1 - SWZ</button>
       <button data-tab="2" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Zał. 2 - Izolacja</button>
       <button data-tab="3" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Zał. 3 - RCD</button>
       <button data-tab="4" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Zał. 4 - Uziemienie</button>
     </div>
 
     <!-- Kontenery załączników -->
-    <div id="attachment-1"></div>
+    <div id="attachment-0"></div>
+    <div id="attachment-1" class="hidden"></div>
     <div id="attachment-2" class="hidden"></div>
     <div id="attachment-3" class="hidden"></div>
     <div id="attachment-4" class="hidden"></div>
@@ -53,6 +55,28 @@ const IZOL_FIELDS_3PHASE = ['L1N','L2N','L3N','L1L2','L1L3','L2L3','L1PE','L2PE'
 
 function getActiveIZOLFields(phaseType) {
   return phaseType === '3' ? IZOL_FIELDS_3PHASE : IZOL_FIELDS_1PHASE;
+}
+
+const INSTRUMENT_LABELS = {
+  SWZ:   'Pomiar skuteczności ochrony przeciwporażeniowej przez samoczynne wyłączenie zasilania',
+  RCD:   'Pomiar wyłączników różnicowoprądowych',
+  IZOL:  'Pomiar rezystancji izolacji',
+  UZIEM: 'Pomiar rezystancji uziomu'
+};
+
+// === HELPERS ===
+
+function generateProtocolNumber() {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  return `${yyyy}/${mm}/001`;
+}
+
+function parseLocalDate(dateStr) {
+  if (!dateStr) return null;
+  const [yyyy, mm, dd] = dateStr.split('-').map(Number);
+  return new Date(yyyy, mm - 1, dd);
 }
 
 // === STATE ===
@@ -92,10 +116,27 @@ const AppState = {
   },
   attachment4: {
     rows: []
+  },
+  form: {
+    protocolNumber: '',
+    objectName: '',
+    objectAddress: '',
+    objectParcel: '',
+    executorName: '',
+    executorSepE: '',
+    executorSepD: '',
+    testDate: '',
+    testTemp: null,
+    instruments: [
+      { type: 'SWZ',   name: '', serial: '', calibration: '' },
+      { type: 'RCD',   name: '', serial: '', calibration: '' },
+      { type: 'IZOL',  name: '', serial: '', calibration: '' },
+      { type: 'UZIEM', name: '', serial: '', calibration: '' }
+    ]
   }
 };
 
-const UIState = { activeTab: 1 };
+const UIState = { activeTab: 0 };
 
 // === EVENT BUS ===
 
@@ -247,7 +288,7 @@ function renderTabs() {
     }
   });
 
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 0; i <= 4; i++) {
     const container = document.getElementById('attachment-' + i);
     if (i === UIState.activeTab) {
       container.classList.remove('hidden');
@@ -374,6 +415,116 @@ function renderSWZRowCells(row, lp, subId, isFixed) {
   }
 
   return html;
+}
+
+function renderFormTab() {
+  const container = document.getElementById('attachment-0');
+  const f = AppState.form;
+  const inputCls = 'w-full border border-gray-300 rounded px-2 py-1.5 text-sm';
+  const labelCls = 'block text-sm font-medium text-gray-700 mb-1';
+  let html = '';
+
+  // FORM-01: Numer protokołu
+  html += '<div class="bg-white border rounded p-4 mb-4">';
+  html += '<h3 class="text-md font-semibold mb-3 text-gray-800">Numer protokołu</h3>';
+  html += '<div class="max-w-xs">';
+  html += '<label class="' + labelCls + '">Numer</label>';
+  html += '<input type="text" data-field="form-protocolNumber" value="' + escapeHtml(f.protocolNumber) + '" class="' + inputCls + '" placeholder="RRRR/MM/NNN">';
+  html += '</div>';
+  html += '</div>';
+
+  // FORM-02: Obiekt badany
+  html += '<div class="bg-white border rounded p-4 mb-4">';
+  html += '<h3 class="text-md font-semibold mb-3 text-gray-800">Obiekt badany</h3>';
+  html += '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">';
+  html += '<div>';
+  html += '<label class="' + labelCls + '">Nazwa obiektu</label>';
+  html += '<input type="text" data-field="form-objectName" value="' + escapeHtml(f.objectName) + '" class="' + inputCls + '" placeholder="np. Budynek mieszkalny">';
+  html += '</div>';
+  html += '<div>';
+  html += '<label class="' + labelCls + '">Adres</label>';
+  html += '<input type="text" data-field="form-objectAddress" value="' + escapeHtml(f.objectAddress) + '" class="' + inputCls + '" placeholder="np. ul. Przykładowa 1, 00-000 Warszawa">';
+  html += '</div>';
+  html += '<div>';
+  html += '<label class="' + labelCls + '">Nr działki</label>';
+  html += '<input type="text" data-field="form-objectParcel" value="' + escapeHtml(f.objectParcel) + '" class="' + inputCls + '" placeholder="np. 123/4">';
+  html += '</div>';
+  html += '</div>';
+  html += '</div>';
+
+  // FORM-03: Wykonawca
+  html += '<div class="bg-white border rounded p-4 mb-4">';
+  html += '<h3 class="text-md font-semibold mb-3 text-gray-800">Wykonawca badań</h3>';
+  html += '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">';
+  html += '<div>';
+  html += '<label class="' + labelCls + '">Imię i nazwisko</label>';
+  html += '<input type="text" data-field="form-executorName" value="' + escapeHtml(f.executorName) + '" class="' + inputCls + '" placeholder="Jan Kowalski">';
+  html += '</div>';
+  html += '<div>';
+  html += '<label class="' + labelCls + '">Nr świadectwa SEP E (eksploatacja)</label>';
+  html += '<input type="text" data-field="form-executorSepE" value="' + escapeHtml(f.executorSepE) + '" class="' + inputCls + '" placeholder="np. 12345/2024">';
+  html += '</div>';
+  html += '<div>';
+  html += '<label class="' + labelCls + '">Nr świadectwa SEP D (dozór)</label>';
+  html += '<input type="text" data-field="form-executorSepD" value="' + escapeHtml(f.executorSepD) + '" class="' + inputCls + '" placeholder="np. 67890/2024">';
+  html += '</div>';
+  html += '</div>';
+  html += '</div>';
+
+  // FORM-04: Warunki badań
+  html += '<div class="bg-white border rounded p-4 mb-4">';
+  html += '<h3 class="text-md font-semibold mb-3 text-gray-800">Warunki badań</h3>';
+  html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-lg">';
+  html += '<div>';
+  html += '<label class="' + labelCls + '">Data badania</label>';
+  html += '<input type="date" data-field="form-testDate" value="' + escapeHtml(f.testDate) + '" class="' + inputCls + '">';
+  html += '</div>';
+  html += '<div>';
+  html += '<label class="' + labelCls + '">Temperatura otoczenia</label>';
+  html += '<div class="flex items-center gap-2">';
+  html += '<input type="number" data-field="form-testTemp" value="' + (f.testTemp != null ? f.testTemp : '') + '" step="0.1" class="' + inputCls + '" placeholder="np. 22.5">';
+  html += '<span class="text-sm text-gray-500">\u00b0C</span>';
+  html += '</div>';
+  html += '</div>';
+  html += '</div>';
+  html += '</div>';
+
+  // FORM-05: Przyrządy pomiarowe
+  html += '<div class="bg-white border rounded p-4 mb-4">';
+  html += '<h3 class="text-md font-semibold mb-3 text-gray-800">Przyrządy pomiarowe</h3>';
+  html += '<div class="overflow-x-auto">';
+  html += '<table class="w-full border-collapse text-sm">';
+  html += '<thead class="bg-gray-50">';
+  html += '<tr>';
+  html += '<th class="border border-gray-300 px-3 py-2 text-left font-medium">Wykonane pomiary</th>';
+  html += '<th class="border border-gray-300 px-3 py-2 text-left font-medium w-56">Przyrządy pomiarowe</th>';
+  html += '<th class="border border-gray-300 px-3 py-2 text-left font-medium w-48">Nr świadectwa wzorcowania</th>';
+  html += '</tr>';
+  html += '</thead>';
+  html += '<tbody>';
+  for (const instr of f.instruments) {
+    html += '<tr>';
+    html += '<td class="border border-gray-300 px-3 py-2 text-sm text-gray-700">' + escapeHtml(INSTRUMENT_LABELS[instr.type]) + '</td>';
+    html += '<td class="border border-gray-300 px-1 py-1">';
+    html += '<input type="text" data-field="form-instr-' + instr.type + '-name" value="' + escapeHtml(instr.name) + '" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="np. MPI-530">';
+    html += '</td>';
+    html += '<td class="border border-gray-300 px-1 py-1">';
+    html += '<input type="text" data-field="form-instr-' + instr.type + '-calibration" value="' + escapeHtml(instr.calibration) + '" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="nr świadectwa">';
+    html += '</td>';
+    html += '</tr>';
+  }
+  html += '</tbody>';
+  html += '</table>';
+  html += '</div>';
+  html += '</div>';
+
+  // FORM-06: Ocena końcowa (placeholder - wypełniany w Task 2)
+  html += '<div id="assessment-section"></div>';
+
+  // FORM-07: Orzeczenie (placeholder - wypełniany w Task 2)
+  html += '<div id="orzeczenie-section"></div>';
+
+  container.innerHTML = html;
 }
 
 function renderAttachment1() {
@@ -850,6 +1001,58 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+// === FORM FIELD CHANGE HANDLERS ===
+
+function handleFormFieldChange(field, value) {
+  switch (field) {
+    case 'form-protocolNumber':
+      AppState.form.protocolNumber = value;
+      break;
+    case 'form-objectName':
+      AppState.form.objectName = value;
+      break;
+    case 'form-objectAddress':
+      AppState.form.objectAddress = value;
+      break;
+    case 'form-objectParcel':
+      AppState.form.objectParcel = value;
+      break;
+    case 'form-executorName':
+      AppState.form.executorName = value;
+      break;
+    case 'form-executorSepE':
+      AppState.form.executorSepE = value;
+      break;
+    case 'form-executorSepD':
+      AppState.form.executorSepD = value;
+      break;
+    case 'form-testDate':
+      AppState.form.testDate = value;
+      if (typeof updateOrzeczenieDisplay === 'function') {
+        updateOrzeczenieDisplay();
+      }
+      break;
+    case 'form-testTemp':
+      AppState.form.testTemp = value === '' ? null : parseFloat(value);
+      break;
+    default:
+      // Instrument field pattern: form-instr-{TYPE}-{PROP}
+      handleInstrumentFieldChange(field, value);
+      break;
+  }
+}
+
+function handleInstrumentFieldChange(field, value) {
+  const match = field.match(/^form-instr-(SWZ|RCD|IZOL|UZIEM)-(name|calibration)$/);
+  if (!match) return;
+  const type = match[1];
+  const prop = match[2];
+  const instr = AppState.form.instruments.find(i => i.type === type);
+  if (instr) {
+    instr[prop] = value;
+  }
+}
+
 // === FORM CONTROLLER ===
 
 function bindTabEvents() {
@@ -858,6 +1061,10 @@ function bindTabEvents() {
     if (!btn) return;
     UIState.activeTab = Number(btn.dataset.tab);
     renderTabs();
+    // Pełny re-render zakladki Protokol przy przełączeniu
+    if (UIState.activeTab === 0) {
+      renderFormTab();
+    }
   });
 }
 
@@ -986,6 +1193,12 @@ function bindAppEvents() {
     const field = e.target.dataset.field;
     if (!field) return;
 
+    // Form field editing (Protokol tab)
+    if (field.startsWith('form-')) {
+      handleFormFieldChange(field, e.target.value);
+      return;
+    }
+
     if (field === 'section-title') {
       const sectionId = e.target.dataset.sectionId;
       const section = AppState.sections.find(s => s.id === sectionId);
@@ -1038,6 +1251,12 @@ function bindAppEvents() {
   app.addEventListener('change', (e) => {
     const field = e.target.dataset.field;
     if (!field) return;
+
+    // Form field change (date input fires change, not input)
+    if (field.startsWith('form-')) {
+      handleFormFieldChange(field, e.target.value);
+      return;
+    }
 
     // IZOL phaseType select
     if (field === 'izol-phaseType') {
@@ -1350,6 +1569,9 @@ EventBus.on('attachment4:changed', renderAttachment4);
 // === INIT ===
 
 function init() {
+  // Auto-generate protocol number
+  AppState.form.protocolNumber = generateProtocolNumber();
+
   // Initialize default content: one section with one subsection and one row
   const defaultSubId = crypto.randomUUID();
   const defaultSectionId = crypto.randomUUID();
@@ -1368,6 +1590,7 @@ function init() {
   AppState.attachment2.rowsBySubsection[defaultSubId] = [];
 
   renderTabs();
+  renderFormTab();
   renderAttachment1();
   renderAttachment2();
   renderAttachment3();
