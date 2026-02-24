@@ -1055,16 +1055,16 @@ function renderIZOLRowCells(row, lp, subId, isFixed) {
   const activeFields = getActiveIZOLFields(row.phaseType);
 
   const dataAttrs = 'data-row-id="' + rowIdAttr + '"' + (subIdAttr ? ' data-sub-id="' + subIdAttr + '"' : '') + ' data-attachment="2"';
-  const inputCls = 'w-full input-glass px-1 py-0.5 text-sm text-center';
+  const inputCls = 'w-full input-glass px-1 py-0.5 text-xs text-center';
 
   let html = '';
 
   // Lp.
-  html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-medium">' + lp + '</td>';
+  html += '<td class="border border-white/[0.12] px-1 py-0.5 text-center font-medium">' + lp + '</td>';
 
   // Nazwa obwodu
   if (isFixed) {
-    html += '<td class="border border-white/[0.12] px-2 py-1 font-medium">WLZ</td>';
+    html += '<td class="border border-white/[0.12] px-1 py-0.5 font-medium">WLZ</td>';
   } else {
     html += '<td class="border border-white/[0.12] px-1 py-0.5">';
     html += '<input type="text" data-field="izol-name" ' + dataAttrs + ' value="' + escapeHtml(row.name || '') + '" class="' + inputCls + '" placeholder="nazwa obwodu">';
@@ -1079,9 +1079,9 @@ function renderIZOLRowCells(row, lp, subId, isFixed) {
   // Fazy select
   html += '<td class="border border-white/[0.12] px-1 py-0.5">';
   if (isFixed) {
-    html += '<span class="text-sm text-platinum/50">3-faz</span>';
+    html += '<span class="text-xs text-platinum/50">3-faz</span>';
   } else {
-    html += '<select data-field="izol-phaseType" ' + dataAttrs + ' class="w-full select-glass px-1 py-0.5 text-sm">';
+    html += '<select data-field="izol-phaseType" ' + dataAttrs + ' class="w-full select-glass px-1 py-0.5 text-xs">';
     html += '<option value="1"' + (row.phaseType === '1' ? ' selected' : '') + '>1-fazowy</option>';
     html += '<option value="3"' + (row.phaseType === '3' ? ' selected' : '') + '>3-fazowy</option>';
     html += '</select>';
@@ -1095,22 +1095,22 @@ function renderIZOLRowCells(row, lp, subId, isFixed) {
     const disabledAttr = isActive ? '' : ' disabled';
     const disabledCls = isActive ? '' : ' bg-white/[0.03] text-platinum/30 cursor-not-allowed';
     html += '<td class="border border-white/[0.12] px-0.5 py-0.5">';
-    html += '<input type="number" data-field="izol-rp-' + field + '" ' + dataAttrs + ' value="' + val + '" step="0.01" class="w-14 input-glass px-0.5 py-0.5 text-sm text-center font-mono' + disabledCls + '"' + disabledAttr + '>';
+    html += '<input type="number" data-field="izol-rp-' + field + '" ' + dataAttrs + ' value="' + val + '" step="0.01" class="w-10 input-glass px-0 py-0.5 text-xs text-center font-mono' + disabledCls + '"' + disabledAttr + '>';
     html += '</td>';
   }
 
   // Rw (not editable, display "1")
-  html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-mono">' + row.Rw + '</td>';
+  html += '<td class="border border-white/[0.12] px-1 py-0.5 text-center font-mono text-xs">' + row.Rw + '</td>';
 
   // Verdict
   const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700 verdict-glow-positive' : calc.verdict === 'NEGATYWNA' ? 'text-red-700 verdict-glow-negative' : '';
-  html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-bold izol-verdict-cell ' + verdictClass + '" data-row-id="' + rowIdAttr + '">' + (calc.verdict || '') + '</td>';
+  html += '<td class="border border-white/[0.12] px-1 py-0.5 text-center text-xs font-bold izol-verdict-cell ' + verdictClass + '" data-row-id="' + rowIdAttr + '">' + (calc.verdict || '') + '</td>';
 
   // Action
   if (isFixed) {
-    html += '<td class="border border-white/[0.12] px-2 py-1 text-center text-platinum/30" title="Wiersz stały - nie można usunąć">-</td>';
+    html += '<td class="border border-white/[0.12] px-0.5 py-0.5 text-center text-platinum/30" title="Wiersz stały - nie można usunąć">-</td>';
   } else {
-    html += '<td class="border border-white/[0.12] px-1 py-1 text-center">';
+    html += '<td class="border border-white/[0.12] px-0.5 py-0.5 text-center">';
     html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-sub-id="' + subId + '" data-attachment="2" class="text-red-400 hover:text-red-300 text-xs">Usuń</button>';
     html += '</td>';
   }
@@ -1126,19 +1126,19 @@ function renderAttachment2() {
   html += '<button data-action="add-section" class="mb-3 px-3 py-1 btn-primary-glass text-sm">Dodaj sekcję</button>';
 
   html += '<div class="overflow-x-auto">';
-  html += '<table class="min-w-max border-collapse text-sm">';
+  html += '<table class="w-full border-collapse text-xs">';
 
   // Header Row 1
   html += '<thead class="bg-white/[0.06] text-xs text-center text-platinum/70">';
   html += '<tr>';
-  html += '<th rowspan="2" class="border border-white/[0.12] px-2 py-1 w-10">Lp.</th>';
-  html += '<th rowspan="2" class="border border-white/[0.12] px-2 py-1 min-w-[120px]">Nazwa obwodu</th>';
-  html += '<th rowspan="2" class="border border-white/[0.12] px-2 py-1 min-w-[100px]">Typ przewodu</th>';
-  html += '<th rowspan="2" class="border border-white/[0.12] px-2 py-1 w-20">Fazy</th>';
-  html += '<th colspan="10" class="border border-white/[0.12] px-2 py-1">R<sub>p</sub> [M&Omega;]</th>';
-  html += '<th rowspan="2" class="border border-white/[0.12] px-2 py-1 w-14">R<sub>w</sub><br>[M&Omega;]</th>';
-  html += '<th rowspan="2" class="border border-white/[0.12] px-2 py-1 w-24">Ocena</th>';
-  html += '<th rowspan="2" class="border border-white/[0.12] px-2 py-1 w-10"></th>';
+  html += '<th rowspan="2" class="border border-white/[0.12] px-1 py-0.5 w-8">Lp.</th>';
+  html += '<th rowspan="2" class="border border-white/[0.12] px-1 py-0.5">Obwód</th>';
+  html += '<th rowspan="2" class="border border-white/[0.12] px-1 py-0.5">Przewód</th>';
+  html += '<th rowspan="2" class="border border-white/[0.12] px-1 py-0.5 w-16">Fazy</th>';
+  html += '<th colspan="10" class="border border-white/[0.12] px-1 py-0.5">R<sub>p</sub> [M&Omega;]</th>';
+  html += '<th rowspan="2" class="border border-white/[0.12] px-1 py-0.5 w-10">R<sub>w</sub></th>';
+  html += '<th rowspan="2" class="border border-white/[0.12] px-1 py-0.5 w-16">Ocena</th>';
+  html += '<th rowspan="2" class="border border-white/[0.12] px-1 py-0.5 w-8"></th>';
   html += '</tr>';
 
   // Header Row 2 - Rp sub-columns
@@ -1163,24 +1163,24 @@ function renderAttachment2() {
   for (const section of AppState.sections) {
     // Section header row with editable title and management buttons
     html += '<tr class="bg-white/[0.08]">';
-    html += '<td colspan="15" class="border border-white/[0.12] px-2 py-1 font-bold">';
-    html += '<input type="text" data-field="section-title" data-section-id="' + section.id + '" value="' + escapeHtml(section.title) + '" class="bg-transparent font-bold w-64 outline-none focus:bg-white/10 focus:ring-1 focus:ring-cyan/40 rounded px-1">';
-    html += '<button data-action="add-subsection" data-section-id="' + section.id + '" class="ml-3 px-2 py-0.5 btn-glass text-cyan text-xs">Dodaj podtytuł</button>';
+    html += '<td colspan="15" class="border border-white/[0.12] px-1 py-0.5 font-bold text-xs">';
+    html += '<input type="text" data-field="section-title" data-section-id="' + section.id + '" value="' + escapeHtml(section.title) + '" class="bg-transparent font-bold w-48 outline-none focus:bg-white/10 focus:ring-1 focus:ring-cyan/40 rounded px-1 text-xs">';
+    html += '<button data-action="add-subsection" data-section-id="' + section.id + '" class="ml-2 px-1.5 py-0.5 btn-glass text-cyan text-xs">Dodaj podtytuł</button>';
     html += '</td>';
-    html += '<td colspan="2" class="border border-white/[0.12] px-2 py-1 text-right">';
-    html += '<button data-action="remove-section" data-section-id="' + section.id + '" class="px-2 py-0.5 btn-glass text-red-400 text-xs">Usuń sekcję</button>';
+    html += '<td colspan="2" class="border border-white/[0.12] px-1 py-0.5 text-right">';
+    html += '<button data-action="remove-section" data-section-id="' + section.id + '" class="px-1.5 py-0.5 btn-glass text-red-400 text-xs">Usuń sekcję</button>';
     html += '</td>';
     html += '</tr>';
 
     for (const sub of section.subsections) {
       // Subsection header row with editable title
       html += '<tr class="bg-white/[0.04]">';
-      html += '<td colspan="15" class="border border-white/[0.12] px-2 py-1 italic">';
-      html += '<input type="text" data-field="subsection-title" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" value="' + escapeHtml(sub.title) + '" class="bg-transparent italic w-64 outline-none focus:bg-white/10 focus:ring-1 focus:ring-cyan/40 rounded px-1">';
-      html += '<button data-action="add-row-izol" data-sub-id="' + sub.id + '" class="ml-3 px-2 py-0.5 btn-glass text-green-400 text-xs not-italic font-normal">Dodaj wiersz</button>';
+      html += '<td colspan="15" class="border border-white/[0.12] px-1 py-0.5 italic text-xs">';
+      html += '<input type="text" data-field="subsection-title" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" value="' + escapeHtml(sub.title) + '" class="bg-transparent italic w-48 outline-none focus:bg-white/10 focus:ring-1 focus:ring-cyan/40 rounded px-1 text-xs">';
+      html += '<button data-action="add-row-izol" data-sub-id="' + sub.id + '" class="ml-2 px-1.5 py-0.5 btn-glass text-green-400 text-xs not-italic font-normal">Dodaj wiersz</button>';
       html += '</td>';
-      html += '<td colspan="2" class="border border-white/[0.12] px-2 py-1 text-right">';
-      html += '<button data-action="remove-subsection" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" class="px-2 py-0.5 btn-glass text-red-400 text-xs">Usuń podtytuł</button>';
+      html += '<td colspan="2" class="border border-white/[0.12] px-1 py-0.5 text-right">';
+      html += '<button data-action="remove-subsection" data-section-id="' + section.id + '" data-sub-id="' + sub.id + '" class="px-1.5 py-0.5 btn-glass text-red-400 text-xs">Usuń podtytuł</button>';
       html += '</td>';
       html += '</tr>';
 
