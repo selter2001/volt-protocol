@@ -99,6 +99,25 @@
       z-index: -1;
     }
 
+    /* Custom scrollbar for dark theme */
+    .overflow-x-auto {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(224, 224, 232, 0.3) transparent;
+    }
+    .overflow-x-auto::-webkit-scrollbar {
+      height: 8px;
+    }
+    .overflow-x-auto::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .overflow-x-auto::-webkit-scrollbar-thumb {
+      background: rgba(224, 224, 232, 0.3);
+      border-radius: 4px;
+    }
+    .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+      background: rgba(224, 224, 232, 0.5);
+    }
+
     /* prefers-reduced-motion — ANIM-07 */
     @media (prefers-reduced-motion: reduce) {
       *,
