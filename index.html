@@ -483,7 +483,7 @@ function renderAttachment1() {
   html += '<div><strong>t<sub>w</sub></strong> - wymagany czas wyłączenia [s]</div>';
   html += '<div><strong>Z<sub>s</sub></strong> - zmierzona impedancja pętli zwarcia [&Omega;]</div>';
   html += '<div><strong>Z<sub>s max</sub></strong> - dopuszczalna impedancja pętli zwarcia [&Omega;]</div>';
-  html += '<div><strong>U<sub>sk</sub></strong> - napięcie dotykowe dopuszczalne [V]</div>';
+  html += '<div><strong>U<sub>sk</sub></strong> - napięcie znamionowe źródła zasilania [V]</div>';
   html += '</div>';
 
   container.innerHTML = html;
@@ -550,10 +550,10 @@ function renderIZOLRowCells(row, lp, subId, isFixed) {
 
   // Action
   if (isFixed) {
-    html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" title="Wiersz staly - nie mozna usunac">-</td>';
+    html += '<td class="border border-gray-300 px-2 py-1 text-center text-gray-400" title="Wiersz stały - nie można usunąć">-</td>';
   } else {
     html += '<td class="border border-gray-300 px-1 py-1 text-center">';
-    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-sub-id="' + subId + '" data-attachment="2" class="text-red-500 hover:text-red-700 text-xs">Usun</button>';
+    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-sub-id="' + subId + '" data-attachment="2" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
     html += '</td>';
   }
 
@@ -564,8 +564,8 @@ function renderAttachment2() {
   const container = document.getElementById('attachment-2');
   let html = '';
 
-  html += '<h2 class="text-lg font-semibold mb-3">Zalacznik nr 2 - Rezystancja izolacji</h2>';
-  html += '<p class="mb-3 text-sm text-blue-600 italic">Sekcje zarzadzane z Zal. 1</p>';
+  html += '<h2 class="text-lg font-semibold mb-3">Załącznik nr 2 - Rezystancja izolacji</h2>';
+  html += '<p class="mb-3 text-sm text-blue-600 italic">Sekcje zarządzane z Zał. 1</p>';
 
   html += '<div class="overflow-x-auto">';
   html += '<table class="min-w-max border-collapse text-sm">';
@@ -635,8 +635,8 @@ function renderAttachment2() {
 
   // Legend IZOL-07
   html += '<div class="mt-4 text-xs text-gray-600 grid grid-cols-2 gap-x-6 gap-y-1">';
-  html += '<div><strong>R<sub>p</sub></strong> - Zmierzona wartosc rezystancji izolacji [M&Omega;]</div>';
-  html += '<div><strong>R<sub>w</sub></strong> - Wymagana wartosc rezystancji izolacji [M&Omega;]</div>';
+  html += '<div><strong>R<sub>p</sub></strong> - Zmierzona wartość rezystancji izolacji [M&Omega;]</div>';
+  html += '<div><strong>R<sub>w</sub></strong> - Wymagana wartość rezystancji izolacji [M&Omega;]</div>';
   html += '</div>';
 
   container.innerHTML = html;
@@ -648,7 +648,7 @@ function renderAttachment3() {
   const selectCls = 'w-full border border-gray-300 rounded px-1 py-0.5 text-sm';
   let html = '';
 
-  html += '<h2 class="text-lg font-semibold mb-3">Zalacznik nr 3 - Badanie wylacznikow roznicowopr&#261;dowych (RCD)</h2>';
+  html += '<h2 class="text-lg font-semibold mb-3">Załącznik nr 3 - Badanie wyłączników różnicowoprądowych (RCD)</h2>';
 
   html += '<div class="overflow-x-auto">';
   html += '<table class="w-full border-collapse text-sm">';
@@ -657,7 +657,7 @@ function renderAttachment3() {
   html += '<thead>';
   html += '<tr class="bg-gray-50 text-center font-semibold">';
   html += '<th class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 min-w-[180px]">Typ urzadzenia</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 min-w-[180px]">Typ urządzenia</th>';
   html += '<th class="border border-gray-300 px-2 py-1 w-16">TEST</th>';
   html += '<th class="border border-gray-300 px-2 py-1 w-20">I<sub>n</sub> [mA]</th>';
   html += '<th class="border border-gray-300 px-2 py-1 w-20">I<sub>w</sub> [mA]</th>';
@@ -721,7 +721,7 @@ function renderAttachment3() {
 
     // Usun
     html += '<td class="border border-gray-300 px-1 py-1 text-center">';
-    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-attachment="3" class="text-red-500 hover:text-red-700 text-xs">Usun</button>';
+    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-attachment="3" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
     html += '</td>';
 
     html += '</tr>';
@@ -739,10 +739,10 @@ function renderAttachment3() {
 
   // Legend RCD-05
   html += '<div class="mt-4 text-xs text-gray-600 grid grid-cols-2 gap-x-6 gap-y-1">';
-  html += '<div><strong>I<sub>n</sub></strong> - Znamionowy prad roznicowy wylacznika [mA]</div>';
-  html += '<div><strong>I<sub>w</sub></strong> - Zmierzony prad wylaczajacy [mA]</div>';
-  html += '<div><strong>t<sub>w</sub></strong> - Zmierzony czas wylaczenia [ms]</div>';
-  html += '<div><strong>t<sub>z</sub></strong> - Dopuszczalny czas wylaczenia [ms]</div>';
+  html += '<div><strong>I<sub>n</sub></strong> - Znamionowy prąd różnicowy wyłącznika [mA]</div>';
+  html += '<div><strong>I<sub>w</sub></strong> - Zmierzony prąd wyłączający [mA]</div>';
+  html += '<div><strong>t<sub>w</sub></strong> - Zmierzony czas wyłączenia [ms]</div>';
+  html += '<div><strong>t<sub>z</sub></strong> - Dopuszczalny czas wyłączenia [ms]</div>';
   html += '</div>';
 
   container.innerHTML = html;
@@ -753,7 +753,7 @@ function renderAttachment4() {
   const inputCls = 'w-full border border-gray-300 rounded px-1 py-0.5 text-sm text-center';
   let html = '';
 
-  html += '<h2 class="text-lg font-semibold mb-3">Zalacznik nr 4 - Rezystancja uziemienia</h2>';
+  html += '<h2 class="text-lg font-semibold mb-3">Załącznik nr 4 - Rezystancja uziemienia</h2>';
 
   html += '<div class="overflow-x-auto">';
   html += '<table class="w-full border-collapse text-sm">';
@@ -762,7 +762,7 @@ function renderAttachment4() {
   html += '<thead>';
   html += '<tr class="bg-gray-50 text-center font-semibold">';
   html += '<th class="border border-gray-300 px-2 py-1 w-10">Lp.</th>';
-  html += '<th class="border border-gray-300 px-2 py-1 min-w-[180px]">Nazwa urzadzenia</th>';
+  html += '<th class="border border-gray-300 px-2 py-1 min-w-[180px]">Nazwa urządzenia</th>';
   html += '<th class="border border-gray-300 px-2 py-1 w-20">R<sub>E</sub> [&Omega;]</th>';
   html += '<th class="border border-gray-300 px-2 py-1 w-16">W<sub>k</sub></th>';
   html += '<th class="border border-gray-300 px-2 py-1 w-20">R<sub>po</sub> [&Omega;]</th>';
@@ -815,7 +815,7 @@ function renderAttachment4() {
 
     // Usun
     html += '<td class="border border-gray-300 px-1 py-1 text-center">';
-    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-attachment="4" class="text-red-500 hover:text-red-700 text-xs">Usun</button>';
+    html += '<button data-action="remove-row" data-row-id="' + row.id + '" data-attachment="4" class="text-red-500 hover:text-red-700 text-xs">Usuń</button>';
     html += '</td>';
 
     html += '</tr>';
@@ -833,10 +833,10 @@ function renderAttachment4() {
 
   // Legend UZIEM-06
   html += '<div class="mt-4 text-xs text-gray-600 grid grid-cols-2 gap-x-6 gap-y-1">';
-  html += '<div><strong>R<sub>E</sub></strong> - Zmierzona wartosc rezystancji uziemienia [&Omega;]</div>';
-  html += '<div><strong>W<sub>k</sub></strong> - Wspolczynnik korekcyjny</div>';
-  html += '<div><strong>R<sub>po</sub></strong> - Obliczona wartosc rezystancji uziemienia [&Omega;]</div>';
-  html += '<div><strong>R<sub>w</sub></strong> - Wymagana wartosc rezystancji uziemienia [&Omega;]</div>';
+  html += '<div><strong>R<sub>E</sub></strong> - Zmierzona wartość rezystancji uziemienia [&Omega;]</div>';
+  html += '<div><strong>W<sub>k</sub></strong> - Współczynnik korekcyjny</div>';
+  html += '<div><strong>R<sub>po</sub></strong> - Obliczona wartość rezystancji uziemienia [&Omega;]</div>';
+  html += '<div><strong>R<sub>w</sub></strong> - Wymagana wartość rezystancji uziemienia [&Omega;]</div>';
   html += '</div>';
 
   container.innerHTML = html;
