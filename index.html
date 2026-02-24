@@ -109,6 +109,72 @@
         transition-duration: 0.01ms !important;
       }
     }
+
+    @layer components {
+      .card-glass {
+        background: rgba(255, 255, 255, 0.04);
+        backdrop-filter: blur(12px) saturate(1.5);
+        -webkit-backdrop-filter: blur(12px) saturate(1.5);
+        border: 1px solid rgba(224, 224, 232, 0.12);
+        border-radius: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      .input-glass {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(224, 224, 232, 0.12);
+        border-radius: 8px;
+        color: #e0e0e8;
+        transition: border-color 200ms ease, box-shadow 200ms ease;
+      }
+      .input-glass:focus {
+        outline: none;
+        border-color: rgba(0, 240, 255, 0.5);
+        box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.2), 0 0 20px rgba(0, 240, 255, 0.1);
+      }
+      .input-glass::placeholder {
+        color: rgba(224, 224, 232, 0.3);
+      }
+      .select-glass {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(224, 224, 232, 0.12);
+        border-radius: 8px;
+        color: #e0e0e8;
+      }
+      .select-glass option {
+        background: #0f0f16;
+        color: #e0e0e8;
+      }
+      .btn-glass {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(224, 224, 232, 0.12);
+        border-radius: 8px;
+        color: #e0e0e8;
+        transition: all 200ms ease;
+      }
+      .btn-glass:hover {
+        background: rgba(255, 255, 255, 0.10);
+        border-color: rgba(0, 240, 255, 0.3);
+      }
+      .btn-primary-glass {
+        background: rgba(0, 240, 255, 0.15);
+        border: 1px solid rgba(0, 240, 255, 0.3);
+        border-radius: 8px;
+        color: #00f0ff;
+        transition: all 200ms ease;
+      }
+      .btn-primary-glass:hover {
+        background: rgba(0, 240, 255, 0.25);
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+      }
+      .hero-result-card {
+        background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(0,240,255,0.04) 100%);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(0, 240, 255, 0.2);
+        border-radius: 24px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 40px rgba(0,240,255,0.05);
+      }
+    }
   </style>
 
   <!-- pdfmake — załadowany od początku, używany w Fazie 3 -->
@@ -122,25 +188,25 @@
 
   <div id="app" class="max-w-7xl mx-auto p-4">
     <div class="flex items-center justify-between mb-6 flex-wrap gap-2">
-      <h1 class="text-2xl font-bold">Protokół kontrolno-pomiarowy PN-HD 60364-6</h1>
+      <h1 class="text-2xl font-bold text-platinum">Protokół kontrolno-pomiarowy PN-HD 60364-6</h1>
       <div class="flex gap-2 flex-wrap">
-        <button id="btn-save" class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm font-medium">Zapisz</button>
-        <button id="btn-load" class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm font-medium">Wczytaj</button>
-        <button id="btn-export-json" class="bg-gray-600 text-white px-3 py-2 rounded hover:bg-gray-700 text-sm font-medium">Eksport JSON</button>
-        <button id="btn-import-json" class="bg-gray-600 text-white px-3 py-2 rounded hover:bg-gray-700 text-sm font-medium">Import JSON</button>
-        <button id="btn-export-word" class="bg-purple-600 text-white px-3 py-2 rounded hover:bg-purple-700 text-sm font-medium">Eksport Word</button>
-        <button id="btn-import-word" class="bg-purple-600 text-white px-3 py-2 rounded hover:bg-purple-700 text-sm font-medium">Import Word</button>
-        <button id="btn-export-pdf" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm font-medium">Eksportuj PDF</button>
+        <button id="btn-save" class="btn-glass px-3 py-2 text-sm font-medium text-green-400 border-green-500/30 hover:border-green-400/50">Zapisz</button>
+        <button id="btn-load" class="btn-glass px-3 py-2 text-sm font-medium text-green-400 border-green-500/30 hover:border-green-400/50">Wczytaj</button>
+        <button id="btn-export-json" class="btn-glass px-3 py-2 text-sm font-medium">Eksport JSON</button>
+        <button id="btn-import-json" class="btn-glass px-3 py-2 text-sm font-medium">Import JSON</button>
+        <button id="btn-export-word" class="btn-glass px-3 py-2 text-sm font-medium text-purple-400 border-purple-500/30 hover:border-purple-400/50">Eksport Word</button>
+        <button id="btn-import-word" class="btn-glass px-3 py-2 text-sm font-medium text-purple-400 border-purple-500/30 hover:border-purple-400/50">Import Word</button>
+        <button id="btn-export-pdf" class="btn-primary-glass px-4 py-2 text-sm font-medium">Eksportuj PDF</button>
       </div>
     </div>
 
     <!-- Zakładki -->
-    <div id="tabs" class="flex border-b border-gray-300 mb-4">
-      <button data-tab="0" class="px-4 py-2 font-medium border-b-2 border-blue-600 text-blue-600">Protokół</button>
-      <button data-tab="1" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Zał. 1 - SWZ</button>
-      <button data-tab="2" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Zał. 2 - Izolacja</button>
-      <button data-tab="3" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Zał. 3 - RCD</button>
-      <button data-tab="4" class="px-4 py-2 font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">Zał. 4 - Uziemienie</button>
+    <div id="tabs" class="flex border-b border-white/10 mb-4">
+      <button data-tab="0" class="px-4 py-2 font-medium border-b-2 border-cyan text-cyan transition-colors duration-200">Protokół</button>
+      <button data-tab="1" class="px-4 py-2 font-medium border-b-2 border-transparent text-platinum/50 hover:text-platinum transition-colors duration-200">Zał. 1 - SWZ</button>
+      <button data-tab="2" class="px-4 py-2 font-medium border-b-2 border-transparent text-platinum/50 hover:text-platinum transition-colors duration-200">Zał. 2 - Izolacja</button>
+      <button data-tab="3" class="px-4 py-2 font-medium border-b-2 border-transparent text-platinum/50 hover:text-platinum transition-colors duration-200">Zał. 3 - RCD</button>
+      <button data-tab="4" class="px-4 py-2 font-medium border-b-2 border-transparent text-platinum/50 hover:text-platinum transition-colors duration-200">Zał. 4 - Uziemienie</button>
     </div>
 
     <!-- Kontenery załączników -->
@@ -151,8 +217,8 @@
     <div id="attachment-4" class="hidden"></div>
 
     <!-- Footer -->
-    <div class="mt-8 pt-4 border-t border-gray-200 text-center text-xs text-gray-400">
-      VoltProtocol &copy; 2026 Wojciech Olszak &middot; <a href="https://github.com/selter2001/volt-protocol" class="underline hover:text-gray-600">GitHub</a> &middot; MIT License
+    <div class="mt-8 pt-4 border-t border-white/10 text-center text-xs text-platinum/40">
+      VoltProtocol &copy; 2026 Wojciech Olszak &middot; <a href="https://github.com/selter2001/volt-protocol" class="underline hover:text-cyan">GitHub</a> &middot; MIT License
     </div>
   </div>
 
