@@ -269,28 +269,48 @@ Rp input (~889): 'border border-gray-300' -> 'input-glass', disabledCls: ' bg-gr
 ZACHOWAJ .izol-verdict-cell
 
 === renderAttachment2() (linie ~912-999) ===
-Ten sam wzorzec co Attachment1:
-- Table: 'border border-gray-300' -> 'border border-white/[0.12]'
-- thead: 'bg-gray-50' -> 'bg-white/[0.06]'
-- Headings: dodaj text-platinum
-- Buttons: bg-blue-600 -> btn-primary-glass
-- Fixed row: bg-yellow-50 -> bg-cyan/5
-- Section/subsection rows: bg-gray-200 -> bg-white/[0.08], bg-gray-100 -> bg-white/[0.04]
-- Legend: text-gray-600 -> text-platinum/60
+Identyczne zmiany co w renderAttachment1:
+- Heading (~916): dodaj 'text-platinum'
+- Add section button (~917): 'bg-blue-600 text-white rounded hover:bg-blue-700' -> 'btn-primary-glass'
+- Table (~920): 'border border-gray-300' -> 'border border-white/[0.12]'
+- thead (~923): 'bg-gray-50' -> 'bg-white/[0.06]'
+- Wszystkie th: 'border border-gray-300' -> 'border border-white/[0.12]'
+- text-gray-500 (np. "3-faz", "numer gniazda", units row): -> 'text-platinum/50'
+- Fixed row (~948): 'bg-yellow-50' -> 'bg-cyan/5'
+- Section header row (~956): 'bg-gray-200' -> 'bg-white/[0.08]'
+- Subsection header row (~968): 'bg-gray-100' -> 'bg-white/[0.04]'
+- Section input focus (~958): 'focus:bg-white focus:ring-1 focus:ring-blue-400' -> 'focus:bg-white/10 focus:ring-1 focus:ring-cyan/40'
+- Sub input focus (~970): to samo
+- Section buttons (~959, 962, 971, 974):
+  - bg-blue-500 text-white -> btn-glass text-cyan
+  - bg-red-500 text-white -> btn-glass text-red-400
+  - bg-green-500 text-white -> btn-glass text-green-400
+  - bg-red-400 text-white -> btn-glass text-red-400
+- Delete buttons (~905 w renderIZOLRowCells): 'text-red-500 hover:text-red-700' -> 'text-red-400 hover:text-red-300'
+- Legend (~994): 'text-gray-600' -> 'text-platinum/60'
 
 === renderAttachment3() (linie ~1002-1106) ===
 Linie ~1004-1005:
   inputCls: 'w-full input-glass px-1 py-0.5 text-sm text-center'
   selectCls: 'w-full select-glass px-1 py-0.5 text-sm'
+Heading (~1008): dodaj 'text-platinum'
 Wszystkie borders: border-gray-300 -> border-white/[0.12]
-thead: bg-gray-50 -> bg-white/[0.06]
-Empty state (~1088): text-gray-400 -> text-platinum/30
-Add button (~1095): bg-blue-600... -> btn-primary-glass
+thead row (~1015): 'bg-gray-50 text-center font-semibold' -> 'bg-white/[0.06] text-center font-semibold text-platinum/70'
+Empty state (~1088): 'text-gray-400 italic' -> 'text-platinum/30 italic'
+Add button (~1095): 'bg-blue-600 text-white rounded hover:bg-blue-700' -> 'btn-primary-glass'
+Delete buttons (~1081): 'text-red-500 hover:text-red-700' -> 'text-red-400 hover:text-red-300'
+Legend (~1098): 'text-gray-600' -> 'text-platinum/60'
 ZACHOWAJ .rcd-verdict-cell
 
 === renderAttachment4() (linie ~1108-1200) ===
 Linia ~1110 inputCls: 'w-full input-glass px-1 py-0.5 text-sm text-center'
-Ten sam wzorzec border/thead/button co inne attachmenty
+Heading (~1113): dodaj 'text-platinum'
+Wszystkie borders: border-gray-300 -> border-white/[0.12]
+thead row (~1120): 'bg-gray-50 text-center font-semibold' -> 'bg-white/[0.06] text-center font-semibold text-platinum/70'
+Empty state (~1182): 'text-gray-400 italic' -> 'text-platinum/30 italic'
+Add button (~1189): 'bg-blue-600 text-white rounded hover:bg-blue-700' -> 'btn-primary-glass'
+Delete buttons (~1175): 'text-red-500 hover:text-red-700' -> 'text-red-400 hover:text-red-300'
+Legend (~1192): 'text-gray-600' -> 'text-platinum/60'
 ZACHOWAJ .uziem-rpo-cell, .uziem-verdict-cell
 
 === updateOrzeczenieDisplay() (linie ~1796-1825) ===
@@ -353,8 +373,13 @@ checks = [
     ('text-platinum/30 mb-2' in js_section, 'orzeczenie no-data platinum styling'),
     ('text-platinum/70' in js_section, 'next date platinum styling'),
 
-    # No leftover light theme patterns in render functions (spot check)
+    # No leftover light theme patterns in render functions
     ('bg-white border rounded p-4 mb-4' not in js_section, 'no leftover bg-white card pattern in JS'),
+    ('border border-gray-300' not in js_section, 'no leftover border-gray-300 in JS'),
+    ('bg-gray-50' not in js_section, 'no leftover bg-gray-50 in JS'),
+    ('bg-gray-200' not in js_section, 'no leftover bg-gray-200 section rows in JS'),
+    ('bg-gray-100' not in js_section, 'no leftover bg-gray-100 subsection rows in JS'),
+    ('bg-yellow-50' not in js_section, 'no leftover bg-yellow-50 fixed rows in JS'),
 ]
 passed = sum(1 for ok, _ in checks if ok)
 for ok, msg in checks:
