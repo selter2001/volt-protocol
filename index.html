@@ -691,7 +691,7 @@ function renderSWZRowCells(row, lp, subId, isFixed) {
   html += '</td>';
 
   // Ocena (verdict)
-  const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700' : calc.verdict === 'NEGATYWNA' ? 'text-red-700' : '';
+  const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700 verdict-glow-positive' : calc.verdict === 'NEGATYWNA' ? 'text-red-700 verdict-glow-negative' : '';
   html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-bold verdict-cell ' + verdictClass + '" data-row-id="' + rowIdAttr + '">' + (calc.verdict || '') + '</td>';
 
   // Action (delete or fixed indicator)
@@ -830,18 +830,18 @@ function renderFormTab() {
   html += '<tr>';
   html += '<td class="border border-white/[0.12] px-3 py-2">Sprawdzenie dokumentacji instalacji</td>';
   html += '<td class="border border-white/[0.12] px-3 py-2 text-center text-platinum/30">\u2014</td>';
-  html += '<td class="border border-white/[0.12] px-3 py-2 text-center font-bold text-green-700">POZYTYWNY</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2 text-center font-bold text-green-700 verdict-glow-positive">POZYTYWNY</td>';
   html += '</tr>';
 
   // Row 2: Oględziny (stały POZYTYWNY)
   html += '<tr>';
   html += '<td class="border border-white/[0.12] px-3 py-2">Ogl\u0119dziny instalacji elektrycznej</td>';
   html += '<td class="border border-white/[0.12] px-3 py-2 text-center text-platinum/30">\u2014</td>';
-  html += '<td class="border border-white/[0.12] px-3 py-2 text-center font-bold text-green-700">POZYTYWNY</td>';
+  html += '<td class="border border-white/[0.12] px-3 py-2 text-center font-bold text-green-700 verdict-glow-positive">POZYTYWNY</td>';
   html += '</tr>';
 
   // Row 3: SWZ
-  const swzClass = assessment.swz === 'POZYTYWNY' ? 'text-green-700' : assessment.swz === 'NEGATYWNY' ? 'text-red-700' : 'text-gray-400';
+  const swzClass = assessment.swz === 'POZYTYWNY' ? 'text-green-700 verdict-glow-positive' : assessment.swz === 'NEGATYWNY' ? 'text-red-700 verdict-glow-negative' : 'text-gray-400';
   html += '<tr>';
   html += '<td class="border border-white/[0.12] px-3 py-2">Badanie skuteczno\u015bci ochrony przeciwpora\u017ceniowej przez samoczynne wy\u0142\u0105czenie zasilania</td>';
   html += '<td class="border border-white/[0.12] px-3 py-2 text-center">Za\u0142. 1</td>';
@@ -849,7 +849,7 @@ function renderFormTab() {
   html += '</tr>';
 
   // Row 4: Izolacja
-  const izolClass = assessment.izol === 'POZYTYWNY' ? 'text-green-700' : assessment.izol === 'NEGATYWNY' ? 'text-red-700' : 'text-gray-400';
+  const izolClass = assessment.izol === 'POZYTYWNY' ? 'text-green-700 verdict-glow-positive' : assessment.izol === 'NEGATYWNY' ? 'text-red-700 verdict-glow-negative' : 'text-gray-400';
   html += '<tr>';
   html += '<td class="border border-white/[0.12] px-3 py-2">Badanie stanu rezystancji izolacji obwod\u00f3w</td>';
   html += '<td class="border border-white/[0.12] px-3 py-2 text-center">Za\u0142. 2</td>';
@@ -857,7 +857,7 @@ function renderFormTab() {
   html += '</tr>';
 
   // Row 5: RCD
-  const rcdClass = assessment.rcd === 'POZYTYWNY' ? 'text-green-700' : assessment.rcd === 'NEGATYWNY' ? 'text-red-700' : 'text-gray-400';
+  const rcdClass = assessment.rcd === 'POZYTYWNY' ? 'text-green-700 verdict-glow-positive' : assessment.rcd === 'NEGATYWNY' ? 'text-red-700 verdict-glow-negative' : 'text-gray-400';
   html += '<tr>';
   html += '<td class="border border-white/[0.12] px-3 py-2">Badanie skuteczno\u015bci ochrony dodatkowej (RCD)</td>';
   html += '<td class="border border-white/[0.12] px-3 py-2 text-center">Za\u0142. 3</td>';
@@ -865,7 +865,7 @@ function renderFormTab() {
   html += '</tr>';
 
   // Row 6: Uziemienie
-  const uziemClass = assessment.uziem === 'POZYTYWNY' ? 'text-green-700' : assessment.uziem === 'NEGATYWNY' ? 'text-red-700' : 'text-gray-400';
+  const uziemClass = assessment.uziem === 'POZYTYWNY' ? 'text-green-700 verdict-glow-positive' : assessment.uziem === 'NEGATYWNY' ? 'text-red-700 verdict-glow-negative' : 'text-gray-400';
   html += '<tr>';
   html += '<td class="border border-white/[0.12] px-3 py-2">Badanie rezystancji uziemienia</td>';
   html += '<td class="border border-white/[0.12] px-3 py-2 text-center">Za\u0142. 4</td>';
@@ -883,12 +883,12 @@ function renderFormTab() {
   html += '<h3 class="text-md font-semibold mb-3 text-platinum">Orzeczenie</h3>';
 
   if (orz.allPositive) {
-    html += '<p id="orzeczenie-text" class="text-base font-bold text-green-700 mb-2">Na podstawie wykonanych bada\u0144 odbiorczych orzeka si\u0119, \u017ce instalacja elektryczna <strong>NADAJE SI\u0118</strong> do eksploatacji.</p>';
+    html += '<p id="orzeczenie-text" class="text-base font-bold text-green-700 verdict-glow-positive mb-2">Na podstawie wykonanych bada\u0144 odbiorczych orzeka si\u0119, \u017ce instalacja elektryczna <strong>NADAJE SI\u0118</strong> do eksploatacji.</p>';
   } else {
     const hasAnyData = calcFinalAssessment();
     const hasNegative = Object.values(hasAnyData).some(v => v === 'NEGATYWNY');
     if (hasNegative) {
-      html += '<p id="orzeczenie-text" class="text-base font-bold text-red-700 mb-2">Na podstawie wykonanych bada\u0144 odbiorczych orzeka si\u0119, \u017ce instalacja elektryczna <strong>NIE NADAJE SI\u0118</strong> do eksploatacji.</p>';
+      html += '<p id="orzeczenie-text" class="text-base font-bold text-red-700 verdict-glow-negative mb-2">Na podstawie wykonanych bada\u0144 odbiorczych orzeka si\u0119, \u017ce instalacja elektryczna <strong>NIE NADAJE SI\u0118</strong> do eksploatacji.</p>';
     } else {
       html += '<p id="orzeczenie-text" class="text-base text-platinum/30 mb-2">(uzupe\u0142nij dane pomiarowe)</p>';
     }
@@ -1084,7 +1084,7 @@ function renderIZOLRowCells(row, lp, subId, isFixed) {
   html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-mono">' + row.Rw + '</td>';
 
   // Verdict
-  const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700' : calc.verdict === 'NEGATYWNA' ? 'text-red-700' : '';
+  const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700 verdict-glow-positive' : calc.verdict === 'NEGATYWNA' ? 'text-red-700 verdict-glow-negative' : '';
   html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-bold izol-verdict-cell ' + verdictClass + '" data-row-id="' + rowIdAttr + '">' + (calc.verdict || '') + '</td>';
 
   // Action
@@ -1263,7 +1263,7 @@ function renderAttachment3() {
     html += '</td>';
 
     // Verdict
-    const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700' : calc.verdict === 'NEGATYWNA' ? 'text-red-700' : '';
+    const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700 verdict-glow-positive' : calc.verdict === 'NEGATYWNA' ? 'text-red-700 verdict-glow-negative' : '';
     html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-bold rcd-verdict-cell ' + verdictClass + '" data-row-id="' + row.id + '">' + (calc.verdict || '') + '</td>';
 
     // Usun
@@ -1357,7 +1357,7 @@ function renderAttachment4() {
     html += '</td>';
 
     // Verdict
-    const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700' : calc.verdict === 'NEGATYWNA' ? 'text-red-700' : '';
+    const verdictClass = calc.verdict === 'POZYTYWNA' ? 'text-green-700 verdict-glow-positive' : calc.verdict === 'NEGATYWNA' ? 'text-red-700 verdict-glow-negative' : '';
     html += '<td class="border border-white/[0.12] px-2 py-1 text-center font-bold uziem-verdict-cell ' + verdictClass + '" data-row-id="' + row.id + '">' + (calc.verdict || '') + '</td>';
 
     // Usun
@@ -1754,23 +1754,64 @@ function handleSWZFieldChange(el) {
   updateFinalAssessmentDisplay();
 }
 
+// === ANIMATION UTILITIES (Phase 2) ===
+
+function animateCountUp(element, newValue, decimals) {
+  if (!element) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    element.textContent = newValue != null ? newValue.toFixed(decimals) : '';
+    return;
+  }
+  if (newValue == null) {
+    element.textContent = '';
+    return;
+  }
+  const oldText = element.textContent.trim();
+  const oldValue = oldText === '' ? 0 : parseFloat(oldText);
+  const diff = newValue - oldValue;
+  if (Math.abs(diff) < 0.001) {
+    element.textContent = newValue.toFixed(decimals);
+    return;
+  }
+  const duration = 300;
+  const start = performance.now();
+  function tick(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = oldValue + diff * eased;
+    element.textContent = current.toFixed(decimals);
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+function applyVerdictGlow(cell, verdict) {
+  if (!cell) return;
+  cell.classList.remove('verdict-glow-positive', 'verdict-glow-negative');
+  if (verdict === 'POZYTYWNA' || verdict === 'POZYTYWNY') {
+    cell.classList.add('verdict-glow-positive');
+  } else if (verdict === 'NEGATYWNA' || verdict === 'NEGATYWNY') {
+    cell.classList.add('verdict-glow-negative');
+  }
+}
+
 function updateSWZComputedCells(rowId, result) {
-  // Find cells by data-row-id attribute on the cells themselves
   const idCell = document.querySelector('.id-cell[data-row-id="' + rowId + '"]');
   const zsmaxCell = document.querySelector('.zsmax-cell[data-row-id="' + rowId + '"]');
   const verdictCell = document.querySelector('.verdict-cell[data-row-id="' + rowId + '"]');
 
-  if (idCell) {
-    idCell.textContent = result.Id != null ? result.Id.toFixed(2) : '';
-  }
-  if (zsmaxCell) {
-    zsmaxCell.textContent = result.Zsmax != null ? result.Zsmax.toFixed(2) : '';
-  }
+  animateCountUp(idCell, result.Id, 2);
+  animateCountUp(zsmaxCell, result.Zsmax, 2);
+
   if (verdictCell) {
     verdictCell.textContent = result.verdict || '';
     verdictCell.classList.remove('text-green-700', 'text-red-700');
     if (result.verdict === 'POZYTYWNA') verdictCell.classList.add('text-green-700');
     if (result.verdict === 'NEGATYWNA') verdictCell.classList.add('text-red-700');
+    applyVerdictGlow(verdictCell, result.verdict);
   }
 }
 
@@ -1849,6 +1890,7 @@ function updateIZOLVerdict(rowId, result) {
     verdictCell.classList.remove('text-green-700', 'text-red-700');
     if (result.verdict === 'POZYTYWNA') verdictCell.classList.add('text-green-700');
     if (result.verdict === 'NEGATYWNA') verdictCell.classList.add('text-red-700');
+    applyVerdictGlow(verdictCell, result.verdict);
   }
 }
 
@@ -1901,6 +1943,7 @@ function updateRCDVerdict(rowId, result) {
     verdictCell.classList.remove('text-green-700', 'text-red-700');
     if (result.verdict === 'POZYTYWNA') verdictCell.classList.add('text-green-700');
     if (result.verdict === 'NEGATYWNA') verdictCell.classList.add('text-red-700');
+    applyVerdictGlow(verdictCell, result.verdict);
   }
 }
 
@@ -1941,19 +1984,16 @@ function handleUZIEMFieldChange(el) {
 }
 
 function updateUZIEMComputedCells(rowId, result) {
-  // Update Rpo cell
   const rpoCell = document.querySelector('.uziem-rpo-cell[data-row-id="' + rowId + '"]');
-  if (rpoCell) {
-    rpoCell.textContent = result.Rpo != null ? result.Rpo.toFixed(2) : '';
-  }
+  animateCountUp(rpoCell, result.Rpo, 2);
 
-  // Update verdict cell
   const verdictCell = document.querySelector('.uziem-verdict-cell[data-row-id="' + rowId + '"]');
   if (verdictCell) {
     verdictCell.textContent = result.verdict || '';
     verdictCell.classList.remove('text-green-700', 'text-red-700');
     if (result.verdict === 'POZYTYWNA') verdictCell.classList.add('text-green-700');
     if (result.verdict === 'NEGATYWNA') verdictCell.classList.add('text-red-700');
+    applyVerdictGlow(verdictCell, result.verdict);
   }
 }
 
@@ -1971,6 +2011,7 @@ function updateAssessmentCell(id, verdict) {
   } else {
     cell.classList.add('text-gray-400');
   }
+  applyVerdictGlow(cell, verdict);
 }
 
 function updateFinalAssessmentDisplay() {
@@ -1993,15 +2034,18 @@ function updateOrzeczenieDisplay() {
   if (orz.allPositive) {
     orzText.innerHTML = 'Na podstawie wykonanych bada\u0144 odbiorczych orzeka si\u0119, \u017ce instalacja elektryczna <strong>NADAJE SI\u0118</strong> do eksploatacji.';
     orzText.className = 'text-base font-bold text-green-700 mb-2';
+    applyVerdictGlow(orzText, 'POZYTYWNA');
   } else {
     const assessment = calcFinalAssessment();
     const hasNegative = Object.values(assessment).some(v => v === 'NEGATYWNY');
     if (hasNegative) {
       orzText.innerHTML = 'Na podstawie wykonanych bada\u0144 odbiorczych orzeka si\u0119, \u017ce instalacja elektryczna <strong>NIE NADAJE SI\u0118</strong> do eksploatacji.';
       orzText.className = 'text-base font-bold text-red-700 mb-2';
+      applyVerdictGlow(orzText, 'NEGATYWNA');
     } else {
       orzText.textContent = '(uzupe\u0142nij dane pomiarowe)';
       orzText.className = 'text-base text-platinum/30 mb-2';
+      applyVerdictGlow(orzText, null);
     }
   }
 
