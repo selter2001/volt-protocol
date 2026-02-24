@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Formularze i Obliczenia** — Wszystkie 4 załączniki z dynamicznymi sekcjami, obliczeniami i bazą zabezpieczeń
 - [x] **Phase 2: Kompletność Normowa** — Formularz główny z danymi ogólnymi, ocena końcowa i legendy
-- [ ] **Phase 3: Eksport i Dane** — PDF do pobrania, localStorage, JSON import/eksport
+- [x] **Phase 3: Eksport i Dane** — PDF do pobrania, localStorage, JSON import/eksport
 
 ## Phase Details
 
@@ -46,7 +46,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 02-01-PLAN.md — Zakładka Protokół (tab 0): AppState.form, pola metadanych FORM-01–05, tabela przyrządów, ocena końcowa FORM-06, orzeczenie FORM-07
+- [x] 02-01-PLAN.md — Zakładka Protokół (tab 0): AppState.form, pola metadanych FORM-01–05, tabela przyrządów, ocena końcowa FORM-06, orzeczenie FORM-07
 
 ### Phase 3: Eksport i Dane
 **Goal**: Elektryk może wygenerować profesjonalny plik PDF do pobrania, zapisać i wczytać stan formularza
@@ -59,8 +59,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — PDFExporter (pdfmake DDO, formularz główny + 4 załączniki, polskie znaki, paginacja headerRows, landscape Zał. 2)
-- [ ] 03-02-PLAN.md — Persistence (localStorage save/load, JSON export/import, restoreAppState z recalculateAll)
+- [x] 03-01-PLAN.md — PDFExporter (pdfmake DDO, formularz główny + 4 załączniki, polskie znaki, paginacja headerRows, landscape Zał. 2)
+- [x] 03-02-PLAN.md — Persistence (localStorage save/load, JSON export/import, restoreAppState z recalculateAll)
 
 ## Progress
 
@@ -71,4 +71,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Formularze i Obliczenia | 3/3 | Complete | 2026-02-24 |
 | 2. Kompletność Normowa | 1/1 | Complete | 2026-02-24 |
-| 3. Eksport i Dane | 0/2 | Not started | - |
+| 3. Eksport i Dane | 2/2 | Complete | 2026-02-24 |
