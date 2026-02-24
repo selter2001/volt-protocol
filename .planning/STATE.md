@@ -5,32 +5,32 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Elektryk wypełnia dane pomiarowe w przeglądarce i jednym kliknięciem pobiera kompletny protokół PDF — bez instalacji, bez rejestracji, za darmo
-**Current focus:** Phase 1 — Formularze i Obliczenia
+**Current focus:** Phase 1 COMPLETE — ready for Phase 2
 
 ## Current Position
 
-Phase: 1 of 3 (Formularze i Obliczenia)
-Plan: 2 of 3 in current phase
-Status: In progress
-Last activity: 2026-02-24 — Completed 01-02-PLAN.md (tabela SWZ z obliczeniami i ocena)
+Phase: 1 of 3 (Formularze i Obliczenia) — COMPLETE
+Plan: 3 of 3 in current phase — ALL DONE
+Status: Phase 1 complete, pending verification
+Last activity: 2026-02-24 — Completed 01-03-PLAN.md (Załączniki 2/3/4 + checkpoint verification)
 
-Progress: [██████░░░░] 2/9 plans (22%)
+Progress: [████░░░░░░] 3/9 plans (33%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 3.5min
-- Total execution time: 7min
+- Total plans completed: 3
+- Average duration: 3.7min
+- Total execution time: 11min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-formularze-i-obliczenia | 2/3 | 7min | 3.5min |
+| 01-formularze-i-obliczenia | 3/3 | 11min | 3.7min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4min), 01-02 (3min)
+- Last 5 plans: 01-01 (4min), 01-02 (3min), 01-03 (4min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -53,6 +53,9 @@ Recent decisions affecting current work:
 - [01-02]: Targeted DOM update zamiast pelnego re-renderu na kazdym keystroke
 - [01-02]: Full re-render z focus save/restore tylko przy zmianie baseType
 - [01-02]: Reczna korekta Ia NIE jest resetowana przy zmianie baseType/baseCurrent (Open Question 2)
+- [01-03]: Zal. 2 sekcje/podtytuly read-only (edycja tylko z Zal. 1)
+- [01-03]: Zal. 3 i 4 plaska lista wierszy (bez sekcji/podsekcji)
+- [01-03]: Usk = "napięcie znamionowe źródła zasilania" (nie "dotykowe dopuszczalne")
 
 ### Pending Todos
 
@@ -66,5 +69,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 01-02-PLAN.md — index.html (1033 lines) z pelna tabela SWZ, obliczeniami i ocena
-Resume file: .planning/phases/01-formularze-i-obliczenia/01-03-PLAN.md
+Stopped at: Phase 1 complete — all 3 plans executed, checkpoint verified, fixes committed
+Resume file: .planning/ROADMAP.md → Phase 2

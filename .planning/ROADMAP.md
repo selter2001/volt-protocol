@@ -12,7 +12,7 @@ Aplikacja jest budowana jako kompletny generator protokołów PN-HD 60364-6 w je
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Formularze i Obliczenia** — Wszystkie 4 załączniki z dynamicznymi sekcjami, obliczeniami i bazą zabezpieczeń
+- [x] **Phase 1: Formularze i Obliczenia** — Wszystkie 4 załączniki z dynamicznymi sekcjami, obliczeniami i bazą zabezpieczeń
 - [ ] **Phase 2: Kompletność Normowa** — Formularz główny z danymi ogólnymi, ocena końcowa i legendy
 - [ ] **Phase 3: Eksport i Dane** — PDF do pobrania, localStorage, JSON import/eksport
 
@@ -31,9 +31,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Architektura (AppState, EventBus, PROTECTION_DB, Calculator) + dynamiczne sekcje/podtytuły/wiersze z Lp.
-- [ ] 01-02-PLAN.md — Załącznik 1 (SWZ) — pełna tabela 13 kolumn, obliczenia Id/Zsmax, baza zabezpieczeń B/C/D, ocena
-- [ ] 01-03-PLAN.md — Załącznik 2 (izolacja 1-faz/3-faz), Załącznik 3 (RCD), Załącznik 4 (uziemienie) + weryfikacja wizualna
+- [x] 01-01-PLAN.md — Architektura (AppState, EventBus, PROTECTION_DB, Calculator) + dynamiczne sekcje/podtytuły/wiersze z Lp.
+- [x] 01-02-PLAN.md — Załącznik 1 (SWZ) — pełna tabela 13 kolumn, obliczenia Id/Zsmax, baza zabezpieczeń B/C/D, ocena
+- [x] 01-03-PLAN.md — Załącznik 2 (izolacja 1-faz/3-faz), Załącznik 3 (RCD), Załącznik 4 (uziemienie) + weryfikacja wizualna
 
 ### Phase 2: Kompletność Normowa
 **Goal**: Protokół jest kompletny zgodnie z PN-HD 60364-6 — zawiera dane ogólne, orzeczenie o zdatności i legendy oznaczeń
@@ -69,6 +69,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Formularze i Obliczenia | 0/3 | Planning complete | - |
+| 1. Formularze i Obliczenia | 3/3 | Complete | 2026-02-24 |
 | 2. Kompletność Normowa | 0/1 | Not started | - |
 | 3. Eksport i Dane | 0/2 | Not started | - |
