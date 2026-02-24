@@ -56,11 +56,11 @@ Plans:
   1. Kliknięcie "Eksportuj PDF" pobiera plik .pdf z pełną treścią protokołu — polskie znaki (ą, ę, ś, ź, ć, ó, ł, ń, ż) wyświetlają się poprawnie, dokument jest czarno-biały z numeracją stron
   2. Przyciski "Zapisz" i "Wczytaj" przechowują i odtwarzają dane z localStorage — żaden wpis nie ginie między sesjami przeglądarki
   3. Użytkownik może wyeksportować dane do pliku .json i wczytać je z powrotem — działa jako przenoszenie protokołu między komputerami
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 03-01: PDFExporter (pdfmake DDO, polskie znaki, paginacja, orientacja landscape Zał. 2)
-- [ ] 03-02: Persistence (localStorage + JSON export/import)
+- [ ] 03-01-PLAN.md — PDFExporter (pdfmake DDO, formularz główny + 4 załączniki, polskie znaki, paginacja headerRows, landscape Zał. 2)
+- [ ] 03-02-PLAN.md — Persistence (localStorage save/load, JSON export/import, restoreAppState z recalculateAll)
 
 ## Progress
 
