@@ -15,11 +15,15 @@
 <body class="bg-gray-50 text-gray-900">
 
   <div id="app" class="max-w-7xl mx-auto p-4">
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-2">
       <h1 class="text-2xl font-bold">Protokół kontrolno-pomiarowy PN-HD 60364-6</h1>
-      <button id="btn-export-pdf" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-medium text-sm">
-        Eksportuj PDF
-      </button>
+      <div class="flex gap-2 flex-wrap">
+        <button id="btn-save" class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm font-medium">Zapisz</button>
+        <button id="btn-load" class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm font-medium">Wczytaj</button>
+        <button id="btn-export-json" class="bg-gray-600 text-white px-3 py-2 rounded hover:bg-gray-700 text-sm font-medium">Eksport JSON</button>
+        <button id="btn-import-json" class="bg-gray-600 text-white px-3 py-2 rounded hover:bg-gray-700 text-sm font-medium">Import JSON</button>
+        <button id="btn-export-pdf" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm font-medium">Eksportuj PDF</button>
+      </div>
     </div>
 
     <!-- Zakładki -->
@@ -2491,6 +2495,10 @@ function init() {
   bindTabEvents();
   bindAppEvents();
   document.getElementById('btn-export-pdf').addEventListener('click', exportPDF);
+  document.getElementById('btn-save').addEventListener('click', saveToLocalStorage);
+  document.getElementById('btn-load').addEventListener('click', loadFromLocalStorage);
+  document.getElementById('btn-export-json').addEventListener('click', exportToJSON);
+  document.getElementById('btn-import-json').addEventListener('click', importFromJSON);
 }
 
 document.addEventListener('DOMContentLoaded', init);
