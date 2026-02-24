@@ -1804,6 +1804,111 @@ function updateOrzeczenieDisplay() {
   }
 }
 
+// === PERSISTENCE ===
+
+const STORAGE_KEY = 'voltprotokol-state';
+
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded shadow-lg text-sm z-50';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 2500);
+}
+
+function recalculateAll() {
+  AppState.swzFixedRow.calculated = calcSWZRow(AppState.swzFixedRow);
+  for (const section of AppState.sections) {
+    for (const sub of section.subsections) {
+      const swzRows = AppState.attachment1.rowsBySubsection[sub.id] || [];
+      for (const row of swzRows) {
+        row.calculated = calcSWZRow(row);
+      }
+      const izolRows = AppState.attachment2.rowsBySubsection[sub.id] || [];
+      for (const row of izolRows) {
+        row.calculated = calcIZOLRow(row);
+      }
+    }
+  }
+  AppState.attachment2.fixedRow.calculated = calcIZOLRow(AppState.attachment2.fixedRow);
+  AppState.attachment3.rows.forEach(row => { row.calculated = calcRCDRow(row); });
+  AppState.attachment4.rows.forEach(row => { row.calculated = calcUZIEMRow(row); });
+}
+
+function restoreAppState(saved) {
+  const deep = JSON.parse(JSON.stringify(saved));
+  Object.keys(deep).forEach(k => { AppState[k] = deep[k]; });
+  Object.keys(AppState).forEach(k => { if (!(k in deep)) delete AppState[k]; });
+  recalculateAll();
+  renderFormTab();
+  renderAttachment1();
+  renderAttachment2();
+  renderAttachment3();
+  renderAttachment4();
+  updateFinalAssessmentDisplay();
+}
+
+function saveToLocalStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(AppState));
+    showToast('Dane zapisane.');
+  } catch (e) {
+    if (e.name === 'QuotaExceededError') {
+      showToast('Błąd: brak miejsca w przeglądarce.');
+    } else {
+      showToast('Błąd zapisu: ' + e.message);
+    }
+  }
+}
+
+function loadFromLocalStorage() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) { showToast('Brak zapisanych danych.'); return; }
+  try {
+    const saved = JSON.parse(raw);
+    restoreAppState(saved);
+    showToast('Dane wczytane.');
+  } catch (e) {
+    showToast('Błąd: uszkodzone dane w localStorage.');
+  }
+}
+
+function exportToJSON() {
+  const json = JSON.stringify(AppState, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const filename = 'voltprotokol-' + (AppState.form.protocolNumber || 'draft').replace(/\//g, '-') + '.json';
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importFromJSON() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const saved = JSON.parse(ev.target.result);
+        restoreAppState(saved);
+        showToast('Wczytano z pliku.');
+      } catch (err) {
+        showToast('Błąd: nieprawidłowy plik JSON.');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
 // === PDF EXPORTER ===
 
 function pdfVal(v) {
