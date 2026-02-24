@@ -4,6 +4,25 @@
 
 Electrical inspection protocol generator per PN-HD 60364-6 — runs entirely in the browser, no installation required.
 
+<h3 align="center">
+  <a href="https://selter2001.github.io/volt-protocol/">Otwórz aplikację / Open App</a>
+</h3>
+
+---
+
+## Screenshots
+
+### Formularz główny / Main Form
+![Protokół - dane ogólne](screenshots/01-protokol-form.png)
+![Protokół - przyrządy i ocena](screenshots/02-protokol-instruments.png)
+![Protokół - ocena końcowa i orzeczenie](screenshots/03-protokol-assessment.png)
+
+### Załączniki pomiarowe / Measurement Appendices
+![Zał. 1 - Skuteczność zerowania (SWZ)](screenshots/04-attachment1-swz.png)
+![Zał. 2 - Rezystancja izolacji](screenshots/05-attachment2-insulation.png)
+![Zał. 3 - Wyłączniki różnicowoprądowe (RCD)](screenshots/06-attachment3-rcd.png)
+![Zał. 4 - Rezystancja uziemienia](screenshots/07-attachment4-earthing.png)
+
 ---
 
 ## PL — Opis
