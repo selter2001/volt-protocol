@@ -84,41 +84,41 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VIS-01 | — | Pending |
-| VIS-02 | — | Pending |
-| VIS-03 | — | Pending |
-| VIS-04 | — | Pending |
-| VIS-05 | — | Pending |
-| VIS-06 | — | Pending |
-| GLASS-01 | — | Pending |
-| GLASS-02 | — | Pending |
-| GLASS-03 | — | Pending |
-| GLASS-04 | — | Pending |
-| GLASS-05 | — | Pending |
-| NAV-01 | — | Pending |
-| NAV-02 | — | Pending |
-| NAV-03 | — | Pending |
-| ANIM-01 | — | Pending |
-| ANIM-02 | — | Pending |
-| ANIM-03 | — | Pending |
-| ANIM-04 | — | Pending |
-| ANIM-05 | — | Pending |
-| ANIM-06 | — | Pending |
-| ANIM-07 | — | Pending |
-| PRES-01 | — | Pending |
-| PRES-02 | — | Pending |
-| PRES-03 | — | Pending |
-| PRES-04 | — | Pending |
-| PRES-05 | — | Pending |
-| PRES-06 | — | Pending |
-| PRES-07 | — | Pending |
-| PRES-08 | — | Pending |
+| VIS-01 | Phase 1 | Pending |
+| VIS-02 | Phase 1 | Pending |
+| VIS-03 | Phase 1 | Pending |
+| VIS-04 | Phase 1 | Pending |
+| VIS-05 | Phase 1 | Pending |
+| VIS-06 | Phase 1 | Pending |
+| GLASS-01 | Phase 1 | Pending |
+| GLASS-02 | Phase 1 | Pending |
+| GLASS-03 | Phase 1 | Pending |
+| GLASS-04 | Phase 1 | Pending |
+| GLASS-05 | Phase 1 | Pending |
+| NAV-01 | Phase 1 | Pending |
+| NAV-02 | Phase 1 | Pending |
+| NAV-03 | Phase 1 | Pending |
+| ANIM-01 | Phase 1 | Pending |
+| ANIM-05 | Phase 1 | Pending |
+| ANIM-07 | Phase 1 | Pending |
+| PRES-07 | Phase 1 | Pending |
+| PRES-08 | Phase 1 | Pending |
+| ANIM-02 | Phase 2 | Pending |
+| ANIM-03 | Phase 2 | Pending |
+| ANIM-04 | Phase 3 | Pending |
+| ANIM-06 | Phase 2 | Pending |
+| PRES-01 | Phase 3 | Pending |
+| PRES-02 | Phase 3 | Pending |
+| PRES-03 | Phase 3 | Pending |
+| PRES-04 | Phase 3 | Pending |
+| PRES-05 | Phase 3 | Pending |
+| PRES-06 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 29 total
-- Mapped to phases: 0
-- Unmapped: 29 ⚠️
+- Mapped to phases: 29
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 after initial definition*
+*Last updated: 2026-02-24 after roadmap creation*
