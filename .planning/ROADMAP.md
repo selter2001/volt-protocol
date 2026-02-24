@@ -26,11 +26,11 @@ Redesign wizualny aplikacji VoltProtocol w 3 fazach narzuconych przez zależnoś
   3. Pola input mają Electric Cyan focus ring po kliknięciu, wartości numeryczne renderują się w monospace, labele w geometric sans
   4. Zakładki (Protokół, Załączniki 1-4) mają dark luxury styling z animowanym cyan wskaźnikiem aktywnej zakładki
   5. Po wpisaniu danych i wygenerowaniu PDF — dokument PDF jest identyczny z wersją sprzed redesignu (jasne tło, polskie znaki)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: Design tokens + body styling (Tailwind @theme, Void Black tło, noise texture, ambient orbs)
-- [ ] 01-02: Glassmorphism components (karty, inputy, tabele, Hero Result Card) + nawigacja (top bar, zakładki, footer)
+- [ ] 01-01-PLAN.md — Design tokens + body styling (Tailwind @theme, Void Black tlo, noise texture, ambient orbs, prefers-reduced-motion)
+- [ ] 01-02-PLAN.md — Glassmorphism components (karty, inputy, tabele, Hero Result Card) + nawigacja (top bar, zakladki, footer)
 
 ### Phase 2: Interactive Layer
 **Goal**: Aplikacja daje pełne odczucie premium "Industrial Elegance" — wyniki obliczeń animują się count-up'em, przyciski mają haptic pressed-in feel, verdykty świecą odpowiednim kolorem.
