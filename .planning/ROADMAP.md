@@ -11,8 +11,8 @@ Redesign wizualny aplikacji VoltProtocol w 3 fazach narzuconych przez zależnoś
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Visual Foundation** - Fundament wizualny: tokeny, tlo, glassmorphism, typografia, nawigacja, statyczne stany -- bez animacji
-- [ ] **Phase 2: Interactive Layer** - Warstwa animacji: count-up na wynikach, neomorphic buttons, glow na verdyktach, spring transitions
-- [ ] **Phase 3: Flow Effect & Stress Test** - Flow Effect (decyzja UX) + pełna weryfikacja pod obciążeniem 20+ wierszy i wszystkich eksportów
+- [x] **Phase 2: Interactive Layer** - Warstwa animacji: count-up na wynikach, neomorphic buttons, glow na verdyktach, spring transitions
+- [x] **Phase 3: Flow Effect & Stress Test** - Flow Effect (decyzja UX) + pełna weryfikacja pod obciążeniem 20+ wierszy i wszystkich eksportów
 
 ## Phase Details
 
@@ -43,7 +43,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 02-01: Animacje wyników (count-up via rAF lub anime.js) + neomorphic button states + verdict glow
+- [x] 02-01: Animacje wyników (count-up via rAF lub anime.js) + neomorphic button states + verdict glow
 
 ### Phase 3: Flow Effect & Stress Test
 **Goal**: Opcjonalny Flow Effect wdrożony (lub świadomie odrzucony), aplikacja zweryfikowana pod pełnym obciążeniem danych — 20+ wierszy we wszystkich zakładkach, wszystkie eksporty, prefers-reduced-motion.
@@ -57,7 +57,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 03-01: Stress test wszystkich zakładek i eksportów + Flow Effect (decyzja i implementacja lub świadome pominięcie)
+- [x] 03-01: Stress test wszystkich zakładek i eksportów + Flow Effect (świadome pominięcie — tabbed layout)
 
 ## Progress
 
@@ -67,5 +67,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Visual Foundation | 2/2 | Complete | 2026-02-24 |
-| 2. Interactive Layer | 0/1 | Not started | - |
-| 3. Flow Effect & Stress Test | 0/1 | Not started | - |
+| 2. Interactive Layer | 1/1 | Complete | 2026-02-25 |
+| 3. Flow Effect & Stress Test | 1/1 | Complete | 2026-02-25 |

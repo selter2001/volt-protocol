@@ -33,21 +33,21 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Animation & Interaction
 
 - [x] **ANIM-01**: Smooth hover/focus CSS transitions na wszystkich interaktywnych elementach (200-300ms ease)
-- [ ] **ANIM-02**: Spring physics count-up animacja na wynikach obliczeń (Id, Zsmax, Ia) przy zmianie wartości
-- [ ] **ANIM-03**: Neomorphic pressed-in depth effect na przyciskach (box-shadow inset przy click)
-- [ ] **ANIM-04**: Flow Effect — animowane SVG linie między sekcjami symulujące przepływ prądu, świecące po wypełnieniu sekcji
+- [x] **ANIM-02**: Spring physics count-up animacja na wynikach obliczeń (Id, Zsmax, Ia) przy zmianie wartości
+- [x] **ANIM-03**: Neomorphic pressed-in depth effect na przyciskach (box-shadow inset przy click)
+- [x] **ANIM-04**: ~~Flow Effect~~ — Skipped (tabbed layout: sekcje nie widoczne jednocześnie, SVG linie bez sensu wizualnego)
 - [x] **ANIM-05**: Glowing focus states na inputach (Electric Cyan glow ring via pseudo-element)
-- [ ] **ANIM-06**: Verdict cells (POZYTYWNA/NEGATYWNA) z subtlnym glow effect odpowiednim do wyniku (green/red)
+- [x] **ANIM-06**: Verdict cells (POZYTYWNA/NEGATYWNA) z subtlnym glow effect odpowiednim do wyniku (green/red)
 - [x] **ANIM-07**: `prefers-reduced-motion` media query wyłącza wszystkie animacje keyframe, zachowuje instant state changes
 
 ### Functional Preservation
 
-- [ ] **PRES-01**: PDF export generuje identyczny dokument jak przed redesignem (jasne tło, polskie znaki, landscape Zał.2)
-- [ ] **PRES-02**: Word export (.docx) generuje identyczny dokument jak przed redesignem
-- [ ] **PRES-03**: JSON export/import działa identycznie — dane zachowane w tym samym formacie
-- [ ] **PRES-04**: localStorage save/load działa identycznie
-- [ ] **PRES-05**: Wszystkie obliczenia (SWZ, izolacja, RCD, uziemienie) zwracają identyczne wyniki
-- [ ] **PRES-06**: Dynamiczne dodawanie/usuwanie sekcji i wierszy działa identycznie
+- [x] **PRES-01**: PDF export generuje identyczny dokument jak przed redesignem (jasne tło, polskie znaki, landscape Zał.2)
+- [x] **PRES-02**: Word export (.docx) generuje identyczny dokument jak przed redesignem
+- [x] **PRES-03**: JSON export/import działa identycznie — dane zachowane w tym samym formacie
+- [x] **PRES-04**: localStorage save/load działa identycznie
+- [x] **PRES-05**: Wszystkie obliczenia (SWZ, izolacja, RCD, uziemienie) zwracają identyczne wyniki
+- [x] **PRES-06**: Dynamiczne dodawanie/usuwanie sekcji i wierszy działa identycznie
 - [x] **PRES-07**: JS selektory (.verdict-cell, .id-cell, .zsmax-cell, .izol-verdict-cell) zachowane na wszystkich zredesignowanych elementach
 - [x] **PRES-08**: Aplikacja pozostaje single HTML file bez build step
 
@@ -103,16 +103,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ANIM-07 | Phase 1 | Done (01-01) |
 | PRES-07 | Phase 1 | Done (01-02) |
 | PRES-08 | Phase 1 | Done (01-02) |
-| ANIM-02 | Phase 2 | Pending |
-| ANIM-03 | Phase 2 | Pending |
-| ANIM-04 | Phase 3 | Pending |
-| ANIM-06 | Phase 2 | Pending |
-| PRES-01 | Phase 3 | Pending |
-| PRES-02 | Phase 3 | Pending |
-| PRES-03 | Phase 3 | Pending |
-| PRES-04 | Phase 3 | Pending |
-| PRES-05 | Phase 3 | Pending |
-| PRES-06 | Phase 3 | Pending |
+| ANIM-02 | Phase 2 | Done (02-01) |
+| ANIM-03 | Phase 2 | Done (02-01) |
+| ANIM-04 | Phase 3 | Skipped (03-01) |
+| ANIM-06 | Phase 2 | Done (02-01) |
+| PRES-01 | Phase 3 | Done (03-01) |
+| PRES-02 | Phase 3 | Done (03-01) |
+| PRES-03 | Phase 3 | Done (03-01) |
+| PRES-04 | Phase 3 | Done (03-01) |
+| PRES-05 | Phase 3 | Done (03-01) |
+| PRES-06 | Phase 3 | Done (03-01) |
 
 **Coverage:**
 - v1 requirements: 29 total
