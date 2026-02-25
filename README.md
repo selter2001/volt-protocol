@@ -20,10 +20,10 @@ Electrical inspection protocol generator per PN-HD 60364-6 — runs entirely in 
 ![Protokół - ocena końcowa i orzeczenie](screenshots/03-protokol-assessment.png)
 
 ### Załączniki pomiarowe / Measurement Appendices
-![Zał. 1 - Skuteczność zerowania (SWZ)](screenshots/04-attachment1-swz.png)
-![Zał. 2 - Rezystancja izolacji](screenshots/05-attachment2-insulation.png)
-![Zał. 3 - Wyłączniki różnicowoprądowe (RCD)](screenshots/06-attachment3-rcd.png)
-![Zał. 4 - Rezystancja uziemienia](screenshots/07-attachment4-earthing.png)
+![Zał. 1 - Skuteczność zerowania (SWZ)](screenshots/04-swz-table.png)
+![Zał. 2 - Rezystancja izolacji](screenshots/05-izolacja-table.png)
+![Zał. 3 - Wyłączniki różnicowoprądowe (RCD)](screenshots/06-rcd-table.png)
+![Zał. 4 - Rezystancja uziemienia](screenshots/07-uziemienie-table.png)
 
 ---
 
@@ -39,8 +39,21 @@ Darmowa aplikacja webowa do generowania protokołów z pomiarów elektrycznych z
 - **Dynamiczne sekcje** — dodawaj/usuwaj sekcje, podtytuły i wiersze pomiarowe
 - **Formularz główny** — dane obiektu, wykonawca, przyrządy pomiarowe, ocena końcowa z orzeczeniem
 - **Eksport PDF** — profesjonalny protokół do pobrania, polskie znaki, paginacja, landscape dla Zał. 2
+- **Eksport Word** — eksport/import .doc z round-trip danych
 - **Zapis/odczyt** — localStorage + eksport/import JSON między komputerami
 - **Zero instalacji** — jeden plik HTML, działa w przeglądarce
+
+### Design
+
+Aplikacja wykorzystuje dark luxury theme "Industrial Elegance":
+- **Void Black** (#0a0a0f) tło z noise texture
+- **Electric Cyan** (#00f0ff) akcenty interaktywne
+- **Soft Platinum** (#e0e0e8) tekst i bordery
+- Glassmorphism karty z backdrop-blur i ultra-thin borders
+- Animacje count-up na wynikach obliczeń
+- Neomorphic pressed-in efekt na przyciskach
+- Glow effect na verdyktach (zielony/czerwony)
+- Space Grotesk + JetBrains Mono (Google Fonts)
 
 ### Jak używać
 
@@ -63,8 +76,21 @@ Free web application for generating electrical measurement protocols according t
 - **Dynamic sections** — add/remove sections, subsections, and measurement rows
 - **Main form** — facility data, inspector details, instruments, final assessment with verdict
 - **PDF export** — professional protocol download with Polish characters, pagination, landscape for Appendix 2
+- **Word export** — .doc export/import with full data round-trip
 - **Save/load** — localStorage persistence + JSON export/import for portability
 - **Zero installation** — single HTML file, runs in any modern browser
+
+### Design
+
+The app features a dark luxury "Industrial Elegance" theme:
+- **Void Black** (#0a0a0f) background with noise texture
+- **Electric Cyan** (#00f0ff) interactive accents
+- **Soft Platinum** (#e0e0e8) text and borders
+- Glassmorphism cards with backdrop-blur and ultra-thin borders
+- Count-up animations on calculation results
+- Neomorphic pressed-in button effects
+- Verdict glow effects (green/red)
+- Space Grotesk + JetBrains Mono typography (Google Fonts)
 
 ### Usage
 
@@ -78,9 +104,12 @@ Free web application for generating electrical measurement protocols according t
 ## Tech Stack
 
 - Vanilla HTML/CSS/JS — single file, no build step
-- [Tailwind CSS v4](https://tailwindcss.com/) (Play CDN)
+- [Tailwind CSS v4](https://tailwindcss.com/) (Play CDN) with custom `@theme` design tokens
 - [pdfmake 0.3.5](https://pdfmake.github.io/docs/) for PDF generation
-- Roboto font for Polish character support (Latin Extended-A)
+- [Google Fonts](https://fonts.google.com/) — Space Grotesk, JetBrains Mono, Roboto
+- CSS glassmorphism (`backdrop-filter`, `@layer components`)
+- `requestAnimationFrame` count-up animations
+- `prefers-reduced-motion` accessibility support
 
 ## Author
 
